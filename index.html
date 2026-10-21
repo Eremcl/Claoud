@@ -1,0 +1,923 @@
+<!doctype html>
+<html lang="tr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<!--APP-START-->
+<title>LGS Masası</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&family=Lexend:wght@400;500;600&family=JetBrains+Mono:wght@500;700&display=swap">
+<style>
+/* Layout: optik form fikri — beyaz "kâğıt" kartlar, A/B/C/D baloncukları, tek pembe vurgu rengi */
+:root {
+  --paper: #F3F5F8;
+  --sheet: #FFFFFF;
+  --ink: #1C2230;
+  --muted: #5B6476;
+  --line: #DCE1EA;
+  --accent: #C43A5C;
+  --accent-soft: #F9E4EA;
+  --good: #1D7F55;
+  --good-soft: #DFF3E9;
+  --bad: #B9402B;
+  --bad-soft: #FBE7E2;
+  --c-tr: #C2532E; --c-mat: #2F5FD0; --c-fen: #12877F;
+  --c-ink: #8B5A2B; --c-din: #5B7F2A; --c-ing: #7B4BC4;
+  --f-display: "Bricolage Grotesque", "Segoe UI", system-ui, sans-serif;
+  --f-body: "Lexend", "Segoe UI", system-ui, sans-serif;
+  --f-mono: "JetBrains Mono", ui-monospace, "Cascadia Mono", monospace;
+  --r: 14px;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --paper: #11141B; --sheet: #191E28; --ink: #E7EAF1; --muted: #9AA2B4; --line: #2B3241;
+    --accent: #F07D98; --accent-soft: #3A1E28; --good: #52C690; --good-soft: #15342A; --bad: #F2846C; --bad-soft: #3A211B;
+    --c-tr: #F08A5D; --c-mat: #7EA2F5; --c-fen: #4FC7BC; --c-ink: #D3A26E; --c-din: #9DC567; --c-ing: #B596EE;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --paper: #11141B; --sheet: #191E28; --ink: #E7EAF1; --muted: #9AA2B4; --line: #2B3241;
+  --accent: #F07D98; --accent-soft: #3A1E28; --good: #52C690; --good-soft: #15342A; --bad: #F2846C; --bad-soft: #3A211B;
+  --c-tr: #F08A5D; --c-mat: #7EA2F5; --c-fen: #4FC7BC; --c-ink: #D3A26E; --c-din: #9DC567; --c-ing: #B596EE;
+  color-scheme: dark;
+}
+* { box-sizing: border-box; }
+body {
+  margin: 0; background: var(--paper); color: var(--ink);
+  font-family: var(--f-body); font-size: 15px; line-height: 1.55;
+}
+.wrap {
+  max-width: 1040px; margin: 0 auto;
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+}
+h1, h2, h3 { font-family: var(--f-display); text-wrap: balance; margin: 0; line-height: 1.15; }
+h2 { font-size: 1.45rem; font-weight: 800; }
+h3 { font-size: 1.05rem; font-weight: 600; }
+.muted { color: var(--muted); }
+.mono { font-family: var(--f-mono); font-variant-numeric: tabular-nums; }
+.label { font-size: .72rem; text-transform: uppercase; letter-spacing: .08em; color: var(--muted); font-weight: 600; }
+button, select, input { font: inherit; color: inherit; }
+:focus-visible { outline: 2.5px solid var(--accent); outline-offset: 2px; }
+
+/* Header */
+header.top { background: var(--sheet); border-bottom: 1px solid var(--line); }
+.top .wrap { display: flex; align-items: center; gap: 16px; flex-wrap: wrap; padding-block: 14px 0; }
+.brand { display: flex; align-items: center; gap: 10px; }
+.brand .logo { width: 34px; height: 34px; border-radius: 50%; border: 2px solid var(--ink); display: grid; place-items: center; font-family: var(--f-mono); font-weight: 700; font-size: .8rem; position: relative; }
+.brand .logo::after { content: ""; position: absolute; inset: 4px; border-radius: 50%; background: var(--accent); opacity: .9; }
+.brand .logo span { position: relative; z-index: 1; color: #fff; }
+.brand h1 { font-size: 1.35rem; font-weight: 800; }
+.countdown { margin-left: auto; display: flex; align-items: baseline; gap: 6px; background: var(--accent-soft); color: var(--accent); padding: 6px 12px; border-radius: 999px; font-weight: 600; font-size: .85rem; }
+.countdown b { font-family: var(--f-mono); font-size: 1.1rem; }
+nav.tabs { width: 100%; overflow-x: auto; display: flex; gap: 4px; margin-top: 6px; scrollbar-width: none; }
+nav.tabs::-webkit-scrollbar { display: none; }
+nav.tabs button {
+  border: 0; background: none; padding: 10px 12px 12px; cursor: pointer; white-space: nowrap; color: var(--muted);
+  border-bottom: 3px solid transparent; font-weight: 500;
+}
+nav.tabs button[aria-current="page"] { color: var(--ink); border-bottom-color: var(--accent); }
+nav.tabs button .n { font-family: var(--f-mono); font-size: .72rem; background: var(--bad-soft); color: var(--bad); padding: 1px 6px; border-radius: 999px; margin-left: 4px; }
+main { padding-block: 24px 64px; display: grid; gap: 20px; }
+
+/* Generic blocks */
+.card { background: var(--sheet); border: 1px solid var(--line); border-radius: var(--r); padding: 20px; min-width: 0; }
+.grid { display: grid; gap: 16px; }
+.g2 { grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); }
+.g3 { grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); }
+.row { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; }
+.stack { display: grid; gap: 12px; }
+.btn {
+  border: 1.5px solid var(--ink); background: var(--ink); color: var(--sheet); padding: 10px 18px; border-radius: 10px;
+  cursor: pointer; font-weight: 600; transition: transform .1s ease;
+}
+.btn:active { transform: translateY(1px); }
+.btn.ghost { background: transparent; color: var(--ink); border-color: var(--line); }
+.btn.ghost:hover { border-color: var(--ink); }
+.btn.accent { background: var(--accent); border-color: var(--accent); color: #fff; }
+.btn.small { padding: 6px 12px; font-size: .85rem; }
+.btn:disabled { opacity: .45; cursor: not-allowed; }
+.chip { display: inline-flex; align-items: center; gap: 6px; font-size: .8rem; font-weight: 600; color: var(--c, var(--muted)); }
+.chip::before { content: ""; width: 9px; height: 9px; border-radius: 50%; background: var(--c, var(--muted)); }
+.pick { display: flex; gap: 8px; flex-wrap: wrap; }
+.pick button {
+  border: 1.5px solid var(--line); background: var(--sheet); border-radius: 999px; padding: 7px 14px; cursor: pointer; font-size: .9rem;
+}
+.pick button[aria-pressed="true"] { border-color: var(--ink); background: var(--ink); color: var(--sheet); }
+select, input[type="number"], input[type="date"] {
+  border: 1.5px solid var(--line); background: var(--sheet); border-radius: 10px; padding: 8px 10px; min-width: 0;
+}
+.field { display: grid; gap: 6px; }
+.empty { padding: 18px; border: 1.5px dashed var(--line); border-radius: var(--r); color: var(--muted); text-align: center; }
+
+/* Stats */
+.big { font-family: var(--f-display); font-weight: 800; font-size: 2.6rem; line-height: 1; }
+.bar { height: 8px; background: var(--paper); border-radius: 999px; overflow: hidden; }
+.bar i { display: block; height: 100%; background: var(--c, var(--accent)); border-radius: 999px; }
+.dersrow { display: grid; grid-template-columns: minmax(0, 150px) 1fr 52px; gap: 12px; align-items: center; font-size: .9rem; }
+.dersrow .mono { text-align: right; }
+.ring { --p: 0; width: 110px; height: 110px; border-radius: 50%; display: grid; place-items: center;
+  background: conic-gradient(var(--accent) calc(var(--p) * 1%), var(--paper) 0); flex: none; }
+.ring div { width: 84px; height: 84px; border-radius: 50%; background: var(--sheet); display: grid; place-items: center; text-align: center; line-height: 1.1; }
+.ring b { font-family: var(--f-mono); font-size: 1.3rem; }
+.weeks { display: grid; grid-template-columns: repeat(14, 1fr); gap: 4px; }
+.weeks span { aspect-ratio: 1; border-radius: 4px; background: var(--paper); border: 1px solid var(--line); max-width: 100%; }
+.weeks span[data-l="1"] { background: color-mix(in srgb, var(--accent) 30%, var(--sheet)); border-color: transparent; }
+.weeks span[data-l="2"] { background: color-mix(in srgb, var(--accent) 60%, var(--sheet)); border-color: transparent; }
+.weeks span[data-l="3"] { background: var(--accent); border-color: transparent; }
+
+/* Pomodoro */
+.pomo-time { font-family: var(--f-mono); font-weight: 700; font-size: 2.8rem; letter-spacing: .02em; line-height: 1; }
+
+/* Question */
+.qcard { max-width: 760px; width: 100%; margin: 0 auto; }
+.qhead { display: flex; gap: 12px; align-items: center; flex-wrap: wrap; margin-bottom: 14px; }
+.qhead .count { margin-left: auto; font-family: var(--f-mono); color: var(--muted); font-size: .9rem; }
+.qtext { font-size: 1.08rem; white-space: pre-line; margin: 0 0 18px; }
+.opts { display: grid; gap: 10px; }
+.opt {
+  display: flex; gap: 14px; align-items: center; text-align: left; width: 100%;
+  border: 1.5px solid var(--line); background: var(--sheet); border-radius: 12px; padding: 10px 14px; cursor: pointer;
+}
+.opt:hover:not(:disabled) { border-color: var(--ink); }
+.opt:disabled { cursor: default; }
+.bub {
+  flex: none; width: 32px; height: 32px; border-radius: 50%; border: 1.5px solid var(--accent); color: var(--accent);
+  display: grid; place-items: center; font-family: var(--f-mono); font-weight: 700; font-size: .85rem;
+}
+.opt.sel { border-color: var(--ink); }
+.opt.sel .bub { background: var(--ink); border-color: var(--ink); color: var(--sheet); }
+.opt.ok { border-color: var(--good); background: var(--good-soft); }
+.opt.ok .bub { background: var(--good); border-color: var(--good); color: var(--sheet); }
+.opt.no { border-color: var(--bad); background: var(--bad-soft); }
+.opt.no .bub { background: var(--bad); border-color: var(--bad); color: var(--sheet); }
+.explain { margin-top: 16px; padding: 14px 16px; border-radius: 12px; background: var(--paper); border-left: 4px solid var(--good); }
+.explain.no { border-left-color: var(--bad); }
+.qfoot { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 18px; justify-content: space-between; }
+.progress { height: 4px; background: var(--paper); border-radius: 999px; overflow: hidden; margin-bottom: 18px; }
+.progress i { display: block; height: 100%; background: var(--accent); }
+
+/* Deneme optik */
+.optik { display: grid; grid-template-columns: repeat(auto-fill, minmax(38px, 1fr)); gap: 6px; }
+.optik button {
+  aspect-ratio: 1; border-radius: 50%; border: 1.5px solid var(--line); background: var(--sheet); cursor: pointer;
+  font-family: var(--f-mono); font-size: .78rem; display: grid; place-items: center; padding: 0; max-width: 100%;
+}
+.optik button.done { background: var(--ink); color: var(--sheet); border-color: var(--ink); }
+.optik button.cur { outline: 2.5px solid var(--accent); outline-offset: 1px; }
+.timer { font-family: var(--f-mono); font-weight: 700; font-size: 1.4rem; }
+.timer.low { color: var(--bad); }
+.exam-layout { display: grid; grid-template-columns: minmax(0, 1fr) 260px; gap: 20px; align-items: start; }
+@media (max-width: 820px) { .exam-layout { grid-template-columns: 1fr; } }
+
+/* Tables */
+.tbl-wrap { overflow-x: auto; }
+table { width: 100%; border-collapse: collapse; font-size: .92rem; }
+th, td { padding: 9px 10px; border-bottom: 1px solid var(--line); text-align: right; font-variant-numeric: tabular-nums; }
+th:first-child, td:first-child { text-align: left; }
+th { font-size: .72rem; text-transform: uppercase; letter-spacing: .06em; color: var(--muted); font-weight: 600; }
+tfoot td { font-weight: 700; border-bottom: 0; }
+td input[type="number"] { width: 64px; text-align: right; }
+
+/* Lists */
+.list { display: grid; gap: 10px; }
+.item { border: 1px solid var(--line); border-radius: 12px; padding: 14px 16px; background: var(--sheet); display: grid; gap: 8px; min-width: 0; }
+.item p { margin: 0; white-space: pre-line; }
+.ans { font-size: .9rem; }
+.ans b { color: var(--good); }
+.topic { display: grid; grid-template-columns: auto minmax(0, 1fr) auto; gap: 12px; align-items: center; padding: 9px 0; border-bottom: 1px solid var(--line); }
+.topic:last-child { border-bottom: 0; }
+.topic input { width: 18px; height: 18px; accent-color: var(--accent); }
+.topic label { cursor: pointer; }
+.topic.done label { color: var(--muted); text-decoration: line-through; text-decoration-color: var(--line); }
+.tag { font-family: var(--f-mono); font-size: .75rem; padding: 2px 8px; border-radius: 999px; background: var(--paper); color: var(--muted); white-space: nowrap; }
+.tag.good { background: var(--good-soft); color: var(--good); }
+.tag.bad { background: var(--bad-soft); color: var(--bad); }
+.confirm { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; padding: 10px 12px; background: var(--accent-soft); border-radius: 10px; }
+.note { font-size: .82rem; color: var(--muted); }
+.hero-res { display: flex; gap: 24px; flex-wrap: wrap; align-items: center; }
+.hero-res > div { display: grid; gap: 2px; }
+@media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
+</style>
+</head>
+<body>
+<header class="top">
+  <div class="wrap">
+    <div class="brand"><div class="logo"><span>A</span></div><h1>LGS Masası</h1></div>
+    <div class="countdown" id="countdown"></div>
+    <nav class="tabs" id="tabs" aria-label="Bölümler"></nav>
+  </div>
+</header>
+<main class="wrap" id="main"></main>
+
+<script>
+/* ===================== DERSLER VE KONULAR ===================== */
+const DERS = {
+  tr:  { ad: "Türkçe", lgs: 20, kat: 4 },
+  mat: { ad: "Matematik", lgs: 20, kat: 4 },
+  fen: { ad: "Fen Bilimleri", lgs: 20, kat: 4 },
+  ink: { ad: "T.C. İnkılap Tarihi", lgs: 10, kat: 1 },
+  din: { ad: "Din Kültürü", lgs: 10, kat: 1 },
+  ing: { ad: "İngilizce", lgs: 10, kat: 1 },
+};
+const DK = Object.keys(DERS);
+const KONU = {
+  tr: ["Sözcükte Anlam", "Cümlede Anlam", "Paragraf", "Fiilimsiler", "Cümlenin Ögeleri", "Fiilde Çatı", "Cümle Türleri", "Yazım Kuralları", "Noktalama İşaretleri", "Söz Sanatları", "Anlatım Bozuklukları", "Metin Türleri"],
+  mat: ["Çarpanlar ve Katlar", "Üslü İfadeler", "Kareköklü İfadeler", "Veri Analizi", "Basit Olayların Olasılığı", "Cebirsel İfadeler ve Özdeşlikler", "Doğrusal Denklemler", "Eşitsizlikler", "Üçgenler", "Eşlik ve Benzerlik", "Dönüşüm Geometrisi", "Geometrik Cisimler"],
+  fen: ["Mevsimler ve İklim", "DNA ve Genetik Kod", "Basınç", "Madde ve Endüstri", "Basit Makineler", "Enerji Dönüşümleri ve Çevre Bilimi", "Elektrik Yükleri ve Elektrik Enerjisi"],
+  ink: ["Bir Kahraman Doğuyor", "Millî Uyanış", "Ya İstiklal Ya Ölüm", "Atatürkçülük ve Çağdaşlaşan Türkiye", "Demokratikleşme Çabaları", "Atatürk Dönemi Dış Politika", "Atatürk'ün Ölümü ve Sonrası"],
+  din: ["Kader İnancı", "Zekât ve Sadaka", "Din ve Hayat", "Hz. Muhammed'in Örnekliği", "Kur'an-ı Kerim ve Özellikleri"],
+  ing: ["Friendship", "Teen Life", "In the Kitchen", "On the Phone", "The Internet", "Adventures", "Tourism", "Chores", "Science", "Natural Forces"],
+};
+
+/* ===================== SORU BANKASI ===================== */
+/* s: ders, t: konu, q: soru, o: seçenekler (A-D), a: doğru seçenek (0-3), e: açıklama */
+const Q = [
+  // ---- TÜRKÇE ----
+  { s: "tr", t: "Sözcükte Anlam", q: "Aşağıdakilerin hangisinde tırnak içindeki sözcük mecaz anlamda kullanılmıştır?", o: ["Paketi \"ince\" bir iple bağladı.", "Arkadaşlarına karşı her zaman çok \"ince\" davranır.", "Masaya \"ince\" bir örtü serdi.", "Kalemin ucu çok \"ince\" olmuş."], a: 1, e: "\"İnce davranmak\" kibar, düşünceli olmak anlamındadır; sözcük gerçek anlamından (kalın olmayan) uzaklaşmıştır." },
+  { s: "tr", t: "Sözcükte Anlam", q: "\"Sınav sonucunu öğrenince etekleri zil çaldı.\"\n\nBu cümledeki deyimin anlamı aşağıdakilerden hangisidir?", o: ["Çok korkmak", "Çok sevinmek", "Çok şaşırmak", "Çok üzülmek"], a: 1, e: "\"Etekleri zil çalmak\" çok sevinmek, sevinçten yerinde duramamak demektir." },
+  { s: "tr", t: "Cümlede Anlam", q: "Aşağıdakilerden hangisi neden-sonuç ilişkisi içeren bir cümledir?", o: ["Erken kalkmak için alarm kurdu.", "Yağmur yağdığı için maç ertelendi.", "Düzenli çalışırsan başarırsın.", "Sanki bütün yük onun omzundaydı."], a: 1, e: "Maçın ertelenmesinin nedeni yağmurdur. A'da amaç-sonuç, C'de koşul-sonuç, D'de benzetme vardır." },
+  { s: "tr", t: "Cümlede Anlam", q: "Aşağıdaki cümlelerin hangisi nesnel bir yargı içerir?", o: ["Bu film yılın en sürükleyici yapımı.", "Türkiye'nin başkenti Ankara'dır.", "Sonbahar en hüzünlü mevsimdir.", "Bu kitabın kapağı çok sıkıcı."], a: 1, e: "Nesnel yargı kanıtlanabilir, kişiden kişiye değişmez. Diğerleri kişisel görüş (öznel) bildirir." },
+  { s: "tr", t: "Paragraf", q: "Kitap okumak, insanın hayal dünyasını genişletir. Okuyan kişi farklı hayatlara tanıklık eder, başka insanların duygularını anlamayı öğrenir. Bu yüzden düzenli okuma alışkanlığı kazanan çocuklar, başkalarının yerine kendini koyabilen bireyler olur.\n\nBu paragrafın ana düşüncesi aşağıdakilerden hangisidir?", o: ["Çocuklar her gün kitap okumalıdır.", "Kitap okumak empati kurmayı kolaylaştırır.", "Hayal gücü yalnızca kitapla gelişir.", "Okuma alışkanlığı ailede kazanılır."], a: 1, e: "Paragraf, okumanın başkalarının duygularını anlamayı (empati) geliştirdiği sonucuna bağlanıyor. Ana düşünce genellikle son cümlede toplanır." },
+  { s: "tr", t: "Fiilimsiler", q: "Aşağıdaki cümlelerin hangisinde isim-fiil (ad-fiil) vardır?", o: ["Koşarak eve geldi.", "Kitap okumayı çok sever.", "Gelecek otobüsü bekliyoruz.", "Eve gelince beni aradı."], a: 1, e: "\"Okuma\" sözcüğü -ma ekiyle yapılmış isim-fiildir. A ve D'de zarf-fiil (-arak, -ınca), C'de sıfat-fiil (-ecek) vardır." },
+  { s: "tr", t: "Fiilimsiler", q: "\"Kırılan vazoyu annem hemen fark etti.\"\n\nBu cümledeki fiilimsinin türü aşağıdakilerden hangisidir?", o: ["İsim-fiil", "Sıfat-fiil", "Zarf-fiil", "Cümlede fiilimsi yoktur."], a: 1, e: "\"Kırılan\" sözcüğü -an ekiyle \"vazo\" ismini nitelemiştir; bu bir sıfat-fiildir (ortaç)." },
+  { s: "tr", t: "Cümlenin Ögeleri", q: "\"Ali dün akşam kitabı bitirdi.\"\n\nBu cümlede \"kitabı\" sözcüğü hangi ögedir?", o: ["Özne", "Belirtili nesne", "Dolaylı tümleç", "Zarf tümleci"], a: 1, e: "Yükleme \"neyi?\" sorusu sorulur: \"Kitabı\" bitirdi. Belirtme durum eki (-ı) aldığı için belirtili nesnedir." },
+  { s: "tr", t: "Fiilde Çatı", q: "Aşağıdaki cümlelerin hangisinin yüklemi edilgen çatılıdır?", o: ["Annem akşam yemeği pişirdi.", "Mektuplar dün postaya verildi.", "Arkadaşlar parkta buluştu.", "Kız aynanın karşısında süslendi."], a: 1, e: "\"Verildi\" fiilinin öznesi belli değildir (verenin kim olduğu söylenmez); -il ekiyle edilgen olmuştur. C işteş, D dönüşlü, A etken çatılıdır." },
+  { s: "tr", t: "Cümle Türleri", q: "Aşağıdakilerden hangisi isim cümlesidir?", o: ["Bahçede çiçekler açtı.", "Bu ev çok eski.", "Yarın erken kalkacağız.", "Kitabı bir günde okudum."], a: 1, e: "İsim cümlesinin yüklemi isim soylu sözcüktür: \"eski\". Diğer cümlelerin yüklemi çekimli fiildir." },
+  { s: "tr", t: "Yazım Kuralları", q: "Aşağıdaki cümlelerin hangisinde yazım yanlışı vardır?", o: ["Sen de bizimle gel.", "Kitabı masada bıraktım.", "Bende seninle geleceğim.", "Evde kimse yoktu."], a: 2, e: "\"Ben de\" anlamındaki bağlaç olan \"de\" ayrı yazılır: \"Ben de seninle geleceğim.\" Cümleden çıkarıldığında anlam bozulmuyorsa bağlaçtır." },
+  { s: "tr", t: "Noktalama İşaretleri", q: "Aşağıdakilerin hangisinin sonuna soru işareti konmaz?", o: ["Yarın okula gelecek misin", "Seni kim aradı", "Nereye gittiğini bilmiyorum", "Bu kitabı okudun mu"], a: 2, e: "C'de soru anlamı yoktur; \"bilmiyorum\" diye bir bilgi verilir. Bu yüzden sonuna nokta konur." },
+  { s: "tr", t: "Söz Sanatları", q: "\"Güneş, pencereden içeri gülümseyerek bakıyordu.\"\n\nBu cümlede hangi söz sanatı kullanılmıştır?", o: ["Benzetme", "Kişileştirme", "Abartma", "Konuşturma"], a: 1, e: "Gülümsemek insana ait bir özelliktir; Güneş'e insan özelliği verilmiştir. Bu kişileştirmedir (teşhis)." },
+  { s: "tr", t: "Söz Sanatları", q: "Aşağıdakilerin hangisinde abartma sanatı vardır?", o: ["Gözyaşlarım sel olup aktı.", "Kar, pamuk gibi yağıyordu.", "Rüzgâr kapıyı çaldı.", "Kuşlar bize \"Bahar geldi!\" dedi."], a: 0, e: "Gözyaşlarının sel olması gerçekte olamayacak kadar büyütülmüştür. B benzetme, C kişileştirme, D konuşturmadır." },
+  { s: "tr", t: "Anlatım Bozuklukları", q: "Aşağıdaki cümlelerin hangisinde gereksiz sözcük kullanımından kaynaklanan bir anlatım bozukluğu vardır?", o: ["Toplantıya elli kişi katıldı.", "Toplantıya yaklaşık elli kadar kişi katıldı.", "Toplantıya ellinin üzerinde kişi katıldı.", "Toplantıya beklenenden az kişi katıldı."], a: 1, e: "\"Yaklaşık\" ile \"kadar\" aynı anlamı verir; ikisinden biri gereksizdir." },
+  { s: "tr", t: "Metin Türleri", q: "Yazarın kendi yaşadığı ya da tanık olduğu olayları, üzerinden zaman geçtikten sonra anlattığı yazı türü hangisidir?", o: ["Anı", "Masal", "Fabl", "Roman"], a: 0, e: "Anı (hatıra), yazarın bizzat yaşadığı veya tanık olduğu olayları anlatır; gerçeğe dayanır." },
+
+  // ---- MATEMATİK ----
+  { s: "mat", t: "Çarpanlar ve Katlar", q: "24 ve 36 sayılarının en büyük ortak böleni (EBOB) kaçtır?", o: ["6", "8", "12", "18"], a: 2, e: "24 = 2³·3, 36 = 2²·3². Ortak asal çarpanların en küçük üslüleri: 2²·3 = 12." },
+  { s: "mat", t: "Çarpanlar ve Katlar", q: "8 ve 12 sayılarının en küçük ortak katı (EKOK) kaçtır?", o: ["24", "48", "4", "96"], a: 0, e: "8 = 2³, 12 = 2²·3. Tüm asal çarpanların en büyük üslüleri: 2³·3 = 24." },
+  { s: "mat", t: "Çarpanlar ve Katlar", q: "Uzunlukları 18 cm ve 30 cm olan iki çubuk, hiç artmayacak şekilde eşit ve olabildiğince uzun parçalara ayrılacaktır. Toplam kaç parça elde edilir?", o: ["6", "8", "12", "16"], a: 1, e: "Parça boyu EBOB(18, 30) = 6 cm olmalı. 18 ÷ 6 = 3, 30 ÷ 6 = 5; toplam 3 + 5 = 8 parça." },
+  { s: "mat", t: "Üslü İfadeler", q: "(2⁵ · 2³) ÷ 2⁶ işleminin sonucu kaçtır?", o: ["2", "4", "8", "16"], a: 1, e: "Tabanlar aynı: çarpmada üsler toplanır, bölmede çıkarılır. 2⁵⁺³⁻⁶ = 2² = 4." },
+  { s: "mat", t: "Üslü İfadeler", q: "(−3)² + (−2)³ işleminin sonucu kaçtır?", o: ["−17", "1", "17", "−1"], a: 1, e: "(−3)² = 9 (çift üs, pozitif), (−2)³ = −8 (tek üs, negatif). 9 + (−8) = 1." },
+  { s: "mat", t: "Üslü İfadeler", q: "0,00045 sayısının bilimsel gösterimi aşağıdakilerden hangisidir?", o: ["4,5 · 10⁻³", "4,5 · 10⁻⁴", "45 · 10⁻⁵", "0,45 · 10⁻³"], a: 1, e: "Bilimsel gösterimde katsayı 1 ile 10 arasında olmalı (1 ≤ a < 10). Virgül 4 basamak sağa kayar: 4,5 · 10⁻⁴." },
+  { s: "mat", t: "Kareköklü İfadeler", q: "√48 ifadesinin en sade hâli aşağıdakilerden hangisidir?", o: ["2√12", "4√3", "3√4", "6√2"], a: 1, e: "48 = 16 · 3 → √48 = √16 · √3 = 4√3. (2√12 de eşittir ama sadeleştirilebilir.)" },
+  { s: "mat", t: "Kareköklü İfadeler", q: "√50 + √18 işleminin sonucu kaçtır?", o: ["8√2", "√68", "15√2", "4√2"], a: 0, e: "√50 = 5√2, √18 = 3√2. Kök içleri aynı olunca katsayılar toplanır: 5√2 + 3√2 = 8√2." },
+  { s: "mat", t: "Kareköklü İfadeler", q: "√70 sayısı hangi iki ardışık tam sayı arasındadır?", o: ["7 ile 8", "8 ile 9", "9 ile 10", "34 ile 35"], a: 1, e: "8² = 64 < 70 < 81 = 9². Bu yüzden 8 < √70 < 9." },
+  { s: "mat", t: "Veri Analizi", q: "Bir öğrencinin 4 deneme sınavındaki matematik netleri 12, 15, 18 ve 15'tir. Bu netlerin aritmetik ortalaması kaçtır?", o: ["14", "15", "16", "18"], a: 1, e: "Toplam: 12 + 15 + 18 + 15 = 60. Ortalama: 60 ÷ 4 = 15." },
+  { s: "mat", t: "Basit Olayların Olasılığı", q: "Bir torbada 3 kırmızı, 5 mavi ve 2 yeşil top vardır. Torbadan rastgele çekilen bir topun mavi olma olasılığı kaçtır?", o: ["1/5", "3/10", "1/2", "1/10"], a: 2, e: "Toplam 10 top, 5'i mavi. Olasılık = 5/10 = 1/2." },
+  { s: "mat", t: "Basit Olayların Olasılığı", q: "Bir zar atıldığında üst yüze asal sayı gelme olasılığı kaçtır?", o: ["1/6", "1/3", "1/2", "2/3"], a: 2, e: "1-6 arasındaki asal sayılar: 2, 3, 5 (3 tane). Olasılık = 3/6 = 1/2. (1 asal değildir.)" },
+  { s: "mat", t: "Cebirsel İfadeler ve Özdeşlikler", q: "(x + 3)² ifadesinin eşiti aşağıdakilerden hangisidir?", o: ["x² + 9", "x² + 3x + 9", "x² + 6x + 9", "x² + 6x + 6"], a: 2, e: "İki terim toplamının karesi: (a + b)² = a² + 2ab + b² → x² + 2·x·3 + 9 = x² + 6x + 9." },
+  { s: "mat", t: "Cebirsel İfadeler ve Özdeşlikler", q: "51² − 49² işleminin sonucu kaçtır?", o: ["2", "100", "200", "400"], a: 2, e: "İki kare farkı: a² − b² = (a − b)(a + b) → (51 − 49)(51 + 49) = 2 · 100 = 200." },
+  { s: "mat", t: "Doğrusal Denklemler", q: "3x − 7 = 2x + 5 denkleminin çözümü kaçtır?", o: ["2", "−2", "12", "−12"], a: 2, e: "x'li terimler bir tarafa: 3x − 2x = 5 + 7 → x = 12." },
+  { s: "mat", t: "Doğrusal Denklemler", q: "A(1, 2) ve B(3, 8) noktalarından geçen doğrunun eğimi kaçtır?", o: ["2", "3", "4", "6"], a: 1, e: "Eğim = (y₂ − y₁) / (x₂ − x₁) = (8 − 2) / (3 − 1) = 6 / 2 = 3." },
+  { s: "mat", t: "Doğrusal Denklemler", q: "y = 2x + 1 doğrusunun y eksenini kestiği nokta aşağıdakilerden hangisidir?", o: ["(1, 0)", "(0, 1)", "(0, 2)", "(−1/2, 0)"], a: 1, e: "y eksenini kestiği noktada x = 0'dır. y = 2·0 + 1 = 1 → (0, 1)." },
+  { s: "mat", t: "Eşitsizlikler", q: "−2x + 4 > 10 eşitsizliğinin çözüm kümesi aşağıdakilerden hangisidir?", o: ["x > −3", "x < −3", "x > 3", "x < 3"], a: 1, e: "−2x > 6. Her iki taraf negatif sayıya (−2) bölünürken eşitsizlik yön değiştirir: x < −3." },
+  { s: "mat", t: "Üçgenler", q: "Dik kenarları 6 cm ve 8 cm olan dik üçgenin hipotenüsü kaç cm'dir?", o: ["10", "12", "14", "9"], a: 0, e: "Pisagor bağıntısı: c² = 6² + 8² = 36 + 64 = 100 → c = 10 cm." },
+  { s: "mat", t: "Üçgenler", q: "İki kenarının uzunluğu 5 cm ve 9 cm olan bir üçgenin üçüncü kenarı tam sayı ise en fazla kaç cm olabilir?", o: ["12", "13", "14", "15"], a: 1, e: "Üçgen eşitsizliği: 9 − 5 < x < 9 + 5 → 4 < x < 14. En büyük tam sayı 13." },
+  { s: "mat", t: "Eşlik ve Benzerlik", q: "ABC ve DEF üçgenleri benzerdir ve |AB| / |DE| = 2/3'tür. |AB| = 8 cm ise |DE| kaç cm'dir?", o: ["10", "12", "16", "24"], a: 1, e: "8 / |DE| = 2/3 → |DE| = 8 · 3 / 2 = 12 cm." },
+  { s: "mat", t: "Dönüşüm Geometrisi", q: "A(2, −3) noktasının y eksenine göre yansımasının koordinatları nedir?", o: ["(2, 3)", "(−2, −3)", "(−2, 3)", "(3, −2)"], a: 1, e: "y eksenine göre yansımada x'in işareti değişir, y aynı kalır: (−2, −3)." },
+  { s: "mat", t: "Dönüşüm Geometrisi", q: "B(−1, 4) noktası önce 3 birim sağa, sonra 2 birim aşağı ötelenirse hangi noktaya gelir?", o: ["(2, 2)", "(−4, 6)", "(2, 6)", "(−4, 2)"], a: 0, e: "Sağa öteleme x'e eklenir: −1 + 3 = 2. Aşağı öteleme y'den çıkarılır: 4 − 2 = 2. Sonuç (2, 2)." },
+  { s: "mat", t: "Geometrik Cisimler", q: "Taban yarıçapı 3 cm, yüksekliği 10 cm olan dik dairesel silindirin hacmi kaç cm³'tür? (π = 3 alınız.)", o: ["90", "180", "270", "900"], a: 2, e: "Hacim = π · r² · h = 3 · 9 · 10 = 270 cm³." },
+
+  // ---- FEN BİLİMLERİ ----
+  { s: "fen", t: "Mevsimler ve İklim", q: "Mevsimlerin oluşmasının temel nedeni aşağıdakilerden hangisidir?", o: ["Dünya'nın Güneş'e olan uzaklığının değişmesi", "Dünya'nın eksen eğikliği ve Güneş etrafında dolanması", "Ay'ın Dünya etrafında dolanması", "Dünya'nın kendi ekseni etrafında dönmesi"], a: 1, e: "Eksen eğikliği yüzünden yıl boyunca Güneş ışınlarının geliş açısı değişir; mevsimler bundan oluşur. Kendi ekseni etrafında dönme gece-gündüzü oluşturur." },
+  { s: "fen", t: "Mevsimler ve İklim", q: "21 Haziran tarihinde Kuzey Yarım Küre için aşağıdakilerden hangisi doğrudur?", o: ["En uzun gece yaşanır.", "Gece ve gündüz süreleri eşittir.", "En uzun gündüz yaşanır.", "Güneş ışınları Oğlak Dönencesi'ne dik gelir."], a: 2, e: "21 Haziran'da ışınlar Yengeç Dönencesi'ne dik gelir; Kuzey Yarım Küre'de en uzun gündüz, en kısa gece yaşanır." },
+  { s: "fen", t: "Mevsimler ve İklim", q: "Uzun yıllar boyunca bir bölgede gözlenen hava olaylarının ortalamasını inceleyen bilim dalı hangisidir?", o: ["Meteoroloji", "Klimatoloji", "Jeoloji", "Ekoloji"], a: 1, e: "İklimi klimatoloji inceler. Meteoroloji ise kısa süreli hava durumunu inceler." },
+  { s: "fen", t: "DNA ve Genetik Kod", q: "Bir DNA zincirindeki baz dizilimi A–T–G–C şeklindedir. Karşı zincirdeki baz dizilimi hangisidir?", o: ["T–A–C–G", "A–T–G–C", "U–A–C–G", "G–C–A–T"], a: 0, e: "DNA'da Adenin–Timin, Guanin–Sitozin eşleşir. A→T, T→A, G→C, C→G. (Urasil DNA'da bulunmaz.)" },
+  { s: "fen", t: "DNA ve Genetik Kod", q: "Bezelyede düz tohum (D) buruşuk tohuma (d) baskındır. Dd × Dd çaprazlamasında buruşuk tohumlu bezelye oluşma olasılığı kaçtır?", o: ["0", "1/4", "1/2", "3/4"], a: 1, e: "Olası genotipler: DD, Dd, Dd, dd. Yalnızca dd buruşuktur → 1/4." },
+  { s: "fen", t: "DNA ve Genetik Kod", q: "Çevre koşullarının etkisiyle oluşan ve kalıtsal olmayan değişikliklere ne ad verilir?", o: ["Mutasyon", "Modifikasyon", "Adaptasyon", "Varyasyon"], a: 1, e: "Modifikasyon genlerin yapısını değiştirmez, sonraki nesle aktarılmaz. Mutasyon ise DNA'da kalıcı değişikliktir." },
+  { s: "fen", t: "Basınç", q: "600 N ağırlığındaki bir cisim, zemine 2 m²'lik yüzeyle temas etmektedir. Cismin zemine yaptığı basınç kaç Pa'dır?", o: ["300", "1200", "600", "150"], a: 0, e: "Basınç = Kuvvet ÷ Yüzey alanı = 600 N ÷ 2 m² = 300 Pa." },
+  { s: "fen", t: "Basınç", q: "Durgun bir sıvının kabın tabanına yaptığı basınç aşağıdakilerden hangisine bağlı değildir?", o: ["Sıvının derinliğine", "Sıvının yoğunluğuna", "Kabın şekline", "Yer çekimi ivmesine"], a: 2, e: "Sıvı basıncı = derinlik × yoğunluk × g. Kabın şekline ve sıvının miktarına bağlı değildir." },
+  { s: "fen", t: "Basınç", q: "Kayak yapan birinin karda batmaması için geniş kayaklar kullanmasının nedeni nedir?", o: ["Ağırlığını azaltmak", "Temas alanını artırıp basıncı azaltmak", "Temas alanını azaltıp basıncı artırmak", "Sürtünmeyi artırmak"], a: 1, e: "Kuvvet (ağırlık) aynı kalır; yüzey alanı büyüdükçe basınç küçülür, bu yüzden kişi kara gömülmez." },
+  { s: "fen", t: "Madde ve Endüstri", q: "Periyodik tablodaki yatay sıralara ne ad verilir?", o: ["Grup", "Periyot", "Blok", "Sütun"], a: 1, e: "Yatay sıralar periyot (7 tane), dikey sütunlar grup olarak adlandırılır." },
+  { s: "fen", t: "Madde ve Endüstri", q: "pH değeri 3 olan bir çözelti için aşağıdakilerden hangisi doğrudur?", o: ["Baziktir.", "Mavi turnusol kâğıdını kırmızıya çevirir.", "Nötrdür.", "Ele kayganlık hissi verir."], a: 1, e: "pH < 7 asidiktir. Asitler mavi turnusolü kırmızıya çevirir. Kayganlık hissi bazların özelliğidir." },
+  { s: "fen", t: "Madde ve Endüstri", q: "Aşağıdakilerden hangisi kimyasal bir değişimdir?", o: ["Buzun erimesi", "Kâğıdın yırtılması", "Demirin paslanması", "Şekerin suda çözünmesi"], a: 2, e: "Paslanmada demir oksijenle tepkimeye girer ve yeni bir madde oluşur. Diğerlerinde maddenin kimliği değişmez." },
+  { s: "fen", t: "Basit Makineler", q: "Basit makinelerle ilgili aşağıdakilerden hangisi doğrudur?", o: ["İşten kazanç sağlarlar.", "Kuvvetten kazanç varsa yoldan da kazanç olur.", "İş yapmayı kolaylaştırır ama işten kazanç sağlamazlar.", "Enerjiyi artırırlar."], a: 2, e: "Basit makineler kuvvetin yönünü veya büyüklüğünü değiştirir; ancak yapılan iş azalmaz. Kuvvetten kazanç, yoldan kayıp demektir." },
+  { s: "fen", t: "Basit Makineler", q: "Sabit makara için aşağıdakilerden hangisi doğrudur?", o: ["Kuvvetten kazanç sağlar.", "Yalnızca kuvvetin yönünü değiştirir.", "Yoldan kazanç sağlar.", "Yükü yarı kuvvetle kaldırır."], a: 1, e: "Sabit makarada kuvvet = yük (ağırlıksız makarada). Kazanç yoktur, yalnızca kuvvetin yönü değişir." },
+  { s: "fen", t: "Enerji Dönüşümleri ve Çevre Bilimi", q: "Fotosentez sonucunda açığa çıkan gaz hangisidir?", o: ["Karbondioksit", "Oksijen", "Azot", "Hidrojen"], a: 1, e: "Fotosentezde bitkiler karbondioksit ve su kullanarak güneş ışığıyla besin (glikoz) üretir ve oksijen açığa çıkarır." },
+  { s: "fen", t: "Enerji Dönüşümleri ve Çevre Bilimi", q: "Aşağıdaki enerji kaynaklarından hangisi yenilenemez?", o: ["Güneş", "Rüzgâr", "Kömür", "Jeotermal"], a: 2, e: "Kömür fosil yakıttır; oluşması milyonlarca yıl sürer, tükenebilir. Diğerleri yenilenebilir kaynaklardır." },
+  { s: "fen", t: "Enerji Dönüşümleri ve Çevre Bilimi", q: "Bir besin zincirinde enerji akışı hangi canlılarla başlar?", o: ["Üreticiler", "Otçullar", "Etçiller", "Ayrıştırıcılar"], a: 0, e: "Enerji Güneş'ten üreticilere (bitkiler) geçer; zincir üreticilerle başlar." },
+  { s: "fen", t: "Elektrik Yükleri ve Elektrik Enerjisi", q: "Aynı cins elektrik yüküyle yüklü iki cisim birbirine yaklaştırılırsa ne olur?", o: ["Birbirini çeker.", "Birbirini iter.", "Etkileşmez.", "Yükleri sıfırlanır."], a: 1, e: "Aynı cins yükler birbirini iter, zıt cins yükler birbirini çeker." },
+  { s: "fen", t: "Elektrik Yükleri ve Elektrik Enerjisi", q: "Gücü 2000 W olan bir ütü 3 saat çalışırsa kaç kWh elektrik enerjisi harcar?", o: ["6", "600", "0,6", "6000"], a: 0, e: "2000 W = 2 kW. Enerji = Güç × Süre = 2 kW × 3 h = 6 kWh." },
+  { s: "fen", t: "Elektrik Yükleri ve Elektrik Enerjisi", q: "Yüklü bir cismin fazla yükünü toprağa aktararak nötr hâle gelmesine ne ad verilir?", o: ["Topraklama", "Sürtünme", "Dokunma", "Etki ile yüklenme"], a: 0, e: "Topraklamada fazla yükler toprağa akar ve cisim nötrleşir. Paratoner bu ilkeyle çalışır." },
+
+  // ---- İNKILAP TARİHİ ----
+  { s: "ink", t: "Bir Kahraman Doğuyor", q: "Mustafa Kemal hangi şehirde doğmuştur?", o: ["Manastır", "Selanik", "Sofya", "İstanbul"], a: 1, e: "Mustafa Kemal 1881'de Selanik'te doğdu. Manastır'da askerî idadiyi okudu." },
+  { s: "ink", t: "Bir Kahraman Doğuyor", q: "Mustafa Kemal'e \"Kemal\" adını veren kişi kimdir?", o: ["Şemsi Efendi", "Matematik öğretmeni Mustafa Bey", "Ali Rıza Efendi", "Ömer Naci"], a: 1, e: "Selanik Askerî Rüştiyesi'ndeki matematik öğretmeni Mustafa Bey, onun matematikteki başarısı nedeniyle bu adı vermiştir." },
+  { s: "ink", t: "Millî Uyanış", q: "Mustafa Kemal'in Tobruk ve Derne'de başarı gösterdiği savaş hangisidir?", o: ["Balkan Savaşları", "Trablusgarp Savaşı", "Çanakkale Savaşları", "Kafkas Cephesi"], a: 1, e: "Trablusgarp Savaşı (1911-1912) İtalya'ya karşı yapılmıştır; Mustafa Kemal Tobruk ve Derne'de görev almıştır." },
+  { s: "ink", t: "Millî Uyanış", q: "Mondros Ateşkes Antlaşması'nın, İtilaf Devletleri'ne \"güvenliklerini tehdit eden bir durumda herhangi bir stratejik noktayı işgal etme\" hakkı veren maddesi hangisidir?", o: ["7. madde", "24. madde", "5. madde", "10. madde"], a: 0, e: "7. madde ile İtilaf Devletleri her yeri işgal edebilecek bir gerekçe kazandı. 24. madde ise Doğu Anadolu'daki altı vilayetle ilgilidir." },
+  { s: "ink", t: "Ya İstiklal Ya Ölüm", q: "\"Milletin istiklalini yine milletin azim ve kararı kurtaracaktır.\" ifadesi hangi belgede yer alır?", o: ["Havza Genelgesi", "Amasya Genelgesi", "Erzurum Kongresi kararları", "Misak-ı Millî"], a: 1, e: "Amasya Genelgesi'nde (22 Haziran 1919) millî egemenliğe dayalı bu karar yer aldı; Kurtuluş Savaşı'nın amacı ve yöntemi belirtildi." },
+  { s: "ink", t: "Ya İstiklal Ya Ölüm", q: "Türkiye Büyük Millet Meclisi hangi tarihte açılmıştır?", o: ["19 Mayıs 1919", "23 Nisan 1920", "30 Ağustos 1922", "29 Ekim 1923"], a: 1, e: "TBMM 23 Nisan 1920'de Ankara'da açıldı. Bu gün Ulusal Egemenlik ve Çocuk Bayramı olarak kutlanır." },
+  { s: "ink", t: "Ya İstiklal Ya Ölüm", q: "Mustafa Kemal'e TBMM tarafından \"Mareşal\" rütbesi ve \"Gazi\" unvanı hangi savaştan sonra verilmiştir?", o: ["I. İnönü Savaşı", "Sakarya Meydan Muharebesi", "Büyük Taarruz", "Kütahya-Eskişehir Savaşları"], a: 1, e: "Sakarya Meydan Muharebesi (1921) zaferinden sonra TBMM, Mustafa Kemal'e Mareşal rütbesi ve Gazi unvanı verdi." },
+  { s: "ink", t: "Ya İstiklal Ya Ölüm", q: "Doğu Trakya'nın savaş yapılmadan geri alınmasını sağlayan antlaşma hangisidir?", o: ["Mudanya Ateşkes Antlaşması", "Lozan Barış Antlaşması", "Ankara Antlaşması", "Moskova Antlaşması"], a: 0, e: "Mudanya Ateşkes Antlaşması (1922) ile İstanbul, Boğazlar ve Doğu Trakya savaşsız kurtarıldı." },
+  { s: "ink", t: "Atatürkçülük ve Çağdaşlaşan Türkiye", q: "Halifeliğin kaldırılması (1924) en çok hangi Atatürk ilkesiyle ilgilidir?", o: ["Halkçılık", "Laiklik", "Devletçilik", "Milliyetçilik"], a: 1, e: "Halifeliğin kaldırılmasıyla din ve devlet işleri birbirinden ayrıldı; bu laiklik ilkesinin gereğidir." },
+  { s: "ink", t: "Atatürkçülük ve Çağdaşlaşan Türkiye", q: "Eğitim ve öğretimin tek çatı altında toplanmasını sağlayan kanun hangisidir?", o: ["Tevhid-i Tedrisat Kanunu", "Soyadı Kanunu", "Türk Medeni Kanunu", "Teşkilat-ı Esasiye Kanunu"], a: 0, e: "Tevhid-i Tedrisat (Öğretim Birliği) Kanunu 3 Mart 1924'te kabul edildi; bütün okullar Maarif Vekâleti'ne bağlandı." },
+  { s: "ink", t: "Atatürkçülük ve Çağdaşlaşan Türkiye", q: "Türk kadınları milletvekili seçme ve seçilme hakkını hangi yıl elde etmiştir?", o: ["1926", "1930", "1934", "1923"], a: 2, e: "1930'da belediye, 1933'te muhtarlık, 1934'te milletvekili seçme ve seçilme hakkı verildi." },
+  { s: "ink", t: "Demokratikleşme Çabaları", q: "Türkiye Cumhuriyeti'nde kurulan ilk muhalefet partisi hangisidir?", o: ["Serbest Cumhuriyet Fırkası", "Terakkiperver Cumhuriyet Fırkası", "Demokrat Parti", "Millî Kalkınma Partisi"], a: 1, e: "Terakkiperver Cumhuriyet Fırkası 1924'te kuruldu. Serbest Cumhuriyet Fırkası ise 1930'da kuruldu." },
+  { s: "ink", t: "Atatürk Dönemi Dış Politika", q: "Boğazlar üzerinde Türkiye'nin tam egemenliğini sağlayan antlaşma hangisidir?", o: ["Lozan Barış Antlaşması", "Montrö Boğazlar Sözleşmesi", "Balkan Antantı", "Sadabat Paktı"], a: 1, e: "1936 Montrö Boğazlar Sözleşmesi ile Boğazlar komisyonu kaldırıldı, Boğazlar'ın yönetimi Türkiye'ye geçti." },
+  { s: "ink", t: "Atatürk Dönemi Dış Politika", q: "Hatay hangi yıl anavatana katılmıştır?", o: ["1923", "1936", "1939", "1945"], a: 2, e: "Hatay Devleti, 29 Haziran 1939'da Hatay Meclisinin kararıyla Türkiye'ye katıldı." },
+  { s: "ink", t: "Atatürk'ün Ölümü ve Sonrası", q: "Atatürk'ün ölümünün ardından TBMM tarafından cumhurbaşkanı seçilen kişi kimdir?", o: ["Celal Bayar", "İsmet İnönü", "Fevzi Çakmak", "Kâzım Karabekir"], a: 1, e: "Atatürk 10 Kasım 1938'de vefat etti; 11 Kasım 1938'de İsmet İnönü cumhurbaşkanı seçildi." },
+
+  // ---- DİN KÜLTÜRÜ ----
+  { s: "din", t: "Kader İnancı", q: "Allah'ın önceden belirlediği şeylerin, zamanı geldiğinde yerinde ve zamanında gerçekleşmesine ne ad verilir?", o: ["Kader", "Kaza", "Tevekkül", "Ecel"], a: 1, e: "Kader, Allah'ın her şeyi önceden bilip belirlemesidir. Kaza ise bu takdirin zamanı gelince gerçekleşmesidir." },
+  { s: "din", t: "Kader İnancı", q: "Gerekli tüm çabayı gösterdikten sonra sonucu Allah'a bırakmaya ne ad verilir?", o: ["Tevekkül", "Rızık", "Kaza", "Sabır"], a: 0, e: "Tevekkül, önce elinden geleni yapıp sonra Allah'a güvenmektir; çalışmadan beklemek tevekkül değildir." },
+  { s: "din", t: "Kader İnancı", q: "Allah'ın her canlı için belirlediği hayat süresinin sona ermesine ne ad verilir?", o: ["Rızık", "Ecel", "Ömür", "İrade"], a: 1, e: "Ecel, canlının hayat süresinin sona erdiği andır." },
+  { s: "din", t: "Zekât ve Sadaka", q: "Para ve ticaret mallarının zekâtı hangi oranda verilir?", o: ["1/10", "1/20", "1/40", "1/5"], a: 2, e: "Nisap miktarına ulaşan para ve ticaret mallarının zekâtı kırkta birdir (%2,5)." },
+  { s: "din", t: "Zekât ve Sadaka", q: "Zekât aşağıdakilerden hangisine verilemez?", o: ["Yoksul komşuya", "Borcunu ödeyemeyen kişiye", "Kendi anne ve babasına", "Yolda kalmış yolcuya"], a: 2, e: "Kişi bakmakla yükümlü olduğu anne-baba, dede-nine ve çocuk-torunlarına zekât veremez." },
+  { s: "din", t: "Zekât ve Sadaka", q: "Çeşme, okul, kütüphane yaptırmak gibi sevabı sürekli devam eden iyiliklere ne ad verilir?", o: ["Fitre", "Sadaka-i câriye", "Fidye", "Kurban"], a: 1, e: "Sadaka-i câriye, insanlar yararlandıkça sevabı devam eden kalıcı iyiliklerdir." },
+  { s: "din", t: "Din ve Hayat", q: "Aşağıdakilerden hangisi dinin korunmasını istediği beş temel değerden biri değildir?", o: ["Can", "Akıl", "Nesil", "Şöhret"], a: 3, e: "Dinin korunmasını istediği temel değerler: din, can, akıl, nesil ve maldır." },
+  { s: "din", t: "Hz. Muhammed'in Örnekliği", q: "Hz. Muhammed'e (s.a.v.) peygamberlikten önce Mekkeliler tarafından verilen \"güvenilir kişi\" anlamındaki lakap hangisidir?", o: ["Emin", "Sıddık", "Faruk", "Zinnureyn"], a: 0, e: "Dürüstlüğü nedeniyle Muhammedü'l-Emin denirdi. Sıddık Hz. Ebubekir'in, Faruk Hz. Ömer'in, Zinnureyn Hz. Osman'ın lakabıdır." },
+  { s: "din", t: "Hz. Muhammed'in Örnekliği", q: "Allah ile konuşma şerefine erdiği için \"Kelîmullah\" olarak anılan peygamber kimdir?", o: ["Hz. İbrahim", "Hz. Musa", "Hz. İsa", "Hz. Nuh"], a: 1, e: "Hz. Musa \"Kelîmullah\", Hz. İbrahim ise \"Halîlullah\" (Allah'ın dostu) olarak anılır." },
+  { s: "din", t: "Kur'an-ı Kerim ve Özellikleri", q: "Kur'an-ı Kerim'de kaç sure vardır?", o: ["110", "114", "120", "124"], a: 1, e: "Kur'an-ı Kerim 114 sureden oluşur; Fâtiha ile başlar, Nâs ile biter." },
+  { s: "din", t: "Kur'an-ı Kerim ve Özellikleri", q: "İlk inen ayetler hangi surede yer alır?", o: ["Fâtiha", "Alak", "Bakara", "İhlâs"], a: 1, e: "İlk vahiy Hira mağarasında geldi: Alak suresinin ilk beş ayeti (\"Oku!\")." },
+  { s: "din", t: "Kur'an-ı Kerim ve Özellikleri", q: "\"Sizin dininiz size, benim dinim bana.\" ayetiyle biten sure hangisidir?", o: ["Kâfirûn", "Felak", "Nâs", "Kevser"], a: 0, e: "Kâfirûn suresi din ve inanç özgürlüğüne vurgu yapan bu ayetle sona erer." },
+
+  // ---- İNGİLİZCE ----
+  { s: "ing", t: "Friendship", q: "— Would you like to come to my birthday party on Saturday?\n— ______ I have to visit my grandparents.", o: ["Sure, why not?", "I'd love to, but I can't.", "Yes, I'd love to.", "That sounds great!"], a: 1, e: "After the blank, she gives an excuse (\"I have to visit...\"), so she is refusing politely: \"I'd love to, but I can't.\"" },
+  { s: "ing", t: "Friendship", q: "Sorry, I can't come to the cinema. I ______ study for my exam.", o: ["have to", "has to", "having to", "am have"], a: 0, e: "With \"I\" we use \"have to\" (obligation). \"Has to\" is for he/she/it." },
+  { s: "ing", t: "Teen Life", q: "I can't stand ______ to loud music while I'm studying.", o: ["listen", "listening", "to listened", "listens"], a: 1, e: "\"Can't stand\" is followed by the -ing form: can't stand listening." },
+  { s: "ing", t: "Teen Life", q: "— How often do you go jogging?\n— ______", o: ["For two hours.", "Twice a week.", "In the park.", "With my brother."], a: 1, e: "\"How often\" asks about frequency: twice a week." },
+  { s: "ing", t: "In the Kitchen", q: "First, the onions ______ into small pieces. Then, they are fried in olive oil.", o: ["is chopped", "are chopped", "chop", "chopping"], a: 1, e: "Recipes often use the passive: \"onions\" is plural → are chopped." },
+  { s: "ing", t: "On the Phone", q: "— Can I speak to Mr. Brown, please?\n— Could you ______ on a minute? I'll check if he is available.", o: ["hang up", "hold", "call back", "turn"], a: 1, e: "\"Hold on\" means wait on the line. \"Hang up\" means end the call." },
+  { s: "ing", t: "The Internet", q: "To stay safe online, you should never share your ______ with anyone.", o: ["password", "browser", "homepage", "keyboard"], a: 0, e: "A password must be kept secret for online safety." },
+  { s: "ing", t: "Adventures", q: "In my opinion, skydiving is ______ than bungee jumping.", o: ["most exciting", "more exciting", "excitinger", "the more exciting"], a: 1, e: "\"Than\" shows a comparison. Long adjectives use \"more\": more exciting than." },
+  { s: "ing", t: "Tourism", q: "I have ______ been to Paris, but I really want to go there.", o: ["ever", "never", "yet", "since"], a: 1, e: "\"But I really want to go\" shows she hasn't been there: I have never been to Paris." },
+  { s: "ing", t: "Chores", q: "My brother is responsible ______ taking out the rubbish.", o: ["of", "for", "with", "at"], a: 1, e: "The correct phrase is \"be responsible for\"." },
+  { s: "ing", t: "Science", q: "The light bulb ______ by Thomas Edison in 1879.", o: ["is invented", "was invented", "invented", "has invent"], a: 1, e: "Past passive (in 1879): was + V3 → was invented." },
+  { s: "ing", t: "Natural Forces", q: "If global warming continues, sea levels ______.", o: ["rise", "will rise", "rose", "would rising"], a: 1, e: "First conditional: If + present simple, will + verb → will rise." },
+];
+Q.forEach((q, i) => { q.id = q.s + "-" + i; });
+const QMAP = Object.fromEntries(Q.map(q => [q.id, q]));
+const HARF = ["A", "B", "C", "D"];
+const DENEME_DAG = { tr: 6, mat: 6, fen: 6, ink: 3, din: 3, ing: 3 };
+const DENEME_DK = 45;
+
+/* ===================== KAYIT ===================== */
+const KEY = "lgs-masasi-v1";
+function bos() {
+  return { sinav: "2027-06-13", hedef: 40, ans: {}, gun: {}, yanlis: [], konu: {}, denemeler: [], pomo: {} };
+}
+function yukle() {
+  try { const r = localStorage.getItem(KEY); if (r) return Object.assign(bos(), JSON.parse(r)); } catch (e) {}
+  return bos();
+}
+function kaydet() { try { localStorage.setItem(KEY, JSON.stringify(S)); } catch (e) {} }
+let S = yukle();
+
+/* ===================== YARDIMCILAR ===================== */
+const $ = (s, el = document) => el.querySelector(s);
+const esc = s => String(s).replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+const gunStr = d => d.getFullYear() + "-" + String(d.getMonth() + 1).padStart(2, "0") + "-" + String(d.getDate()).padStart(2, "0");
+const bugun = () => gunStr(new Date());
+const karistir = a => { a = a.slice(); for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; } return a; };
+const fmt = n => (Math.round(n * 100) / 100).toLocaleString("tr-TR");
+const net = (d, y) => d - y / 3;
+const chip = s => `<span class="chip" style="--c:var(--c-${s})">${esc(DERS[s].ad)}</span>`;
+const sure = sn => String(Math.floor(sn / 60)).padStart(2, "0") + ":" + String(sn % 60).padStart(2, "0");
+
+/* LGS puanı yaklaşık: ağırlıklı net (Türkçe/Mat/Fen ×4, diğerleri ×1), en fazla 270 → 100–500 aralığına */
+function puanHesap(netler) {
+  let w = 0;
+  for (const k of DK) w += Math.max(0, netler[k] || 0) * DERS[k].kat;
+  return Math.max(100, Math.min(500, 100 + 400 * w / 270));
+}
+
+function kaydetCevap(q, ch) {
+  const r = S.ans[q.id] || (S.ans[q.id] = { d: 0, y: 0, b: 0 });
+  const k = ch < 0 ? "b" : ch === q.a ? "d" : "y";
+  r[k]++;
+  if (ch >= 0) S.gun[bugun()] = (S.gun[bugun()] || 0) + 1;
+  if (k === "y" && !S.yanlis.includes(q.id)) S.yanlis.push(q.id);
+  if (k === "d") S.yanlis = S.yanlis.filter(x => x !== q.id);
+  kaydet();
+  return k;
+}
+function dersIst(s) {
+  let d = 0, y = 0, b = 0;
+  for (const q of Q) if (q.s === s && S.ans[q.id]) { d += S.ans[q.id].d; y += S.ans[q.id].y; b += S.ans[q.id].b; }
+  return { d, y, b, n: d + y };
+}
+function konuIst(s, t) {
+  let d = 0, y = 0, adet = 0;
+  for (const q of Q) if (q.s === s && q.t === t) { adet++; const r = S.ans[q.id]; if (r) { d += r.d; y += r.y; } }
+  return { d, y, n: d + y, adet };
+}
+function seri() {
+  const g = new Date(); let n = 0;
+  if (!S.gun[gunStr(g)]) g.setDate(g.getDate() - 1);
+  while (S.gun[gunStr(g)]) { n++; g.setDate(g.getDate() - 1); }
+  return n;
+}
+function kalanGun() {
+  const t = new Date(S.sinav + "T09:30:00");
+  return Math.ceil((t - new Date()) / 86400000);
+}
+
+/* ===================== YÖNLENDİRME ===================== */
+const SEKME = [
+  ["panel", "Panel"], ["coz", "Soru Çöz"], ["deneme", "Deneme"], ["yanlis", "Yanlışlarım"], ["konular", "Konu Takibi"], ["net", "Net Hesapla"],
+];
+let aktif = "panel";
+function ust() {
+  const k = kalanGun();
+  $("#countdown").innerHTML = k > 0 ? `<span>LGS'ye</span><b>${k}</b><span>gün</span>` : `<span>Sınav tarihini Panel'den güncelle</span>`;
+  $("#tabs").innerHTML = SEKME.map(([id, ad]) =>
+    `<button data-tab="${id}" ${id === aktif ? 'aria-current="page"' : ""}>${ad}${id === "yanlis" && S.yanlis.length ? `<span class="n">${S.yanlis.length}</span>` : ""}</button>`).join("");
+}
+function git(id) {
+  aktif = SEKME.some(s => s[0] === id) ? id : "panel";
+  try { history.replaceState(null, "", "#" + aktif); } catch (e) {}
+  ciz();
+  window.scrollTo({ top: 0 });
+}
+function ciz() {
+  ust();
+  const v = { panel: vPanel, coz: vCoz, deneme: vDeneme, yanlis: vYanlis, konular: vKonular, net: vNet }[aktif];
+  $("#main").innerHTML = v();
+  if (aktif === "panel") pomoGuncelle();
+  if (aktif === "net") netGuncelle();
+}
+
+/* ===================== PANEL ===================== */
+function vPanel() {
+  const bu = S.gun[bugun()] || 0;
+  const p = Math.min(100, Math.round(bu / S.hedef * 100));
+  let topD = 0, topY = 0;
+  DK.forEach(s => { const i = dersIst(s); topD += i.d; topY += i.y; });
+  const isabet = topD + topY ? Math.round(topD / (topD + topY) * 100) : null;
+
+  // son 14 gün
+  const gunler = [];
+  for (let i = 13; i >= 0; i--) { const d = new Date(); d.setDate(d.getDate() - i); const n = S.gun[gunStr(d)] || 0; gunler.push([gunStr(d), n]); }
+  const lvl = n => n === 0 ? 0 : n < S.hedef / 2 ? 1 : n < S.hedef ? 2 : 3;
+
+  // zayıf konular
+  const zayif = [];
+  DK.forEach(s => KONU[s].forEach(t => { const i = konuIst(s, t); if (i.n >= 2) zayif.push({ s, t, o: i.d / i.n, n: i.n }); }));
+  zayif.sort((a, b) => a.o - b.o);
+  const zz = zayif.filter(z => z.o < 0.75).slice(0, 4);
+
+  const den = S.denemeler.slice(-5).reverse();
+
+  return `
+  <section class="grid g2">
+    <div class="card row" style="gap:20px;flex-wrap:nowrap">
+      <div class="ring" style="--p:${p}"><div><span><b>${bu}</b><br><span class="note">/ ${S.hedef} soru</span></span></div></div>
+      <div class="stack" style="gap:6px;min-width:0">
+        <span class="label">Bugünkü hedef</span>
+        <h3>${bu >= S.hedef ? "Hedef tamam, harika iş!" : bu ? `${S.hedef - bu} soru kaldı` : "Bugün henüz soru çözmedin"}</h3>
+        <div class="row" style="gap:8px">
+          <label class="note" for="hedef">Günlük hedef</label>
+          <input type="number" id="hedef" min="5" max="300" step="5" value="${S.hedef}" style="width:80px">
+        </div>
+        <button class="btn accent small" data-tab="coz" style="justify-self:start">Soru çözmeye başla</button>
+      </div>
+    </div>
+    <div class="card stack">
+      <div class="row" style="justify-content:space-between">
+        <div><span class="label">Çalışma serisi</span><div class="big">${seri()}<span class="muted" style="font-size:1rem;font-family:var(--f-body);font-weight:500"> gün</span></div></div>
+        <div style="text-align:right"><span class="label">Doğru oranı</span><div class="big">${isabet === null ? "–" : "%" + isabet}</div></div>
+      </div>
+      <div class="weeks" aria-label="Son 14 gün">${gunler.map(([g, n]) => `<span data-l="${lvl(n)}" title="${g}: ${n} soru"></span>`).join("")}</div>
+      <span class="note">Son 14 gün · koyu kutu = hedefi tamamladığın gün</span>
+    </div>
+  </section>
+
+  <section class="grid g2">
+    <div class="card stack">
+      <div class="row" style="justify-content:space-between"><h3>Derslere göre başarı</h3><span class="note">doğru / çözülen</span></div>
+      ${DK.map(s => { const i = dersIst(s); const o = i.n ? Math.round(i.d / i.n * 100) : 0;
+        return `<div class="dersrow"><span class="chip" style="--c:var(--c-${s})">${esc(DERS[s].ad)}</span><div class="bar" style="--c:var(--c-${s})"><i style="width:${o}%"></i></div><span class="mono">${i.n ? "%" + o : "–"}</span></div>`; }).join("")}
+      ${topD + topY === 0 ? `<p class="note" style="margin:0">Soru çözdükçe çubuklar dolacak.</p>` : ""}
+    </div>
+    <div class="card stack">
+      <h3>Tekrar etmen gereken konular</h3>
+      ${zz.length ? `<div class="list">${zz.map(z => `
+        <div class="row" style="justify-content:space-between;gap:8px">
+          <div style="min-width:0"><span class="chip" style="--c:var(--c-${z.s})">${esc(DERS[z.s].ad)}</span><div>${esc(z.t)}</div></div>
+          <div class="row" style="gap:8px"><span class="tag bad">%${Math.round(z.o * 100)}</span><button class="btn ghost small" data-act="konu-coz" data-s="${z.s}" data-t="${esc(z.t)}">Çalış</button></div>
+        </div>`).join("")}</div>`
+      : `<div class="empty">Bir konuda en az 2 soru çözünce, doğru oranı %75'in altında kalan konular burada listelenir.</div>`}
+    </div>
+  </section>
+
+  <section class="grid g2">
+    <div class="card stack">
+      <div class="row" style="justify-content:space-between"><h3>Pomodoro</h3><span class="note" id="pomo-say"></span></div>
+      <div class="row" style="justify-content:space-between;align-items:end">
+        <div><span class="label" id="pomo-mod"></span><div class="pomo-time" id="pomo-time"></div></div>
+        <div class="row">
+          <button class="btn small" data-act="pomo-bas" id="pomo-bas"></button>
+          <button class="btn ghost small" data-act="pomo-sifir">Sıfırla</button>
+        </div>
+      </div>
+      <p class="note" style="margin:0">25 dakika odaklan, 5 dakika mola ver. Her 4 turdan sonra 15 dakikalık uzun mola.</p>
+    </div>
+    <div class="card stack">
+      <div class="row" style="justify-content:space-between"><h3>Son denemeler</h3><button class="btn ghost small" data-tab="deneme">Deneme çöz</button></div>
+      ${den.length ? `<div class="tbl-wrap"><table><thead><tr><th>Tarih</th><th>Net</th><th>Tahmini puan</th></tr></thead><tbody>
+        ${den.map(d => `<tr><td>${new Date(d.tarih).toLocaleDateString("tr-TR", { day: "numeric", month: "short" })}</td><td class="mono">${fmt(d.topNet)} / ${d.soru}</td><td class="mono">${fmt(d.puan)}</td></tr>`).join("")}
+      </tbody></table></div>` : `<div class="empty">Henüz deneme çözmedin. 27 soruluk mini deneme ${DENEME_DK} dakika sürer.</div>`}
+    </div>
+  </section>
+
+  <section class="card row" style="justify-content:space-between">
+    <div class="field">
+      <label class="label" for="sinav">LGS tarihi</label>
+      <input type="date" id="sinav" value="${S.sinav}">
+    </div>
+    <p class="note" style="max-width:52ch;margin:0">Tarihi MEB'in açıkladığı takvime göre güncelle. Tüm ilerlemen yalnızca bu tarayıcıda saklanır.</p>
+  </section>`;
+}
+
+/* ===================== POMODORO ===================== */
+const P = { mod: "calis", kalan: 25 * 60, calisiyor: false, tur: 0, int: null, ctx: null };
+const POMO_SURE = { calis: 25 * 60, mola: 5 * 60, uzun: 15 * 60 };
+const POMO_AD = { calis: "Odaklanma", mola: "Kısa mola", uzun: "Uzun mola" };
+function bip() {
+  try {
+    if (!P.ctx) return;
+    [0, 0.25, 0.5].forEach(t => {
+      const o = P.ctx.createOscillator(), g = P.ctx.createGain();
+      o.frequency.value = 880; o.connect(g); g.connect(P.ctx.destination);
+      g.gain.setValueAtTime(0.2, P.ctx.currentTime + t); g.gain.exponentialRampToValueAtTime(0.001, P.ctx.currentTime + t + 0.2);
+      o.start(P.ctx.currentTime + t); o.stop(P.ctx.currentTime + t + 0.22);
+    });
+  } catch (e) {}
+}
+function pomoTik() {
+  P.kalan--;
+  if (P.kalan <= 0) {
+    bip();
+    if (P.mod === "calis") {
+      P.tur++; S.pomo[bugun()] = (S.pomo[bugun()] || 0) + 1; kaydet();
+      P.mod = P.tur % 4 === 0 ? "uzun" : "mola";
+    } else P.mod = "calis";
+    P.kalan = POMO_SURE[P.mod];
+  }
+  pomoGuncelle();
+}
+function pomoGuncelle() {
+  const t = $("#pomo-time"); if (!t) return;
+  t.textContent = sure(P.kalan);
+  $("#pomo-mod").textContent = POMO_AD[P.mod];
+  $("#pomo-bas").textContent = P.calisiyor ? "Duraklat" : "Başlat";
+  const n = S.pomo[bugun()] || 0;
+  $("#pomo-say").textContent = n ? `Bugün ${n} pomodoro` : "";
+}
+
+/* ===================== SORU ÇÖZ ===================== */
+const C = { ders: "hepsi", konu: "hepsi", adet: 10, yeni: false };
+let Z = null; // aktif pratik oturumu
+
+function havuz() {
+  return Q.filter(q => (C.ders === "hepsi" || q.s === C.ders) && (C.konu === "hepsi" || q.t === C.konu) && (!C.yeni || !S.ans[q.id]));
+}
+function pratikBasla(liste, baslik) {
+  Z = { liste, i: 0, cev: [], baslik };
+  aktif = "coz"; try { history.replaceState(null, "", "#coz"); } catch (e) {}
+  ciz(); window.scrollTo({ top: 0 });
+}
+function vCoz() {
+  if (Z && Z.i < Z.liste.length) return vSoru();
+  if (Z) return vPratikSonuc();
+  const h = havuz();
+  const konular = C.ders === "hepsi" ? [] : KONU[C.ders].filter(t => Q.some(q => q.s === C.ders && q.t === t));
+  return `
+  <section class="card stack" style="gap:18px">
+    <div><h2>Soru çöz</h2><p class="muted" style="margin:4px 0 0">Ders ve konu seç; her sorudan sonra doğru cevabı ve açıklamasını gör.</p></div>
+    <div class="field"><span class="label">Ders</span>
+      <div class="pick">
+        <button data-act="c-ders" data-v="hepsi" aria-pressed="${C.ders === "hepsi"}">Karışık</button>
+        ${DK.map(s => `<button data-act="c-ders" data-v="${s}" aria-pressed="${C.ders === s}">${esc(DERS[s].ad)}</button>`).join("")}
+      </div>
+    </div>
+    <div class="row" style="gap:16px;align-items:end">
+      <div class="field" style="flex:1 1 240px"><label class="label" for="c-konu">Konu</label>
+        <select id="c-konu" ${C.ders === "hepsi" ? "disabled" : ""}>
+          <option value="hepsi">Tüm konular</option>
+          ${konular.map(t => `<option ${C.konu === t ? "selected" : ""}>${esc(t)}</option>`).join("")}
+        </select>
+      </div>
+      <div class="field"><label class="label" for="c-adet">Soru sayısı</label>
+        <select id="c-adet">${[5, 10, 20, 0].map(n => `<option value="${n}" ${C.adet === n ? "selected" : ""}>${n || "Tümü"}</option>`).join("")}</select>
+      </div>
+      <label class="row" style="gap:8px;padding-bottom:8px"><input type="checkbox" id="c-yeni" ${C.yeni ? "checked" : ""}> Yalnızca çözmediklerim</label>
+    </div>
+    <div class="row" style="justify-content:space-between">
+      <span class="muted">${h.length} soru uygun</span>
+      <button class="btn accent" data-act="c-basla" ${h.length ? "" : "disabled"}>Başla</button>
+    </div>
+  </section>
+  <section class="grid g3">
+    ${DK.map(s => { const n = Q.filter(q => q.s === s).length; const c = Q.filter(q => q.s === s && S.ans[q.id]).length;
+      return `<div class="card stack" style="gap:8px"><span class="chip" style="--c:var(--c-${s})">${esc(DERS[s].ad)}</span>
+        <div class="bar" style="--c:var(--c-${s})"><i style="width:${Math.round(c / n * 100)}%"></i></div>
+        <span class="note">${c} / ${n} soru çözüldü</span></div>`; }).join("")}
+  </section>`;
+}
+function vSoru() {
+  const q = Z.liste[Z.i], c = Z.cev[Z.i];
+  const acik = c !== undefined;
+  const sinif = j => !acik ? "" : j === q.a ? "ok" : j === c ? "no" : "";
+  return `
+  <section class="card qcard">
+    <div class="progress"><i style="width:${Z.i / Z.liste.length * 100}%"></i></div>
+    <div class="qhead">${chip(q.s)}<span class="note">${esc(q.t)}</span><span class="count">${Z.i + 1} / ${Z.liste.length}</span></div>
+    <p class="qtext">${esc(q.q)}</p>
+    <div class="opts">${q.o.map((o, j) => `<button class="opt ${sinif(j)}" data-act="p-sec" data-j="${j}" ${acik ? "disabled" : ""}><span class="bub">${HARF[j]}</span><span>${esc(o)}</span></button>`).join("")}</div>
+    ${acik ? `<div class="explain ${c === q.a ? "" : "no"}"><b>${c === q.a ? "Doğru!" : c < 0 ? "Boş bıraktın." : "Yanlış."}</b> Doğru cevap ${HARF[q.a]}. ${esc(q.e)}</div>` : ""}
+    <div class="qfoot">
+      <button class="btn ghost small" data-act="p-bitir">Testi bitir</button>
+      ${acik ? `<button class="btn" data-act="p-ileri">${Z.i + 1 < Z.liste.length ? "Sonraki soru" : "Sonuçları gör"}</button>`
+             : `<button class="btn ghost" data-act="p-sec" data-j="-1">Boş bırak</button>`}
+    </div>
+  </section>`;
+}
+function vPratikSonuc() {
+  const cevaplanan = Z.liste.slice(0, Z.cev.length);
+  let d = 0, y = 0, b = 0; const yan = [];
+  cevaplanan.forEach((q, i) => { const c = Z.cev[i]; if (c < 0) b++; else if (c === q.a) d++; else { y++; yan.push(q); } });
+  return `
+  <section class="card stack" style="gap:18px">
+    <div><span class="label">${esc(Z.baslik || "Test sonucu")}</span><h2>${d + y === 0 ? "Hiç soru cevaplamadın" : d / (d + y) >= 0.8 ? "Çok iyi gidiyorsun!" : d / (d + y) >= 0.5 ? "Fena değil, devam!" : "Bu konuyu tekrar etmekte fayda var"}</h2></div>
+    <div class="hero-res">
+      <div><span class="label">Doğru</span><span class="big" style="color:var(--good)">${d}</span></div>
+      <div><span class="label">Yanlış</span><span class="big" style="color:var(--bad)">${y}</span></div>
+      <div><span class="label">Boş</span><span class="big muted">${b}</span></div>
+      <div><span class="label">Net</span><span class="big">${fmt(net(d, y))}</span></div>
+    </div>
+    <p class="note" style="margin:0">LGS'de 3 yanlış 1 doğruyu götürür: Net = Doğru − Yanlış ÷ 3.</p>
+    <div class="row">
+      <button class="btn accent" data-act="p-yeni">Yeni test</button>
+      ${yan.length ? `<button class="btn ghost" data-act="p-tekrar">Bu testteki yanlışları tekrar çöz (${yan.length})</button>` : ""}
+    </div>
+  </section>`;
+}
+
+/* ===================== DENEME ===================== */
+let D = null; // aktif deneme
+function denemeKur() {
+  const liste = [];
+  DK.forEach(s => liste.push(...karistir(Q.filter(q => q.s === s)).slice(0, DENEME_DAG[s])));
+  D = { liste, i: 0, cev: Array(liste.length).fill(-1), bitis: Date.now() + DENEME_DK * 60000, onay: false, sonuc: null, int: null };
+  D.int = setInterval(denemeTik, 1000);
+}
+function denemeKalan() { return Math.max(0, Math.round((D.bitis - Date.now()) / 1000)); }
+function denemeTik() {
+  if (!D || D.sonuc) return;
+  const k = denemeKalan();
+  const t = $("#timer");
+  if (t) { t.textContent = sure(k); t.classList.toggle("low", k < 300); }
+  if (k <= 0) denemeBitir();
+}
+function denemeBitir() {
+  clearInterval(D.int);
+  const r = {}; DK.forEach(s => r[s] = { d: 0, y: 0, b: 0 });
+  D.liste.forEach((q, i) => { const k = kaydetCevap(q, D.cev[i]); r[q.s][k]++; });
+  const netler = {}, olcekli = {};
+  let topNet = 0;
+  DK.forEach(s => { netler[s] = net(r[s].d, r[s].y); topNet += netler[s]; olcekli[s] = netler[s] / DENEME_DAG[s] * DERS[s].lgs; });
+  const puan = puanHesap(olcekli);
+  D.sonuc = { r, netler, topNet, puan };
+  S.denemeler.push({ tarih: Date.now(), topNet, puan, soru: D.liste.length, r });
+  if (S.denemeler.length > 50) S.denemeler.shift();
+  kaydet();
+  if (aktif === "deneme") ciz();
+}
+function vDeneme() {
+  if (!D) {
+    return `
+    <section class="card stack" style="gap:16px">
+      <div><h2>Mini deneme sınavı</h2><p class="muted" style="margin:4px 0 0">Gerçek LGS'deki ders dağılımına göre karışık ${D_TOPLAM()} soru, ${DENEME_DK} dakika. Cevaplar sınav bitince açıklanır.</p></div>
+      <div class="tbl-wrap"><table>
+        <thead><tr><th>Ders</th><th>Bu denemede</th><th>Gerçek LGS'de</th><th>Katsayı</th></tr></thead>
+        <tbody>${DK.map(s => `<tr><td>${chip(s)}</td><td class="mono">${DENEME_DAG[s]}</td><td class="mono">${DERS[s].lgs}</td><td class="mono">×${DERS[s].kat}</td></tr>`).join("")}</tbody>
+      </table></div>
+      <p class="note" style="margin:0">Gerçek sınavda sözel bölüm (50 soru) 75 dakika, sayısal bölüm (40 soru) 80 dakikadır.</p>
+      <div><button class="btn accent" data-act="d-basla">Denemeyi başlat</button></div>
+    </section>`;
+  }
+  if (D.sonuc) return vDenemeSonuc();
+  const q = D.liste[D.i], c = D.cev[D.i];
+  const bos = D.cev.filter(x => x < 0).length;
+  return `
+  <section class="exam-layout">
+    <div class="card qcard" style="margin:0">
+      <div class="qhead">${chip(q.s)}<span class="note">${esc(q.t)}</span><span class="count">${D.i + 1} / ${D.liste.length}</span></div>
+      <p class="qtext">${esc(q.q)}</p>
+      <div class="opts">${q.o.map((o, j) => `<button class="opt ${c === j ? "sel" : ""}" data-act="d-sec" data-j="${j}"><span class="bub">${HARF[j]}</span><span>${esc(o)}</span></button>`).join("")}</div>
+      <div class="qfoot">
+        <button class="btn ghost" data-act="d-git" data-i="${D.i - 1}" ${D.i === 0 ? "disabled" : ""}>Önceki</button>
+        ${c >= 0 ? `<button class="btn ghost small" data-act="d-sec" data-j="${c}">Cevabı sil</button>` : ""}
+        <button class="btn" data-act="d-git" data-i="${D.i + 1}" ${D.i + 1 >= D.liste.length ? "disabled" : ""}>Sonraki</button>
+      </div>
+    </div>
+    <aside class="card stack">
+      <div class="row" style="justify-content:space-between"><span class="label">Kalan süre</span><span class="timer ${denemeKalan() < 300 ? "low" : ""}" id="timer">${sure(denemeKalan())}</span></div>
+      <span class="label">Cevap kâğıdı</span>
+      <div class="optik">${D.liste.map((x, i) => `<button class="${D.cev[i] >= 0 ? "done" : ""} ${i === D.i ? "cur" : ""}" data-act="d-git" data-i="${i}" aria-label="Soru ${i + 1}">${i + 1}</button>`).join("")}</div>
+      ${D.onay ? `<div class="confirm"><span>${bos ? `${bos} boş soru var. ` : ""}Sınavı bitirmek istiyor musun?</span><button class="btn accent small" data-act="d-bitir-evet">Evet, bitir</button><button class="btn ghost small" data-act="d-bitir-hayir">Devam et</button></div>`
+               : `<button class="btn accent" data-act="d-bitir">Sınavı bitir</button>`}
+    </aside>
+  </section>`;
+}
+const D_TOPLAM = () => Object.values(DENEME_DAG).reduce((a, b) => a + b, 0);
+function vDenemeSonuc() {
+  const { r, netler, topNet, puan } = D.sonuc;
+  let td = 0, ty = 0, tb = 0; DK.forEach(s => { td += r[s].d; ty += r[s].y; tb += r[s].b; });
+  return `
+  <section class="card stack" style="gap:18px">
+    <div><span class="label">Deneme sonucu</span><h2>${fmt(topNet)} net · tahmini ${fmt(puan)} puan</h2></div>
+    <div class="tbl-wrap"><table>
+      <thead><tr><th>Ders</th><th>D</th><th>Y</th><th>B</th><th>Net</th></tr></thead>
+      <tbody>${DK.map(s => `<tr><td>${chip(s)}</td><td class="mono">${r[s].d}</td><td class="mono">${r[s].y}</td><td class="mono">${r[s].b}</td><td class="mono">${fmt(netler[s])}</td></tr>`).join("")}</tbody>
+      <tfoot><tr><td>Toplam</td><td class="mono">${td}</td><td class="mono">${ty}</td><td class="mono">${tb}</td><td class="mono">${fmt(topNet)}</td></tr></tfoot>
+    </table></div>
+    <p class="note" style="margin:0">Tahmini puan, netlerin gerçek LGS soru sayılarına ölçeklenip katsayılarla ağırlıklandırılmasıyla hesaplanır. Gerçek puan, o yılın sınav ortalamalarına göre değişir.</p>
+    <div class="row"><button class="btn accent" data-act="d-yeni">Yeni deneme</button><button class="btn ghost" data-tab="yanlis">Yanlışlarıma git</button></div>
+  </section>
+  <section class="stack">
+    <h3>Cevap anahtarı</h3>
+    <div class="list">${D.liste.map((q, i) => { const c = D.cev[i]; const k = c < 0 ? "b" : c === q.a ? "d" : "y";
+      return `<div class="item">
+        <div class="row" style="justify-content:space-between"><div class="row" style="gap:10px"><span class="mono note">${i + 1}.</span>${chip(q.s)}</div>
+        <span class="tag ${k === "d" ? "good" : k === "y" ? "bad" : ""}">${k === "d" ? "Doğru" : k === "y" ? "Yanlış" : "Boş"}</span></div>
+        <p>${esc(q.q)}</p>
+        <div class="ans">Senin cevabın: ${c < 0 ? "–" : HARF[c]} · Doğru cevap: <b>${HARF[q.a]}) ${esc(q.o[q.a])}</b></div>
+        ${k !== "d" ? `<div class="note">${esc(q.e)}</div>` : ""}
+      </div>`; }).join("")}</div>
+  </section>`;
+}
+
+/* ===================== YANLIŞLARIM ===================== */
+function vYanlis() {
+  const liste = S.yanlis.map(id => QMAP[id]).filter(Boolean);
+  if (!liste.length) return `
+    <section class="card stack"><h2>Yanlışlarım</h2>
+    <div class="empty">Yanlış cevapladığın sorular burada birikir. Bir soruyu sonradan doğru cevaplayınca listeden çıkar.</div>
+    <div><button class="btn accent" data-tab="coz">Soru çöz</button></div></section>`;
+  const say = {}; liste.forEach(q => say[q.s] = (say[q.s] || 0) + 1);
+  return `
+  <section class="card stack">
+    <div class="row" style="justify-content:space-between">
+      <div><h2>Yanlışlarım</h2><p class="muted" style="margin:4px 0 0">${liste.length} soru tekrar bekliyor. Doğru cevapladığın soru listeden çıkar.</p></div>
+      <button class="btn accent" data-act="y-coz">Hepsini tekrar çöz</button>
+    </div>
+    <div class="row">${DK.filter(s => say[s]).map(s => `<button class="btn ghost small" data-act="y-coz" data-s="${s}">${esc(DERS[s].ad)} (${say[s]})</button>`).join("")}</div>
+  </section>
+  <section class="list">${liste.map(q => `
+    <details class="item">
+      <summary class="row" style="cursor:pointer;gap:10px">${chip(q.s)}<span class="note">${esc(q.t)}</span></summary>
+      <p>${esc(q.q)}</p>
+      <div class="ans">Doğru cevap: <b>${HARF[q.a]}) ${esc(q.o[q.a])}</b></div>
+      <div class="note">${esc(q.e)}</div>
+    </details>`).join("")}
+  </section>`;
+}
+
+/* ===================== KONU TAKİBİ ===================== */
+function vKonular() {
+  return `
+  <section><h2>Konu takibi</h2><p class="muted" style="margin:4px 0 0">8. sınıf müfredatındaki üniteler. Bitirdiğin konuları işaretle; yanındaki etiket o konudaki doğru oranını gösterir.</p></section>
+  <section class="grid g2">${DK.map(s => { const tamam = KONU[s].filter(t => S.konu[s + "|" + t]).length;
+    return `<div class="card stack">
+      <div class="row" style="justify-content:space-between"><span class="chip" style="--c:var(--c-${s})">${esc(DERS[s].ad)}</span><span class="mono note">${tamam} / ${KONU[s].length}</span></div>
+      <div class="bar" style="--c:var(--c-${s})"><i style="width:${tamam / KONU[s].length * 100}%"></i></div>
+      <div>${KONU[s].map((t, i) => { const id = `k-${s}-${i}`; const ist = konuIst(s, t); const done = !!S.konu[s + "|" + t];
+        const o = ist.n ? Math.round(ist.d / ist.n * 100) : null;
+        return `<div class="topic ${done ? "done" : ""}">
+          <input type="checkbox" id="${id}" data-konu="${esc(s + "|" + t)}" ${done ? "checked" : ""}>
+          <label for="${id}">${esc(t)}</label>
+          <span class="row" style="gap:6px">${o === null ? "" : `<span class="tag ${o >= 75 ? "good" : o < 50 ? "bad" : ""}">%${o}</span>`}${ist.adet ? `<button class="btn ghost small" data-act="konu-coz" data-s="${s}" data-t="${esc(t)}" aria-label="${esc(t)} sorularını çöz">Çöz</button>` : ""}</span>
+        </div>`; }).join("")}</div>
+    </div>`; }).join("")}
+  </section>`;
+}
+
+/* ===================== NET HESAPLA ===================== */
+const N = {}; DK.forEach(s => N[s] = { d: 0, y: 0 });
+function vNet() {
+  return `
+  <section><h2>Net ve puan hesaplayıcı</h2><p class="muted" style="margin:4px 0 0">Deneme sonuçlarını gir; netin ve yaklaşık LGS puanın anında hesaplansın.</p></section>
+  <section class="grid" style="grid-template-columns:repeat(auto-fit,minmax(300px,1fr));align-items:start">
+    <div class="card tbl-wrap"><table>
+      <thead><tr><th>Ders</th><th>Doğru</th><th>Yanlış</th><th>Net</th></tr></thead>
+      <tbody>${DK.map(s => `<tr>
+        <td>${chip(s)}<div class="note">${DERS[s].lgs} soru</div></td>
+        <td><input type="number" id="n-${s}-d" data-net="${s}" data-k="d" min="0" max="${DERS[s].lgs}" value="${N[s].d}" aria-label="${esc(DERS[s].ad)} doğru"></td>
+        <td><input type="number" id="n-${s}-y" data-net="${s}" data-k="y" min="0" max="${DERS[s].lgs}" value="${N[s].y}" aria-label="${esc(DERS[s].ad)} yanlış"></td>
+        <td class="mono" id="n-${s}-net"></td></tr>`).join("")}</tbody>
+      <tfoot><tr><td>Toplam</td><td></td><td></td><td class="mono" id="n-top"></td></tr></tfoot>
+    </table></div>
+    <div class="card stack">
+      <span class="label">Tahmini LGS puanı</span>
+      <div class="big" id="n-puan"></div>
+      <div class="bar"><i id="n-bar"></i></div>
+      <p class="note" style="margin:0" id="n-uyari"></p>
+      <p class="note" style="margin:0">Türkçe, Matematik ve Fen netleri 4 katsayılı; İnkılap, Din Kültürü ve İngilizce 1 katsayılıdır. Puan 100 ile 500 arasındadır ve gerçek sonuç o yılın ortalamalarına göre değişir.</p>
+    </div>
+  </section>`;
+}
+function netGuncelle() {
+  let top = 0, uyari = "";
+  const netler = {};
+  DK.forEach(s => {
+    const n = net(N[s].d, N[s].y); netler[s] = n; top += n;
+    const el = $(`#n-${s}-net`); if (el) el.textContent = fmt(n);
+    if (N[s].d + N[s].y > DERS[s].lgs) uyari = `${DERS[s].ad}: doğru + yanlış ${DERS[s].lgs} soruyu geçemez.`;
+  });
+  if (!$("#n-top")) return;
+  $("#n-top").textContent = fmt(top);
+  const p = puanHesap(netler);
+  $("#n-puan").textContent = fmt(p);
+  $("#n-bar").style.width = ((p - 100) / 4) + "%";
+  $("#n-uyari").textContent = uyari;
+  $("#n-uyari").style.color = uyari ? "var(--bad)" : "";
+}
+
+/* ===================== OLAYLAR ===================== */
+document.addEventListener("click", e => {
+  const tab = e.target.closest("[data-tab]");
+  if (tab) { git(tab.dataset.tab); return; }
+  const b = e.target.closest("[data-act]");
+  if (!b) return;
+  const a = b.dataset.act;
+
+  if (a === "c-ders") { C.ders = b.dataset.v; C.konu = "hepsi"; ciz(); }
+  else if (a === "c-basla") {
+    let l = karistir(havuz()); if (C.adet) l = l.slice(0, C.adet);
+    pratikBasla(l, C.ders === "hepsi" ? "Karışık test" : DERS[C.ders].ad + (C.konu !== "hepsi" ? " · " + C.konu : ""));
+  }
+  else if (a === "konu-coz") {
+    const l = karistir(Q.filter(q => q.s === b.dataset.s && q.t === b.dataset.t));
+    pratikBasla(l, DERS[b.dataset.s].ad + " · " + b.dataset.t);
+  }
+  else if (a === "p-sec") {
+    if (Z.cev[Z.i] !== undefined) return;
+    const j = +b.dataset.j; Z.cev[Z.i] = j; kaydetCevap(Z.liste[Z.i], j); ciz();
+  }
+  else if (a === "p-ileri") { Z.i++; ciz(); window.scrollTo({ top: 0 }); }
+  else if (a === "p-bitir") { Z.i = Z.liste.length; Z.liste = Z.liste.slice(0, Z.cev.length); ciz(); }
+  else if (a === "p-yeni") { Z = null; ciz(); }
+  else if (a === "p-tekrar") {
+    const l = Z.liste.filter((q, i) => Z.cev[i] >= 0 && Z.cev[i] !== q.a);
+    pratikBasla(karistir(l), "Yanlışları tekrar");
+  }
+  else if (a === "y-coz") {
+    const l = S.yanlis.map(id => QMAP[id]).filter(q => q && (!b.dataset.s || q.s === b.dataset.s));
+    pratikBasla(karistir(l), "Yanlışlarım tekrarı");
+  }
+  else if (a === "d-basla") { denemeKur(); ciz(); }
+  else if (a === "d-sec") { const j = +b.dataset.j; D.cev[D.i] = D.cev[D.i] === j ? -1 : j; ciz(); }
+  else if (a === "d-git") { const i = +b.dataset.i; if (i >= 0 && i < D.liste.length) { D.i = i; D.onay = false; ciz(); } }
+  else if (a === "d-bitir") { D.onay = true; ciz(); }
+  else if (a === "d-bitir-hayir") { D.onay = false; ciz(); }
+  else if (a === "d-bitir-evet") { denemeBitir(); window.scrollTo({ top: 0 }); }
+  else if (a === "d-yeni") { D = null; ciz(); }
+  else if (a === "pomo-bas") {
+    try { if (!P.ctx) P.ctx = new (window.AudioContext || window.webkitAudioContext)(); } catch (err) {}
+    P.calisiyor = !P.calisiyor;
+    clearInterval(P.int);
+    if (P.calisiyor) P.int = setInterval(pomoTik, 1000);
+    pomoGuncelle();
+  }
+  else if (a === "pomo-sifir") { clearInterval(P.int); P.calisiyor = false; P.mod = "calis"; P.kalan = POMO_SURE.calis; pomoGuncelle(); }
+});
+document.addEventListener("change", e => {
+  const t = e.target;
+  if (t.id === "c-konu") { C.konu = t.value; ciz(); }
+  else if (t.id === "c-adet") { C.adet = +t.value; }
+  else if (t.id === "c-yeni") { C.yeni = t.checked; ciz(); }
+  else if (t.id === "hedef") { const v = Math.max(5, Math.min(300, +t.value || 40)); S.hedef = v; kaydet(); ciz(); }
+  else if (t.id === "sinav" && t.value) { S.sinav = t.value; kaydet(); ust(); }
+  else if (t.dataset.konu) { if (t.checked) S.konu[t.dataset.konu] = true; else delete S.konu[t.dataset.konu]; kaydet(); ciz(); }
+});
+document.addEventListener("input", e => {
+  const t = e.target;
+  if (t.dataset.net) { N[t.dataset.net][t.dataset.k] = Math.max(0, +t.value || 0); netGuncelle(); }
+});
+document.addEventListener("keydown", e => {
+  if (e.target.matches("input, select, textarea")) return;
+  const k = e.key.toUpperCase();
+  const idx = HARF.indexOf(k);
+  if (aktif === "coz" && Z && Z.i < Z.liste.length) {
+    if (idx >= 0 && Z.cev[Z.i] === undefined) { Z.cev[Z.i] = idx; kaydetCevap(Z.liste[Z.i], idx); ciz(); }
+    else if (e.key === "Enter" && Z.cev[Z.i] !== undefined) { Z.i++; ciz(); }
+  } else if (aktif === "deneme" && D && !D.sonuc) {
+    if (idx >= 0) { D.cev[D.i] = idx; ciz(); }
+    else if (e.key === "ArrowRight" && D.i + 1 < D.liste.length) { D.i++; ciz(); }
+    else if (e.key === "ArrowLeft" && D.i > 0) { D.i--; ciz(); }
+  }
+});
+
+/* ===================== BAŞLAT ===================== */
+const ilk = (location.hash || "").slice(1);
+aktif = SEKME.some(s => s[0] === ilk) ? ilk : "panel";
+pomoGuncelle();
+ciz();
+</script>
+<!--APP-END-->
+</body>
+</html>
