@@ -7,6 +7,7 @@
 - **Kılıç Yolu (oyun):** Şövalyen yolda yürür; her canavar bir LGS sorusu taşır. Doğru cevap kılıç darbesi, yanlış cevap can kaybı. Kombo puanı, altın toplama (zıpla), her 8 canavarda 3 soruluk Sınav Canavarı ve rekor.
 - **Panel:** LGS'ye kalan gün, günlük soru hedefi, çalışma serisi, son 14 gün, derslere göre doğru oranı, tekrar edilmesi gereken zayıf konular, son denemeler.
 - **Soru Çöz:** Ders/konu seçerek test çöz; her sorudan sonra doğru cevap ve açıklama. Klavye ile A/B/C/D ve Enter.
+- **Tahta:** Elle soru yazıp çözmek için çizim tahtası: kalem, fosforlu kalem, silgi, 5 renk, 3 kalınlık, geri al/yinele (Ctrl+Z / Ctrl+Y), kareli/çizgili/noktalı zemin, çoklu sayfa ve tam ekran. Bankadan soru getirilebilir ya da Soru Çöz ve Yanlışlarım'daki "Tahtada çöz" düğmesiyle bir soru tahtaya gönderilebilir.
 - **Deneme:** LGS ders dağılımına göre 27 soruluk, 45 dakikalık mini deneme; optik cevap kâğıdı, D/Y/B/net tablosu, tahmini puan ve cevap anahtarı.
 - **Yanlışlarım:** Yanlış yaptığın sorular birikir; doğru cevaplayınca listeden çıkar.
 - **Konu Takibi:** 6 dersin 8. sınıf üniteleri; bitirdiklerini işaretle, konu bazında başarını gör.

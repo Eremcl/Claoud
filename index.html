@@ -45,6 +45,7 @@
   color-scheme: dark;
 }
 * { box-sizing: border-box; }
+[hidden] { display: none !important; }
 body {
   margin: 0; background: var(--paper); color: var(--ink);
   font-family: var(--f-body); font-size: 15px; line-height: 1.55;
@@ -213,6 +214,31 @@ td input[type="number"] { width: 64px; text-align: right; }
 .tbar { height: 6px; background: var(--paper); border-radius: 999px; overflow: hidden; margin-bottom: 14px; }
 .tbar i { display: block; height: 100%; width: 100%; background: var(--accent); }
 .tag.src { background: var(--accent-soft); color: var(--accent); }
+/* Tahta */
+.sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+.board-card { padding: 0; overflow: hidden; display: grid; }
+.board-card.full { position: fixed; inset: 0; z-index: 50; border-radius: 0; border: 0; align-content: start;
+  padding-top: env(safe-area-inset-top, 0px); padding-bottom: env(safe-area-inset-bottom, 0px);
+  padding-left: env(safe-area-inset-left, 0px); padding-right: env(safe-area-inset-right, 0px); }
+body.kilit { overflow: hidden; }
+.toolbar { display: flex; flex-wrap: wrap; gap: 10px 14px; align-items: center; padding: 10px 14px; border-bottom: 1px solid var(--line); }
+.toolbar .tb-sag { margin-left: auto; }
+.seg { display: inline-flex; border: 1.5px solid var(--line); border-radius: 10px; overflow: hidden; }
+.seg button { border: 0; background: var(--sheet); padding: 6px 12px; cursor: pointer; font-size: .88rem; }
+.seg button + button { border-left: 1.5px solid var(--line); }
+.seg button[aria-pressed="true"] { background: var(--ink); color: var(--sheet); }
+.swatches, .sizes { display: flex; gap: 6px; align-items: center; }
+.sw { width: 26px; height: 26px; border-radius: 50%; background: var(--sw); border: 2px solid var(--sheet); box-shadow: 0 0 0 1.5px var(--line); cursor: pointer; padding: 0; }
+.sw[aria-pressed="true"] { box-shadow: 0 0 0 2.5px var(--ink); }
+.sizes button { width: 30px; height: 30px; border-radius: 8px; border: 1.5px solid var(--line); background: var(--sheet); display: grid; place-items: center; cursor: pointer; padding: 0; }
+.sizes button[aria-pressed="true"] { border-color: var(--ink); }
+.sizes i { display: block; border-radius: 50%; background: var(--ink); }
+.board { --g: 40px; position: relative; margin: 0 auto; background-color: #fdfdfb; max-width: 100%; }
+.board.z-kare { background-image: linear-gradient(#d9e4f2 1px, transparent 1px), linear-gradient(90deg, #d9e4f2 1px, transparent 1px); background-size: var(--g) var(--g); }
+.board.z-cizgi { background-image: linear-gradient(#cddcf0 1px, transparent 1px); background-size: 100% var(--g); }
+.board.z-nokta { background-image: radial-gradient(#b9c6d8 1.2px, transparent 1.4px); background-size: var(--g) var(--g); }
+.board canvas { display: block; touch-action: none; cursor: crosshair; }
+.pager { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; justify-content: space-between; padding: 10px 14px; border-top: 1px solid var(--line); }
 @media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
 </style>
 </head>
@@ -507,7 +533,7 @@ function kalanGun() {
 
 /* ===================== YÖNLENDİRME ===================== */
 const SEKME = [
-  ["panel", "Panel"], ["oyun", "Kılıç Yolu"], ["coz", "Soru Çöz"], ["deneme", "Deneme"], ["yanlis", "Yanlışlarım"], ["konular", "Konu Takibi"], ["net", "Net Hesapla"],
+  ["panel", "Panel"], ["oyun", "Kılıç Yolu"], ["coz", "Soru Çöz"], ["tahta", "Tahta"], ["deneme", "Deneme"], ["yanlis", "Yanlışlarım"], ["konular", "Konu Takibi"], ["net", "Net Hesapla"],
 ];
 let aktif = "panel";
 function ust() {
@@ -524,11 +550,12 @@ function git(id) {
 }
 function ciz() {
   ust();
-  const v = { panel: vPanel, oyun: vOyun, coz: vCoz, deneme: vDeneme, yanlis: vYanlis, konular: vKonular, net: vNet }[aktif];
+  const v = { panel: vPanel, oyun: vOyun, coz: vCoz, tahta: vTahta, deneme: vDeneme, yanlis: vYanlis, konular: vKonular, net: vNet }[aktif];
   $("#main").innerHTML = v();
   if (aktif === "panel") pomoGuncelle();
   if (aktif === "net") netGuncelle();
   if (aktif === "oyun") oyunBagla(); else oyunDurdur();
+  if (aktif === "tahta") tahtaBagla(); else document.body.classList.remove("kilit");
 }
 
 /* ===================== PANEL ===================== */
@@ -722,7 +749,7 @@ function vSoru() {
     <div class="opts">${q.o.map((o, j) => `<button class="opt ${sinif(j)}" data-act="p-sec" data-j="${j}" ${acik ? "disabled" : ""}><span class="bub">${HARF[j]}</span><span>${esc(o)}</span></button>`).join("")}</div>
     ${acik ? `<div class="explain ${c === q.a ? "" : "no"}"><b>${c === q.a ? "Doğru!" : c < 0 ? "Boş bıraktın." : "Yanlış."}</b> Doğru cevap ${HARF[q.a]}. ${esc(q.e)}</div>` : ""}
     <div class="qfoot">
-      <button class="btn ghost small" data-act="p-bitir">Testi bitir</button>
+      <div class="row" style="gap:8px"><button class="btn ghost small" data-act="p-bitir">Testi bitir</button><button class="btn ghost small" data-act="t-gonder" data-id="${q.id}">Tahtada çöz</button></div>
       ${acik ? `<button class="btn" data-act="p-ileri">${Z.i + 1 < Z.liste.length ? "Sonraki soru" : "Sonuçları gör"}</button>`
              : `<button class="btn ghost" data-act="p-sec" data-j="-1">Boş bırak</button>`}
     </div>
@@ -866,6 +893,7 @@ function vYanlis() {
       <p>${esc(q.q)}</p>
       <div class="ans">Doğru cevap: <b>${HARF[q.a]}) ${esc(q.o[q.a])}</b></div>
       <div class="note">${esc(q.e)}</div>
+      <div><button class="btn ghost small" data-act="t-gonder" data-id="${q.id}">Tahtada çöz</button></div>
     </details>`).join("")}
   </section>`;
 }
@@ -1337,6 +1365,191 @@ function gBoyut() {
 window.addEventListener("resize", () => { if (aktif === "oyun") gBoyut(); });
 document.addEventListener("pointerdown", e => { if (e.target.id === "g-cv") zipla(); });
 
+/* ===================== TAHTA ===================== */
+/* Çizgiler vektör olarak 1000×700'lük mantıksal tahtada saklanır; ekran boyutu değişse de bozulmaz. */
+const TKEY = "lgs-masasi-tahta-v1", TW = 1000, TH = 700;
+const T_RENK = [["#1c2230", "Siyah"], ["#2f5fd0", "Mavi"], ["#d23a3a", "Kırmızı"], ["#1d8f55", "Yeşil"], ["#f2b705", "Sarı"]];
+const T_KAL = { kalem: [2, 4, 8], fosfor: [14, 24, 36], silgi: [16, 34, 70] };
+const T_AD = { kalem: "Kalem", fosfor: "Fosforlu", silgi: "Silgi" };
+const T = { arac: "kalem", renk: "#1c2230", kal: 1, tam: false, onay: null, aktifCizgi: null, ileri: [], cv: null, ctx: null, cache: null, olcek: 1, dpr: 1, raf: 0, kayitHata: false, cevap: null, soruDers: "hepsi" };
+function tYukle() {
+  try { const r = localStorage.getItem(TKEY); if (r) { const d = JSON.parse(r); if (d.sayfalar && d.sayfalar.length) return Object.assign({ zemin: "kare", i: 0 }, d); } } catch (e) {}
+  return { sayfalar: [{ cizgi: [], soru: null }], i: 0, zemin: "kare" };
+}
+const TB = tYukle();
+let tKayitZaman = 0;
+function tKaydet() {
+  clearTimeout(tKayitZaman);
+  tKayitZaman = setTimeout(() => {
+    try { localStorage.setItem(TKEY, JSON.stringify(TB)); T.kayitHata = false; } catch (e) { T.kayitHata = true; }
+    const n = $("#t-not"); if (n) n.textContent = T.kayitHata ? "Tahta çok doldu, bu tarayıcıya kaydedilemedi. Bazı sayfaları temizle." : "";
+  }, 400);
+}
+const tSayfa = () => TB.sayfalar[TB.i];
+
+function vTahta() {
+  const sf = tSayfa(), q = sf.soru && QMAP[sf.soru];
+  const kal = T_KAL[T.arac];
+  return `
+  <section class="card stack" id="t-soru">${q ? tSoruHtml(q) : `
+    <div class="row" style="justify-content:space-between;align-items:end">
+      <div style="min-width:0;flex:1 1 280px"><h2>Tahta</h2><p class="muted" style="margin:4px 0 0">Kendi sorunu elle yaz ve çöz ya da bankadan bir soru getirip altında işlem yap. Sayfaların bu tarayıcıda saklanır.</p></div>
+      <div class="row">
+        <label class="sr" for="t-ders">Ders</label>
+        <select id="t-ders"><option value="hepsi">Karışık</option>${DK.map(s => `<option value="${s}" ${T.soruDers === s ? "selected" : ""}>${esc(DERS[s].ad)}</option>`).join("")}</select>
+        <button class="btn ghost" data-act="t-getir">Soru getir</button>
+      </div>
+    </div>`}
+  </section>
+  <section class="card board-card ${T.tam ? "full" : ""}" id="t-wrap">
+    <div class="toolbar" role="toolbar" aria-label="Tahta araçları">
+      <div class="seg">${Object.keys(T_AD).map(a => `<button data-act="t-arac" data-v="${a}" aria-pressed="${T.arac === a}">${T_AD[a]}</button>`).join("")}</div>
+      <div class="swatches" ${T.arac === "silgi" ? "hidden" : ""}>${T_RENK.map(([c, ad]) => `<button class="sw" data-act="t-renk" data-v="${c}" style="--sw:${c}" aria-pressed="${T.renk === c}" aria-label="${ad}"></button>`).join("")}</div>
+      <div class="sizes">${kal.map((k, i) => `<button data-act="t-kal" data-v="${i}" aria-pressed="${T.kal === i}" aria-label="Kalınlık ${i + 1}"><i style="width:${Math.min(22, 4 + i * 7)}px;height:${Math.min(22, 4 + i * 7)}px"></i></button>`).join("")}</div>
+      <div class="row" style="gap:6px">
+        <button class="btn ghost small" data-act="t-geri" ${sf.cizgi.length ? "" : "disabled"} title="Ctrl+Z">Geri al</button>
+        <button class="btn ghost small" data-act="t-ileri" ${T.ileri.length ? "" : "disabled"} title="Ctrl+Y">Yinele</button>
+      </div>
+      <div class="row tb-sag" style="gap:6px">
+        <label class="sr" for="t-zemin">Zemin</label>
+        <select id="t-zemin">${[["kare", "Kareli"], ["cizgi", "Çizgili"], ["nokta", "Noktalı"], ["duz", "Düz"]].map(([v, ad]) => `<option value="${v}" ${TB.zemin === v ? "selected" : ""}>${ad}</option>`).join("")}</select>
+        <button class="btn ghost small" data-act="t-tam">${T.tam ? "Küçült" : "Tam ekran"}</button>
+      </div>
+    </div>
+    <div class="board z-${TB.zemin}" id="t-board"><canvas id="t-cv" aria-label="Çizim tahtası"></canvas></div>
+    <div class="pager">
+      <div class="row" style="gap:6px">
+        <button class="btn ghost small" data-act="t-sayfa" data-v="-1" ${TB.i === 0 ? "disabled" : ""} aria-label="Önceki sayfa">‹</button>
+        <span class="mono note">Sayfa ${TB.i + 1} / ${TB.sayfalar.length}</span>
+        <button class="btn ghost small" data-act="t-sayfa" data-v="1" ${TB.i + 1 >= TB.sayfalar.length ? "disabled" : ""} aria-label="Sonraki sayfa">›</button>
+        <button class="btn ghost small" data-act="t-yeni">+ Yeni sayfa</button>
+      </div>
+      <span class="note" id="t-not">${T.kayitHata ? "Tahta çok doldu, bu tarayıcıya kaydedilemedi." : T.tam && window.innerHeight > window.innerWidth ? "Telefonu yan çevirirsen tahta büyür." : ""}</span>
+      ${T.onay ? `<div class="confirm"><span>${T.onay === "sil" ? "Bu sayfa silinsin mi?" : "Sayfadaki tüm çizimler silinsin mi?"}</span><button class="btn accent small" data-act="t-onay-evet">Evet</button><button class="btn ghost small" data-act="t-onay-hayir">Vazgeç</button></div>`
+        : `<div class="row" style="gap:6px"><button class="btn ghost small" data-act="t-temizle" ${sf.cizgi.length ? "" : "disabled"}>Sayfayı temizle</button>${TB.sayfalar.length > 1 ? `<button class="btn ghost small" data-act="t-sil">Sayfayı sil</button>` : ""}</div>`}
+    </div>
+  </section>`;
+}
+function tSoruHtml(q) {
+  const c = T.cevap;
+  const sinif = j => c === null ? "" : j === q.a ? "ok" : j === c ? "no" : "";
+  return `
+    <div class="qhead" style="margin:0">${chip(q.s)}<span class="note">${esc(q.t)}</span>${kaynak(q)}
+      <span class="row" style="gap:6px;margin-left:auto"><button class="btn ghost small" data-act="t-getir">Başka soru</button><button class="btn ghost small" data-act="t-kaldir">Soruyu kaldır</button></span></div>
+    <p class="qtext" style="margin:0">${esc(q.q)}</p>
+    <div class="opts">${q.o.map((o, j) => `<button class="opt ${sinif(j)}" data-act="t-cev" data-j="${j}" ${c !== null ? "disabled" : ""}><span class="bub">${HARF[j]}</span><span>${esc(o)}</span></button>`).join("")}</div>
+    ${c !== null ? `<div class="explain ${c === q.a ? "" : "no"}" style="margin:0"><b>${c === q.a ? "Doğru!" : "Yanlış."}</b> Doğru cevap ${HARF[q.a]}. ${esc(q.e)}</div>` : `<p class="note" style="margin:0">İşlemini aşağıdaki tahtada yap, sonra cevabını seç.</p>`}`;
+}
+function tSoruGuncelle() { const el = $("#t-soru"); if (el) { const q = QMAP[tSayfa().soru]; if (q) el.innerHTML = tSoruHtml(q); } }
+function tahtaSoruKoy(id) {
+  const sf = tSayfa();
+  if (!sf.cizgi.length && !sf.soru) sf.soru = id;
+  else { TB.sayfalar.push({ cizgi: [], soru: id }); TB.i = TB.sayfalar.length - 1; }
+  T.cevap = null; T.ileri = []; tKaydet();
+}
+
+/* ---- çizim ---- */
+function tahtaBagla() {
+  const cv = $("#t-cv"); if (!cv) return;
+  T.cv = cv; T.ctx = cv.getContext("2d"); T.cache = document.createElement("canvas");
+  tBoyut();
+  cv.addEventListener("pointerdown", tBas);
+  cv.addEventListener("pointermove", tHareket);
+  cv.addEventListener("pointerup", tBirak);
+  cv.addEventListener("pointercancel", tBirak);
+  document.body.classList.toggle("kilit", T.tam);
+}
+function tBoyut() {
+  if (!T.cv) return;
+  const wrap = $("#t-board");
+  let w = wrap.parentElement.clientWidth - (T.tam ? 0 : 2);
+  if (T.tam) {
+    const ust = $("#t-wrap .toolbar").offsetHeight + $("#t-wrap .pager").offsetHeight + 24;
+    w = Math.min(w, (window.innerHeight - ust) * TW / TH);
+  }
+  w = Math.max(200, Math.floor(w));
+  const h = Math.round(w * TH / TW);
+  T.olcek = w / TW; T.dpr = Math.min(2, window.devicePixelRatio || 1);
+  wrap.style.width = w + "px"; wrap.style.height = h + "px";
+  wrap.style.setProperty("--g", (40 * T.olcek) + "px");
+  [T.cv, T.cache].forEach(c => { c.width = Math.round(w * T.dpr); c.height = Math.round(h * T.dpr); });
+  T.cv.style.width = w + "px"; T.cv.style.height = h + "px";
+  tCacheYap();
+}
+function tCizgiCiz(ctx, c) {
+  const p = c.p; if (!p.length) return;
+  ctx.save();
+  ctx.globalCompositeOperation = c.a === "silgi" ? "destination-out" : "source-over";
+  ctx.globalAlpha = c.a === "fosfor" ? 0.35 : 1;
+  ctx.strokeStyle = ctx.fillStyle = c.c;
+  ctx.lineCap = ctx.lineJoin = "round";
+  ctx.lineWidth = c.w;
+  if (p.length === 1) { ctx.beginPath(); ctx.arc(p[0][0], p[0][1], c.w / 2, 0, 7); ctx.fill(); ctx.restore(); return; }
+  ctx.beginPath(); ctx.moveTo(p[0][0], p[0][1]);
+  for (let i = 1; i < p.length - 1; i++) {
+    const mx = (p[i][0] + p[i + 1][0]) / 2, my = (p[i][1] + p[i + 1][1]) / 2;
+    ctx.quadraticCurveTo(p[i][0], p[i][1], mx, my);
+  }
+  const s = p[p.length - 1]; ctx.lineTo(s[0], s[1]);
+  ctx.stroke(); ctx.restore();
+}
+function tCacheYap() {
+  const x = T.cache.getContext("2d");
+  x.setTransform(1, 0, 0, 1, 0, 0); x.clearRect(0, 0, T.cache.width, T.cache.height);
+  x.setTransform(T.olcek * T.dpr, 0, 0, T.olcek * T.dpr, 0, 0);
+  tSayfa().cizgi.forEach(c => tCizgiCiz(x, c));
+  tGoster();
+}
+function tGoster() {
+  const x = T.ctx; if (!x) return;
+  x.setTransform(1, 0, 0, 1, 0, 0); x.clearRect(0, 0, T.cv.width, T.cv.height);
+  if (T.aktifCizgi && T.aktifCizgi.a === "silgi") {
+    // silgi canlıyken önbelleği kopyalayıp üstünden sil
+    x.drawImage(T.cache, 0, 0);
+    x.setTransform(T.olcek * T.dpr, 0, 0, T.olcek * T.dpr, 0, 0); tCizgiCiz(x, T.aktifCizgi);
+  } else {
+    x.drawImage(T.cache, 0, 0);
+    if (T.aktifCizgi) { x.setTransform(T.olcek * T.dpr, 0, 0, T.olcek * T.dpr, 0, 0); tCizgiCiz(x, T.aktifCizgi); }
+  }
+}
+function tNokta(e) {
+  const r = T.cv.getBoundingClientRect();
+  return [Math.round((e.clientX - r.left) / T.olcek * 10) / 10, Math.round((e.clientY - r.top) / T.olcek * 10) / 10];
+}
+function tBas(e) {
+  if (e.button > 0) return;
+  e.preventDefault();
+  T.cv.setPointerCapture(e.pointerId);
+  const taban = T_KAL[T.arac][T.kal];
+  const bas = e.pointerType === "pen" && e.pressure > 0 ? 0.6 + e.pressure * 0.8 : 1;
+  T.aktifCizgi = { a: T.arac, c: T.arac === "silgi" ? "#000" : T.renk, w: Math.round(taban * (T.arac === "kalem" ? bas : 1) * 10) / 10, p: [tNokta(e)] };
+  tGoster();
+}
+function tHareket(e) {
+  if (!T.aktifCizgi) return;
+  const olaylar = e.getCoalescedEvents ? e.getCoalescedEvents() : [e];
+  for (const o of (olaylar.length ? olaylar : [e])) {
+    const n = tNokta(o), s = T.aktifCizgi.p[T.aktifCizgi.p.length - 1];
+    if (Math.abs(n[0] - s[0]) + Math.abs(n[1] - s[1]) >= 1.5) T.aktifCizgi.p.push(n);
+  }
+  if (!T.raf) T.raf = requestAnimationFrame(() => { T.raf = 0; tGoster(); });
+}
+function tBirak() {
+  if (!T.aktifCizgi) return;
+  tSayfa().cizgi.push(T.aktifCizgi); T.aktifCizgi = null; T.ileri = [];
+  const x = T.cache.getContext("2d"); x.setTransform(T.olcek * T.dpr, 0, 0, T.olcek * T.dpr, 0, 0);
+  tCizgiCiz(x, tSayfa().cizgi[tSayfa().cizgi.length - 1]);
+  tGoster(); tKaydet(); tAracGuncelle();
+}
+function tAracGuncelle() {
+  const sf = tSayfa();
+  const g = $('[data-act="t-geri"]'), i = $('[data-act="t-ileri"]'), t = $('[data-act="t-temizle"]');
+  if (g) g.disabled = !sf.cizgi.length; if (i) i.disabled = !T.ileri.length; if (t) t.disabled = !sf.cizgi.length;
+}
+function tGeri() { const sf = tSayfa(); if (!sf.cizgi.length) return; T.ileri.push(sf.cizgi.pop()); tCacheYap(); tKaydet(); tAracGuncelle(); }
+function tIleri() { if (!T.ileri.length) return; tSayfa().cizgi.push(T.ileri.pop()); tCacheYap(); tKaydet(); tAracGuncelle(); }
+window.addEventListener("resize", () => { if (aktif === "tahta") tBoyut(); });
+
 /* ===================== OLAYLAR ===================== */
 document.addEventListener("click", e => {
   const tab = e.target.closest("[data-tab]");
@@ -1389,7 +1602,30 @@ document.addEventListener("click", e => {
   else if (a === "g-devam") gDevam();
   else if (a === "g-menu") { G.durum = "menu"; G.canavar = null; G.soru = null; gHud(); gPanel(); }
   else if (a === "g-ses") { G.sesAcik = !G.sesAcik; gHud(); }
-  else if (a === "pomo-sifir") { clearInterval(P.int); P.calisiyor = false; P.mod = "calis"; P.kalan = POMO_SURE.calis; pomoGuncelle(); }
+  else if (a === "t-arac") { T.arac = b.dataset.v; if (T.kal > 2) T.kal = 1; ciz(); }
+  else if (a === "t-renk") { T.renk = b.dataset.v; if (T.arac === "silgi") T.arac = "kalem"; ciz(); }
+  else if (a === "t-kal") { T.kal = +b.dataset.v; ciz(); }
+  else if (a === "t-geri") tGeri();
+  else if (a === "t-ileri") tIleri();
+  else if (a === "t-tam") { T.tam = !T.tam; ciz(); }
+  else if (a === "t-sayfa") { TB.i = Math.max(0, Math.min(TB.sayfalar.length - 1, TB.i + +b.dataset.v)); T.ileri = []; T.cevap = null; T.onay = null; tKaydet(); ciz(); }
+  else if (a === "t-yeni") { TB.sayfalar.push({ cizgi: [], soru: null }); TB.i = TB.sayfalar.length - 1; T.ileri = []; T.cevap = null; tKaydet(); ciz(); }
+  else if (a === "t-temizle") { T.onay = "temizle"; ciz(); }
+  else if (a === "t-sil") { T.onay = "sil"; ciz(); }
+  else if (a === "t-onay-hayir") { T.onay = null; ciz(); }
+  else if (a === "t-onay-evet") {
+    if (T.onay === "sil" && TB.sayfalar.length > 1) { TB.sayfalar.splice(TB.i, 1); TB.i = Math.min(TB.i, TB.sayfalar.length - 1); }
+    else tSayfa().cizgi = [];
+    T.onay = null; T.ileri = []; T.cevap = null; tKaydet(); ciz();
+  }
+  else if (a === "t-getir") {
+    const h = Q.filter(q => T.soruDers === "hepsi" || q.s === T.soruDers);
+    tSayfa().soru = h[Math.floor(Math.random() * h.length)].id; T.cevap = null; tKaydet(); ciz();
+  }
+  else if (a === "t-kaldir") { tSayfa().soru = null; T.cevap = null; tKaydet(); ciz(); }
+  else if (a === "t-cev") { const q = QMAP[tSayfa().soru]; if (q && T.cevap === null) { T.cevap = +b.dataset.j; kaydetCevap(q, T.cevap); ust(); tSoruGuncelle(); } }
+  else if (a === "t-gonder") { tahtaSoruKoy(b.dataset.id); git("tahta"); }
+ { clearInterval(P.int); P.calisiyor = false; P.mod = "calis"; P.kalan = POMO_SURE.calis; pomoGuncelle(); }
 });
 document.addEventListener("change", e => {
   const t = e.target;
@@ -1397,6 +1633,8 @@ document.addEventListener("change", e => {
   else if (t.id === "c-adet") { C.adet = +t.value; }
   else if (t.id === "c-yeni") { C.yeni = t.checked; ciz(); }
   else if (t.id === "c-meb") { C.meb = t.checked; ciz(); }
+  else if (t.id === "t-ders") { T.soruDers = t.value; }
+  else if (t.id === "t-zemin") { TB.zemin = t.value; tKaydet(); const bd = $("#t-board"); if (bd) bd.className = "board z-" + t.value; }
   else if (t.id === "g-meb") { G.meb = t.checked; }
   else if (t.id === "hedef") { const v = Math.max(5, Math.min(300, +t.value || 40)); S.hedef = v; kaydet(); ciz(); }
   else if (t.id === "sinav" && t.value) { S.sinav = t.value; kaydet(); ust(); }
@@ -1408,6 +1646,13 @@ document.addEventListener("input", e => {
 });
 document.addEventListener("keydown", e => {
   if (e.target.matches("input, select, textarea")) return;
+  if (aktif === "tahta") {
+    const z = (e.ctrlKey || e.metaKey) && e.key.toLowerCase() === "z";
+    if (z && !e.shiftKey) { e.preventDefault(); tGeri(); }
+    else if ((e.ctrlKey || e.metaKey) && (e.key.toLowerCase() === "y" || (z && e.shiftKey))) { e.preventDefault(); tIleri(); }
+    else if (e.key === "Escape" && T.tam) { T.tam = false; ciz(); }
+    return;
+  }
   const k = e.key.toUpperCase();
   const idx = HARF.indexOf(k);
   if (aktif === "oyun") {
