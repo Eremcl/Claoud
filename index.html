@@ -200,6 +200,19 @@ td input[type="number"] { width: 64px; text-align: right; }
 .note { font-size: .82rem; color: var(--muted); }
 .hero-res { display: flex; gap: 24px; flex-wrap: wrap; align-items: center; }
 .hero-res > div { display: grid; gap: 2px; }
+/* Kılıç Yolu */
+.game { padding: 0; overflow: hidden; }
+.hud { display: flex; gap: 8px 16px; flex-wrap: wrap; align-items: center; padding: 10px 16px; border-bottom: 1px solid var(--line); font-size: .9rem; }
+.hud .hearts { color: var(--accent); font-size: 1.25rem; letter-spacing: 2px; line-height: 1; }
+.hud .sp { margin-left: auto; }
+.stage { background: #1b1430; }
+.stage canvas { display: block; width: 100%; cursor: pointer; touch-action: manipulation; user-select: none; -webkit-user-select: none; }
+.gpanel { padding: 16px 20px 20px; }
+.duel-head { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; margin-bottom: 8px; }
+.duel-head .sp { margin-left: auto; }
+.tbar { height: 6px; background: var(--paper); border-radius: 999px; overflow: hidden; margin-bottom: 14px; }
+.tbar i { display: block; height: 100%; width: 100%; background: var(--accent); }
+.tag.src { background: var(--accent-soft); color: var(--accent); }
 @media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
 </style>
 </head>
@@ -347,6 +360,83 @@ const Q = [
   { s: "ing", t: "Science", q: "The light bulb ______ by Thomas Edison in 1879.", o: ["is invented", "was invented", "invented", "has invent"], a: 1, e: "Past passive (in 1879): was + V3 → was invented." },
   { s: "ing", t: "Natural Forces", q: "If global warming continues, sea levels ______.", o: ["rise", "will rise", "rose", "would rising"], a: 1, e: "First conditional: If + present simple, will + verb → will rise." },
 ];
+
+/* MEB "LGS Çalışma Kitapları Seti"nden: 2025-2026 Merkezî Sınav soruları (şekil gerektirmeyenler).
+   Cevaplar MEB cevap anahtarındandır; açıklamalar bu uygulamaya aittir. */
+const MEB = "LGS 2026";
+const QMEB = [
+  // ---- TÜRKÇE ----
+  { s: "tr", t: "Sözcükte Anlam", q: "Cahit Zarifoğlu, gördüğü gerçeklerle ilgili ne varsa düşüncelerini korkusuzca ifade etmiştir. Bu yüzden eleştirilecek yer varsa eleştirisini - - - - yapmaktan geri durmamıştır. Zarifoğlu, - - - - bir yazardır aynı zamanda. Çünkü yazılarının tamamı okunduğunda günümüz şartlarının nasıl olacağını yaşadığı dönemden okumuş gibidir. Özellikle medya, çocuk eğitimi ve ailelerin tutumu konularındaki görüşleri, günümüzde yaşanan olayları çok önceden sezdiğini gösteren önemli kanıtlardır.\n\nBu metinde boş bırakılan yerlere düşüncenin akışına göre sırasıyla aşağıdakilerden hangisi getirilmelidir?", o: ["cesaretle - öngörülü", "saygıyla - öz güvenli", "fedakârca - ağırbaşlı", "tarafsızca - özverili"], a: 0, e: "Düşüncelerini korkusuzca söylemesi \"cesaretle\", günümüzü önceden sezmesi \"öngörülü\" sözcüğüyle uyumludur." },
+  { s: "tr", t: "Sözcükte Anlam", q: "Çocukluk yıllarımda zihnimi tanımadığım diyarlara doğru yola çıkararak dünyaya başka bir gözle bakmamı sağlayan kişi, dedemden başkası değildi. Yeni bir işe başlarken hep ona danışır, onun tecrübelerinden faydalanırdım. Doktor olmamda dedemin etkisi çok fazladır.\n\nMetindeki \"zihnimi tanımadığım diyarlara doğru yola çıkararak\" ifadesinin bu metne kattığı anlam aşağıdakilerden hangisidir?", o: ["Sorunlarına çözüm bulmak", "Farklı düşünmesini sağlamak", "Vereceği kararları etkilemek", "Deneyiminden yararlanmak"], a: 1, e: "Zihni tanımadığı diyarlara yola çıkarmak, dünyaya başka bir gözle bakmayı yani farklı düşünmeyi anlatır." },
+  { s: "tr", t: "Cümlede Anlam", q: "\"Bir aydını tanımanın en iyi yolu, onun hangi tarihsel ve toplumsal zeminden bize seslendiğini tespit etmektir.\"\n\nAşağıdakilerden hangisi bu cümleye anlamca en yakındır?", o: ["Tarihsel ve toplumsal bağlılıkları bir düşünürün kişiliği hakkında doğru bilgiler verir.", "Tarihsel ve toplumsal atmosfer düşünürlerin gerçek değerini ortaya çıkarır.", "Düşünürlerin kimliğini belirleyen, tarihsel ve toplumsal olaylara karşı sergiledikleri tutumdur.", "Düşünürler bulunduğu çağa tarihsel ve toplumsal açıdan yön veren insanlardır."], a: 0, e: "Cümle, bir aydını tanımak için tarihsel ve toplumsal zeminine bakmak gerektiğini söylüyor. A, bu bağlılıkların kişiliği hakkında doğru bilgi verdiğini söyleyerek aynı yargıyı taşır." },
+  { s: "tr", t: "Paragraf", q: "Çağımızın en parlak aynası gibi görünen sosyal medya, aslında gerçeği çoğu kez eğip büken bir yanılsamalar perdesidir. Bir tıkla milyonlara ulaşan, kaynağı sorgulanmayan her söz benliğimize sızar; hakikat, söylentilerin gürültüsü içinde âdeta boğulur. Bilginin ışık gibi yayılması onun doğruluğunu garanti etmez aksine çoğu zaman hakikatin gölgelenmesine hizmet eder ve bilgi çarpıtılmış olur. Bunu önleyebilmek, teknolojik bariyerler inşa etmekle değil toplumdaki bireylere eleştirel düşünme becerisi kazandırmakla mümkün olacaktır. Fakat bilinçlenmiş toplumlarla sorumluluk bilinci olan sosyal medya şirketlerinin adımları birleşmedikçe sosyal medya güvenin değil, kuşkunun merkezi olmaya devam edecektir.\n\nBu metinde asıl anlatılmak istenen aşağıdakilerden hangisidir?", o: ["Sosyal medyada yapılan paylaşımların inandırıcılığını bilginin sunulma biçimi belirler.", "Sosyal medya şirketlerinin bilgi kirliliğinin artmasında ve yayılmasında önemli bir etkisi bulunur.", "Sosyal medyada yapılan paylaşımların hızı, insanların doğru bilgiye ulaşmasını zorlaştırır.", "Sosyal medyadaki bilgilerin güvenilirliği, bilinçli bir toplum ile sosyal medya kuruluşlarının iş birliğiyle sağlanır."], a: 3, e: "Metin son cümlede toplanıyor: güven, bilinçli toplumla sorumlu sosyal medya şirketlerinin adımları birleşince sağlanır." },
+  { s: "tr", t: "Paragraf", q: "Bugünkü yazısıyla okurlarına pusula oluyor yazar. Karşısındaki kişiyi kendisine yakın hissettirmek, aradaki bağı güçlü kılmak için seslenme ifadesi kullanıyor. Hakikate ulaşmak için soru sormaktan çekinmiyor. Verdiği öğütle gençlerin zihin dünyasına giriyor. Bunlarla başarıya ulaşıyor.\n\nBu metin, aşağıdakilerden hangisini değerlendirmek için yazılmış olabilir?", o: ["Gönül, insanların kalbinde oluşan duyguların kaynağıdır. Bu kaynağın temelinde ise güven vardır. O, her yerde hemen ortaya çıkmaz. Sevgili genç, bazen derdimize kuyudan gönül ararız fakat bulamayız. Çünkü biz de kimseye gönlümüzü kuyu yapmamışızdır.", "Sözün adressiz bir mektup olduğuna inanırım. Söz söylenir, göğe kanatlanır ve gideceği yere varır mı? Evet, zamanı gelince illaki muhatabını bulur. Eli kalem tutan herkesin bunu yapması gerekir. Yeter ki söylenecek söz olsun, yeter ki sözler iyi olsun.", "Diyorum ki, zamanımızı daha verimli kullanabilmek için ne yapmamız gerekir? Değerli arkadaşlar, dünyamıza sıkı sıkı hapsettiğimiz, gitmelerine müsaade etmediğimiz bize katkısı olmayan iş ve davranışlardan vazgeçelim. Uzun yollara, uzak uçurumlara armağan edelim onları. Gün, geceye gelmeden yorgunluğumuzu eksiltelim.", "Sorular senin zamanda yapacağın yolculuktur. Ey oğul, sorular en önemli yol göstericindir senin! Yola çıktığında merakını giderebilmek, kendini geliştirebilmek ve etrafına faydalı bir insan olabilmek için soru sormaktan çekinme. Daha sağlıklı, huzurlu yarınlara ulaşabilmek için onlara ihtiyacın olacak."], a: 2, e: "C'de seslenme (\"Değerli arkadaşlar\"), soru (\"ne yapmamız gerekir?\") ve öğüt (\"vazgeçelim\") birlikte var. D soru sormayı öğütler ama kendisi soru sormaz." },
+  { s: "tr", t: "Paragraf", q: "Behçet Necatigil, şiirle iç içe geçen kırk yılı boyunca orta hâlli bir vatandaşın başından geçebilecek durumları anlatmaya çalıştı. Zamanını onların gerçek yaşantılarını duyurmaya harcadı. Çok şiir yazıp şiirleriyle çok hayata dokunmuş olsa da \"Kitaplarda Ölmek\" şiirinde insan hayatına bakış açısını şu dizelerle anlattı:\n\"Adı, soyadı\nAçılır parantez\nDoğduğu yıl, çizgi, öldüğü yıl, bitti\nKapanır parantez.\"\nBu dizelerine bakıp da şairin parantezinin kapandığını sanmayın. Onun şiir parantezi hiç kapanmadı ve kapanmayacak.\n\nBu metinden, \"Behçet Necatigil\" ile ilgili aşağıdakilerin hangisine ulaşılamaz?", o: ["Şiirlerinde günlük hayatı yansıtmıştır.", "Şiirleriyle okuyucularda izler bırakmıştır.", "Şiirleriyle kalıcılığı yakalamıştır.", "Şiirlerinde okurların beklentisini gözetmiştir."], a: 3, e: "Okurların beklentisini gözettiğine dair bir bilgi yok. Günlük hayatı anlattığı, hayatlara dokunduğu ve \"parantezinin hiç kapanmayacağı\" metinde var." },
+  { s: "tr", t: "Metin Türleri", q: "I. Metin\nYıldızlar birer ikişer sayılmaya başladığında o kitapçıdan nasıl çıktım bilmiyorum. Sanki bir el \"Yeter artık, ayrıl şu rafların arasından!\" diyerek beni çekip aldı. Nihayet yuvama döndüğümde annemin sobada pişirdiği somun ekmeklerin kokusu beni karşıladı. Çocukluğumun eşsiz güzelliklerinin hâlâ bu evde yaşıyor olması beni mutlu ediyordu. Dünyam bundan ibaretti benim: Çocukluğumu hatırlatan anlar ve kitaplar.\n\nII. Metin\nGün doğumunu seyrederken elimdeki dolma kalemin artık olmadığını fark etmiştim. Günün ilk ışıklarına dek yazmak benim için bir alışkanlık değil, mecburiyet hâline gelmişti. Kendimi bu seyre öylesine kaptırmıştım ki bana kalan birkaç saatlik uyku vaktini de elimden düşen dolma kalemi de fark etmemiştim. Yükselen kuş sesleri, bana rengârenk çiçeklerin açtığı bir bahçeden geçercesine bir yaşama arzusuyla hayat sürmem gerektiğini söylüyor gibiydi.\n\nNumaralanmış metinlerin sadece birinde bulunmayan hikâye unsuru aşağıdakilerden hangisidir?", o: ["Yer", "Kişi", "Olay", "Zaman"], a: 0, e: "I. metinde kitapçı ve ev gibi mekânlar var; II. metinde olayın geçtiği yer belirtilmez (bahçe yalnızca benzetmedir). Kişi, olay ve zaman ikisinde de var." },
+  { s: "tr", t: "Paragraf", q: "Yaşamımızda birçok sorunla karşılaşmamız ve farklı şeylere ihtiyaç duymamız her zaman olası. Bunlar bizi çözüm arayışına yönlendirir. Bu arayışta ilk seçenek olarak yeni bir ürün veya hizmet satın alabiliriz. Diğer bir seçenekse kendi çözümümüzü üretip etkili bir yöntem geliştirmek. Birinci yolu tercih etmek risksiz ve kolay olacaktır. İkinci yolu tercih etmek ise zorluklar karşısında sabırlı olmayı ve çok çalışmayı gerektirecek sonunda da kişisel gelişimi sağlayacaktır.\n\nBu metne göre aşağıdakilerden hangisi yaşadığı problemi ikinci yolu tercih ederek çözen birinin davranışına örnek olamaz?", o: ["Köpeğinin barınma ihtiyacını karşılamak isteyen birinin, evdeki boş karton kutularla kulübe yapması", "Arabasının tekerleği patlayan birinin çağırdığı ustanın, tekerleğe plastik eriterek yama yapması", "Ayakkabısının tabanı kopan bir dağcının, ayakkabısının tabanını bir bandanayla bağlayarak sabitlemesi", "Eşinin eşyalarını taşımakta zorlanan birinin, eşya taşımak için eski tişörtlerini kullanarak çanta dikmesi"], a: 1, e: "B'de kişi sorunu kendisi çözmüyor, usta çağırıyor. Bu hizmet satın almaktır, yani birinci yol." },
+  { s: "tr", t: "Paragraf", q: "Biraz temizlik yaptıktan sonra kütüphanemi düzenlemeye başladım. Odanın her yeri kitap. Bu duruma biraz köpürsem de kitaplarımı ayırmaya devam ettim. Damla, her zamanki gibi sade bir kahve yapıp yanıma geldi. Yerde oturduğumu görünce üst üste koyduğum kitapların üzerine kahveyi bırakıyordu ki kahve dökülüverdi, ne yapacağını bilemedi. Anlayışla karşılayıp gülümsedim. Kitaplarıma olan sevgimi bilen Damla, gülümseyişime hayret etti. Çekmecedeki bezlerden birini alıp aceleyle kitabı sildi. Aldım elinden, baktım hemen hangi kitap acaba diye. Yeğenim Efe'nin hediye ettiği \"Küçük Ağa\" romanıymış.\n\nAşağıdakilerden hangisi bu metnin anlatıcısının duygu durumlarından biri değildir?", o: ["Hoşgörü", "Merak", "Öfke", "Şaşırma"], a: 3, e: "Hayret eden (şaşıran) Damla'dır, anlatıcı değil. Anlatıcı köpürür (öfke), anlayışla karşılar (hoşgörü), hangi kitap diye bakar (merak)." },
+  { s: "tr", t: "Paragraf", q: "XX. yüzyılın öncesinde insanlar, ihtiyacı kadar üretip tüketen bir anlayışa sahipti. XX. yüzyıl küresel çapta çok önemli değişmelere sahne oldu. Böylelikle küresel tüketim medeniyeti doğmuş oldu. - - - -\n\nBu parça aşağıdakilerin hangisiyle tamamlanırsa metnin anlatım biçimi değişmez?", o: ["Bu medeniyet tarihe, geleneğe ve değerlere yabancılaşıp bilim ve teknolojiyi, bir araç olmaktan çıkararak nihai bir amaç hâline getirdi. Bununla birlikte toplumda birçok taşın yerini değiştirdi. Yapılan köklü değişiklikler toplumda yaralar açmaz mı?", "Bu medeniyet, yalnızca beslenme alışkanlıklarınızı değil giydiğiniz elbiseden oturduğunuz eve kadar gereksiz tüketim algısını zihinlerinize kazıdı. Algıyı kırmak için sistemin dayattığı yönlendirmelerle savaşmalısınız.", "Bu medeniyetle beraber insanların yaşam biçimleri değişti. Yaşanan değişimde, teknolojik gelişmelerin insan yaşamına getirdiği makineleşmenin çok büyük bir etkisi vardır.", "Bu medeniyetten öncekiler bu küresel tüketim medeniyetinden farklı olarak dengeli bir yaşam anlayışına sahipti. Bu anlayış, tüketim çılgınlığını reddeden bir bakış açısına sahip değil miydi?"], a: 2, e: "Parça bilgi veren açıklayıcı bir anlatımla yazılmış; C de böyle sürer. A ve D soruyla tartışmaya, B okura seslenip yönlendirmeye geçer." },
+  { s: "tr", t: "Paragraf", q: "Hafif bir rüzgâr... Belli belirsiz bulutlar... Kara bir bulut gelip konabilir göğün kalbine. Bir damla düşecek gibi toprağa. Rüzgâr hâlâ hafif. Yağmur geldi, geldi de tam kalbimin üstüne düştü o kadar susuz toprak dururken. Hafifçe sendeledim, göğe çevirdim yüzümü. Güneş yoktu. Hiç görünmüyordu güneş. Öyle bir baktım ki bulutlara, bir şiir başlayabilirdi o an. Bir ırmak, akışını değiştirmek için bütün gücünü toplayabilirdi. Yağmur tanesine dokunduğumda içim buz gibi olsa da elimi göğsüme götürdüğümde orası sıcak geldi biraz da olsa.\n\nBu metnin dil ve anlatımıyla ilgili aşağıdakilerden hangisi söylenemez?", o: ["Tanımlamaya başvurulmuştur.", "Karşılaştırmaya yer verilmiştir.", "Niteleyici sözcükler kullanılmıştır.", "Farklı duyulardan yararlanılmıştır."], a: 0, e: "Metinde bir kavramın ne olduğu açıklanmıyor, yani tanımlama yok. İçinin buz gibi, göğsünün sıcak olması karşılaştırma; \"hafif, kara\" niteleyici; görme ve dokunma duyuları var." },
+  { s: "tr", t: "Yazım Kuralları", q: "İnsan yaş aldıkça birbaşına (I) kalıp bazı şeyleri sebepli sebepsiz özlüyor; bazen yavaş yavaş, bazen birdenbire (II). Ben de yeni zamanlara, yeni zamanlarla birarada (III) gelen yeni yaşama hâllerine birtürlü (IV) ısınamadığım için hep geçmişte, özellikle de gençlik yıllarımda dolaşıp duruyorum.\n\nBu metinde numaralanmış sözcüklerin hangisinde yazım yanlışı yoktur?", o: ["I", "II", "III", "IV"], a: 1, e: "\"Birdenbire\" bitişik yazılır. Diğerlerinin doğrusu: bir başına, bir arada, bir türlü." },
+  { s: "tr", t: "Noktalama İşaretleri", q: "Reşat Nuri Güntekin( ) Muhsin Ertuğrul'a yazdığı mektupta şöyle der( ) \"Kardeşim Muhsin( ) tiyatroya dönüştürdüğün 'Yaprak Dökümü' romanımı benim bile kolayca tanıyamayacağım bir hâle getirmişsin( )\"\n\nBu cümlede yay ayraçla ( ) gösterilen yerlere sırasıyla aşağıdakilerden hangisi getirilmelidir?", o: ["(,) (;) (:) (.)", "(;) (:) (,) (!)", "(;) (;) (:) (!)", "(,) (:) (,) (.)"], a: 3, e: "Özneden sonra virgül, alıntıdan önce iki nokta, hitaptan sonra virgül, cümle sonunda nokta gelir." },
+  { s: "tr", t: "Cümlenin Ögeleri", q: "(I) Gümüşhane'de iki hafta geçirdikten sonra ülkenin orta bölgelerine geçmenin vakti gelmişti. (II) Bir otobüse bindikten sonra yaklaşık dokuz saat sürecek yolculuğun nasıl geçeceğini merak ediyordum. (III) Şehirden ayrılırken otobüsün penceresi, uçsuz bucaksız orman manzarasıyla çevrili bir tabloya dönüşmüştü. (IV) Ormanın koyu yeşil rengi, beni ve oğlum Kağan'ı büyülemişti.\n\nBu parçada numaralanmış cümlelerin hangisinde yer tamlayıcısı bulunmaktadır?", o: ["I", "II", "III", "IV"], a: 2, e: "III'te yükleme \"neye dönüşmüştü?\" diye sorulunca \"...bir tabloya\" cevabı alınır; bu yer tamlayıcısıdır (dolaylı tümleç)." },
+  { s: "tr", t: "Fiilde Çatı", q: "(I) TRT'de yayımlanan \"Kervan: Kadim Bir Medeniyetin Yol Hikâyesi\" belgeseli, 13. yüzyılda Anadolu Selçuklu Devleti zamanında Anadolu'nun farklı şehirlerinde inşa edilen tarihî kervansarayları ele alıyor. (II) Anadolu'dan yolu geçen tüccarlar ve seyyahlar yüzyıllarca bu coğrafyanın farklı noktalarındaki kervansaraylarda konakladılar. (III) Anadolu Selçuklu Devleti'nin yurt edinme, toprağa hükmetme, dünyayı imar etme gayretlerinin eseri kervansaraylar, bulundukları bölgenin ticari yaşamını da etkiledi. (IV) 19. yüzyılın sonlarına doğru sahada yapılan araştırmalar, bu kervansarayların bütüncül bir imar planına göre inşa edildiğini ortaya çıkardı.\n\nBu parçada numaralanmış cümlelerdeki fiillerden hangisi nesnesine göre farklı bir çatıdadır?", o: ["I", "II", "III", "IV"], a: 1, e: "\"Konakladılar\" nesne almaz, geçişsizdir. \"Ele alıyor, etkiledi, ortaya çıkardı\" nesne alır, geçişlidir." },
+
+  // ---- MATEMATİK ----
+  { s: "mat", t: "Kareköklü İfadeler", q: "Aşağıdakilerden hangisi bir tam kare pozitif tam sayıdır?", o: ["3", "9", "18", "27"], a: 1, e: "9 = 3² olduğu için tam kare sayıdır." },
+  { s: "mat", t: "Doğrusal Denklemler", q: "(x − 2) / 5 = 3 denklemini sağlayan x değeri kaçtır?", o: ["11", "13", "15", "17"], a: 3, e: "İki tarafı 5 ile çarp: x − 2 = 15, buradan x = 17." },
+  { s: "mat", t: "Üslü İfadeler", q: "1 kg toryumdan elde edilen enerji ile 3,5 · 10⁶ kg kömürden elde edilen enerji birbirine eşittir. Günümüz teknolojisinde 10⁵ kg kömürden elde edilen enerji ile 80 adet elektrikli aracın enerji ihtiyacı karşılanmaktadır.\n\nBuna göre, 28 adet elektrikli aracın enerji ihtiyacını karşılamak için kaç kilogram toryum gereklidir?", o: ["10²", "10", "10⁻¹", "10⁻²"], a: 3, e: "28 araç için 28/80 · 10⁵ = 3,5 · 10⁴ kg kömür gerekir. Bu da 3,5 · 10⁴ ÷ 3,5 · 10⁶ = 10⁻² kg toryuma denktir." },
+  { s: "mat", t: "Çarpanlar ve Katlar", q: "Bir imalathanede 168 adet beyaz renkli mum ile 200 adet sarı renkli mum üretilmiştir. Bu mumların tamamı, her bir pakette eşit sayıda ve tek renk mum olacak şekilde paketlenmiştir. Bu iş için en az sayıda paket kullanılmıştır. Paketleme sonrasında yapılan kontrolde, 17 adet beyaz mum ile 11 adet sarı mumun kırık olduğu tespit edilmiştir.\n\nBuna göre, içinde kırık mum bulunmayan paketlerin sayısı en fazla kaçtır?", o: ["40", "41", "42", "43"], a: 1, e: "Paket başına EBOB(168, 200) = 8 mum; 21 + 25 = 46 paket. Kırıklar en az pakete toplanırsa 17 beyaz 3 pakete, 11 sarı 2 pakete sığar. 46 − 5 = 41." },
+  { s: "mat", t: "Kareköklü İfadeler", q: "Uzunluğu 4√2 m olan K yolu ile uzunluğu 2√6 m olan L yolu vardır. Şarjı tam dolu olan bir oyuncak tren, L yolunda 6 tam tur attığı anda şarjı bitmektedir. L yolundaki bu tren, şarjı tam dolu iken hareket ettirilmiş; bu yolda 2 tam tur attığı anda durdurulup K yoluna yerleştirilerek tekrar hareket ettirilmiştir.\n\nBuna göre bu trenin şarjı, tren K yolunda kaçıncı turu atarken biter?", o: ["1.", "2.", "3.", "4."], a: 3, e: "Kalan şarj 4 tur L'ye yeter: 4 · 2√6 = 8√6 m. 8√6 ÷ 4√2 = 2√3 ≈ 3,46 tur, yani şarj 4. turda biter." },
+  { s: "mat", t: "Üslü İfadeler", q: "Bir afişin her satırına, kelimelerin ilk harfleri büyük olacak biçimde \"Bizim Çocuklar\" ifadesi birer kez yazılmıştır. Afiş hazırlanırken içinde 2⁴ mL mürekkep bulunan bir kalem kullanılmıştır. Her büyük harf için 2⁻² mL, her küçük harf için 2⁻³ mL mürekkep harcanmış ve 9. satırdaki ifade yazılırken kalemdeki mürekkep bitmiştir.\n\nBuna göre, aşağıdaki harflerden hangisinin yazımı tamamlandığında kalemdeki mürekkep bitmiştir?", o: ["Ç", "u", "o", "z"], a: 0, e: "Bir satır: 2 büyük harf (2 · ¼) + 11 küçük harf (11 · ⅛) = 15/8 mL. 8 satır 15 mL eder, 1 mL kalır: B (¼) + i-z-i-m (4 · ⅛ = ½) + Ç (¼) = 1 mL." },
+  { s: "mat", t: "Eşitsizlikler", q: "Çiftçi Adem Amca, 1 m²'lik bir çerçeveyi tarlasına koyduğunda içinde 400 başak saymıştır. Çerçeveden aldığı 3 başaktan sırasıyla 29, 24 ve 22 buğday tanesi çıkmış; bunların ortalamasını 400 ile çarparak 1 m²'deki tane sayısını bulmuştur.\n\nBu buğday türünde 1000 tanenin kütlesi y gram olmak üzere 32 ≤ y ≤ 40'tır. Adem Amca 20 dekar tarlasından x kg buğday alacağını tahmin ettiğine göre, x'in alabileceği değerleri gösteren eşitsizlik hangisidir?\n(1 dekar = 1000 m², 1 kg = 1000 g)", o: ["6400 ≤ x ≤ 8000", "3200 ≤ x ≤ 6400", "3200 ≤ x ≤ 4000", "4000 ≤ x ≤ 8000"], a: 0, e: "Ortalama 25 tane → 1 m²'de 10 000 tane. 20 000 m²'de 2 · 10⁸ tane = 2 · 10⁵ tane bini. 32 g ile 6400 kg, 40 g ile 8000 kg." },
+
+  // ---- FEN BİLİMLERİ ----
+  { s: "fen", t: "DNA ve Genetik Kod", q: "Bezelyelerde çiçek renginin kalıtımıyla ilgili iki çaprazlama yapılıyor:\n1. çaprazlama: Mor çiçekli iki bezelye çaprazlanıyor.\n2. çaprazlama: Mor çiçekli bezelye ile beyaz çiçekli bezelye çaprazlanıyor.\nHer iki çaprazlamada mor ve beyaz çiçekli bezelyeler elde ediliyor.\n\nBuna göre,\nI. Melez genotipli bezelyelerin elde edilme ihtimali 1. çaprazlamada 2. çaprazlamadakine göre daha yüksektir.\nII. Çekinik özellikteki bezelyelerin elde edilme ihtimali 2. çaprazlamada 1. çaprazlamadakine göre daha yüksektir.\nIII. Saf baskın genotipli bezelyelerin elde edilme ihtimali her iki çaprazlamada eşittir.\n\nyargılarından hangileri doğrudur?", o: ["Yalnız II", "I ve III", "II ve III", "I, II ve III"], a: 0, e: "Beyaz çıktığı için mor bezelyeler melezdir. Mm × Mm: melez ½, beyaz ¼, saf mor ¼. Mm × mm: melez ½, beyaz ½, saf mor 0. Yalnız II doğru." },
+  { s: "fen", t: "DNA ve Genetik Kod", q: "Doğal ortamında yaşayan bir su bitkisinin hava ortamında gelişen yaprakları (1) ile su ortamında gelişen yaprakları (2) birbirinden farklı görünmektedir. Bir araştırmacı bu bitkinin su içindeki ve su dışındaki kısımlarından aldığı parçalardan yeni bitkiler elde ediyor. Bu yeni bitkilerin de hava ortamında gelişen yapraklarının 1 numaralı yaprak gibi, su ortamında gelişen yapraklarının 2 numaralı yaprak gibi olduğunu gözlemliyor.\n\nBuna göre, yaprakların farklı görünüşte olması aşağıdakilerin hangisiyle açıklanır?", o: ["Yaprak gelişiminden sorumlu genin su ortamında mutasyona uğraması", "Hava ortamında gelişen yaprakta, yaprak gelişiminden sorumlu gendeki her iki alelin de baskın olması", "Hava ve su ortamında gelişen yapraklarda, yaprak gelişiminden sorumlu genin nükleotid dizilimlerinin farklı olması", "Yaprak gelişiminden sorumlu genin yaprağın geliştiği ortama göre farklı biçimde ifade edilmesi"], a: 3, e: "Aynı genlere sahip parçalardan gelen bitkilerde de fark ortama göre oluşuyor. Gen değişmiyor; ortam genin ifadesini etkiliyor (modifikasyon)." },
+  { s: "fen", t: "Enerji Dönüşümleri ve Çevre Bilimi", q: "Kaynakların ekonomik kullanılması ve enerjiden tasarruf edilmesi amacıyla bazı atık maddeler tekrar üretim sürecine dâhil edilerek geri dönüştürülür.\n\nBuna göre, aşağıdakilerden hangisi bir geri dönüşüm uygulamasıdır?", o: ["Ham petrolden bazı plastik malzemelerin üretilmesi", "Metal içecek kutularının işlenerek çöp kovası üretilmesi", "Yağmur suyunun depolanarak bahçe sulamada kullanılması", "Cam kavanozdaki ürün tüketildikten sonra bu cam kavanozun kalemlik olarak kullanılması"], a: 1, e: "Geri dönüşümde atık işlenip yeniden üretime girer. Kavanozu kalemlik yapmak yeniden kullanımdır, geri dönüşüm değildir." },
+  { s: "fen", t: "Mevsimler ve İklim", q: "Yerküre üzerinde eş yükseltide bulunan P, R ve S şehirleriyle ilgili bilgiler şöyledir:\n• P ve S şehirleri Kuzey Yarım Küre'dedir.\n• S şehri dönence üzerinde ve Ekvator'a P şehrinden daha yakındır.\n• R şehri Güney Yarım Küre'de ve dönence üzerindedir.\n\nBuna göre, öğle saatinde yatay zeminde Güneş ışınlarıyla birim yüzeye aktarılan enerji miktarıyla ilgili hangisi doğrudur?", o: ["21 Haziran'da R şehrinde aktarılan enerji, aynı tarihte S şehrindekinden fazladır.", "R şehrinde 21 Haziran'da aktarılan enerji, aynı şehirde 21 Aralık'takinden fazladır.", "21 Aralık'ta P şehrinde aktarılan enerji, aynı tarihte S şehrindekinden fazladır.", "P şehrinde 21 Haziran'da aktarılan enerji, aynı şehirde 21 Aralık'takinden fazladır."], a: 3, e: "Kuzey Yarım Küre'deki P'ye 21 Haziran'da ışınlar daha dik gelir. R Güney'de olduğu için 21 Haziran'da az enerji alır; S, Ekvator'a daha yakın olduğundan 21 Aralık'ta P'den fazla alır." },
+  { s: "fen", t: "Basınç", q: "Alt ve üst kısımları eşit bölmelendirilmiş bir tel kafese, esneklik özelliği her yerinde aynı olan şişmemiş bir balon takılıyor. Balonun içine bir miktar sıvı konulduğunda, tel kafesin alt kısmındaki bölmelerde balonun üst kısımdakilere göre daha fazla şiştiği gözlemleniyor.\n\nBu gözlemlere göre,\nI. Kafesin her bölmesinde balonun şişmesinin nedeni, sıvının temas ettiği yüzeylere basınç uygulamasıdır.\nII. Üst bölmelerde balonun daha az şişmesinin nedeni, sıvıların basınç artışını her yönde farklı büyüklükte iletmesidir.\nIII. Alt bölmelerde balonun daha fazla şişmesinin nedeni, alt bölmelerin sıvının üst yüzeyine olan mesafesinin fazla olmasıdır.\n\nyargılarından hangileri doğrudur?", o: ["Yalnız III", "I ve II", "I ve III", "I, II ve III"], a: 2, e: "Sıvı temas ettiği her yüzeye basınç uygular (I) ve basınç derinlikle artar (III). Sıvılar basıncı her yöne aynı büyüklükte iletir; II yanlış." },
+  { s: "fen", t: "Basit Makineler", q: "Çamura batan bir traktörü çıkarmak için ağırlığı önemsiz, esnemeyen bir ip ve özdeş halkalar kullanılıyor. Sürtünmeler önemsiz:\n1. uygulama: İpin bir ucu traktördeki halkaya bağlanıyor, diğer ucu ağaç gövdesinin etrafından dolandırılıp çekiliyor.\n2. uygulama: İpin bir ucu traktördeki halkaya bağlanıyor, diğer ucu ağaca bağlı bir halkadan geçirilip çekiliyor.\n3. uygulama: İp traktördeki halkanın içinden geçiriliyor; bir ucu ağaca bağlanıp diğer ucundan çekiliyor.\n\nEn küçük kuvvetler uygulandığına göre,\nI. 2. uygulamadaki kuvvet 1. uygulamadakinden küçüktür.\nII. 1. uygulamadaki kuvvet 3. uygulamadakine eşittir.\nIII. 2. uygulamadaki kuvvet 3. uygulamadakinden büyüktür.\n\nyargılarından hangileri doğrudur?", o: ["Yalnız I", "Yalnız III", "I ve II", "II ve III"], a: 1, e: "1. ve 2. uygulamada ağaç/halka sabit makara gibidir, kuvvet yüke eşittir. 3. uygulamada traktördeki halka hareketli makaradır, kuvvet yarıya iner. Yalnız III doğru." },
+  { s: "fen", t: "Elektrik Yükleri ve Elektrik Enerjisi", q: "Bir fotokopi makinesinde kopyalanacak kâğıda ışık gönderilir. Kâğıdın beyaz bölgesinden yansıyan ışık, yüzeyi elektriksel olarak yüklü bir silindire düşürülür. Silindirde ışığın düştüğü bölgeler başlangıçtakine göre zıt yükle yüklenir; ışığın düşmediği bölgeler başlangıçtaki yükünü korur. Elektriksel olarak yüklü toner tozları silindire gönderildiğinde sadece ışığın düşmediği bölgelere tutunur.\n\nBuna göre,\nI. Toner tozları negatif yüklüdür.\nII. Silindirde ışığın düşmediği bölge ile toner tozları zıt yüklüdür.\nIII. Silindirde ışığın düştüğü bölge ile toner tozları zıt yüklüdür.\n\nyargılarından hangileri kesinlikle doğrudur?", o: ["Yalnız II", "Yalnız III", "I ve II", "I ve III"], a: 0, e: "Toner ışık düşmeyen bölgeye tutunuyor; zıt yükler çekiştiği için II kesin doğru. Işık düşen bölge tonerle aynı yüke sahip olur (III yanlış). Yükün işareti bilinmez (I kesin değil)." },
+  { s: "fen", t: "Madde ve Endüstri", q: "Bir çinko çubuk, mavi renkli bir çözeltiye bir kısmı çözelti içinde kalacak biçimde daldırılıyor. Bir süre sonra çözeltinin renksizleştiği ve çubuğun çözelti içindeki kısmında çinkonun renginden farklı renkte bir tabaka oluştuğu gözlemleniyor.\n\nBu deneyle ilgili,\nI. Renkli tabakanın oluşması fiziksel değişimdir.\nII. Renkli tabaka ile çinkonun kimyasal özellikleri aynıdır.\nIII. Çinko çubuk ile mavi renkli çözelti arasında kimyasal tepkime gerçekleşmiştir.\n\nyargılarından hangileri doğrudur?", o: ["Yalnız I", "Yalnız III", "I ve II", "II ve III"], a: 1, e: "Renk değişimi ve yeni bir tabakanın oluşması kimyasal tepkimedir. Yeni oluşan madde çinkodan farklıdır." },
+  { s: "fen", t: "Madde ve Endüstri", q: "Bir sıcak su torbasına ilk durumda 70 °C su konuluyor ve su 10 °C olana kadar ortama ısı veriyor. Torbanın ortama daha fazla ısı vermesi için:\nI. Kütlesi daha fazla olan 70 °C su kullanıp 10 °C olana kadar beklemek,\nII. Eşit kütlede, öz ısısı sudan küçük 70 °C bir sıvı kullanıp 10 °C olana kadar beklemek,\nIII. Eşit kütlede 90 °C su kullanıp 30 °C olana kadar beklemek\n\nişlemlerinden hangileri yapıldığında torba ilk duruma göre ortama daha fazla ısı verir? (Isı alışverişi yalnızca torbadaki sıvı ile ortam arasındadır.)", o: ["Yalnız I", "Yalnız III", "I ve II", "II ve III"], a: 0, e: "Verilen ısı = kütle × öz ısı × sıcaklık değişimi. I'de kütle artıyor (daha fazla), II'de öz ısı azalıyor (daha az), III'te sıcaklık farkı yine 60 °C (eşit)." },
+  { s: "fen", t: "Madde ve Endüstri", q: "Özdeş iki cam kaptaki, sıcaklığı ve kütlesi bilinmeyen saf sular özdeş ısıtıcılarla aynı anda ısıtılıyor:\n• Hâl değişimi başlayana kadar geçen süre: 1. kap 5 dakika, 2. kap 8 dakika\n• Hâl değişiminin sürdüğü süre: 1. kap 3 dakika, 2. kap 3 dakika\n\nIsı alışverişi yalnızca ısıtıcı ile su arasındadır. Buna göre kaplardaki sularla ilgili,\nI. Kütleleri farklıdır.\nII. Başlangıç sıcaklıkları farklıdır.\nIII. Hâl değişimi süresince aldıkları ısı miktarları farklıdır.\n\nyargılarından hangileri doğrudur?", o: ["Yalnız I", "Yalnız II", "I ve III", "II ve III"], a: 1, e: "Hâl değişimi ikisinde de 3 dakika sürüyor: aynı ısıyı alıyorlar, kütleleri eşit. Kaynamaya ulaşma süreleri farklı olduğuna göre başlangıç sıcaklıkları farklıdır." },
+
+  // ---- İNKILAP TARİHİ ----
+  { s: "ink", t: "Millî Uyanış", q: "İtalya, Trablusgarp'a askerî harekâta girişmeden önce uluslararası ortamı yoklamış, Almanya ve İngiltere'nin kendisine engel olmayacaklarını anlamıştır. Osmanlı Hükûmeti ise toprak bütünlüğünün çiğnenmemesi şartıyla İtalya'ya birtakım ayrıcalıklar tanıyabileceğini bildirmiştir. Buna rağmen İtalya, 1911 yılında Osmanlı Devleti'ne savaş ilan etmiştir. Yaşanan gelişmeler üzerine Sadrazam İbrahim Hakkı Paşa istifa etmiş ve yerine Said Paşa getirilmiştir.\n\nBu bilgilere göre aşağıdakilerden hangisi söylenebilir?", o: ["İngiltere ve Almanya, savaşı önlemek için ara bulucu rolünü üstlenmişlerdir.", "Osmanlı Devleti, Trablusgarp sorununu diplomatik yollardan çözmeye çalışmıştır.", "Osmanlı Devleti, iç işlerine karışılmasını engellemek için rejim değişikliğine gitmiştir.", "Avrupalı devletler, Osmanlı Devleti'ne toprak bütünlüğü konusunda güvence vermişlerdir."], a: 1, e: "Osmanlı'nın İtalya'ya ayrıcalık tanımayı teklif etmesi, sorunu savaşmadan, diplomasiyle çözme çabasıdır." },
+  { s: "ink", t: "Millî Uyanış", q: "Kâzım Karabekir, Birinci Dünya Savaşı öncesi Osmanlı Devleti'nin durumunu şöyle açıklamıştır: \"Cihan Harbi birçok meseleler arasında Türk-Rus davasını da kökünden halledecekti. İttihat ve Terakki Hükûmeti bu vaziyeti kavramıştı. Millî mevcudiyetimizi yaklaşan tehlikeden korumak için İngiliz ve Fransızlardan umduğu teminatı alamayınca uzatılan Alman ellerine sarılmaya mecbur oldu ve ister istemez Cihan Harbi'ne sürüklendi.\"\n\nBu açıklamaya göre aşağıdaki yargılardan hangisine ulaşılabilir?", o: ["Osmanlı Devleti, uluslararası alanda kaybolan itibarını yeniden kazanmıştır.", "İngiltere ve Fransa, barışçı bir uluslararası politika izlemiştir.", "Osmanlı yönetimi, devletler arasındaki bloklaşmaya karşı çıkmıştır.", "İngiltere ve Fransa'nın politikası, Osmanlı'yı Almanya'ya yakınlaştırmıştır."], a: 3, e: "İngiltere ve Fransa'dan güvence alınamayınca Almanya'ya yönelinmiştir." },
+  { s: "ink", t: "Ya İstiklal Ya Ölüm", q: "Ankaralılar günler öncesinden Mustafa Kemal'i ve Temsil Heyeti üyelerini karşılamaya hazırlanmıştı. İçlerinden bir kısmı Beynam ormanlarına kadar gitmişti. Ankara gazetesi 27 Aralık 1919'da \"HOŞ GELDİNİZ\" başlıklı bir yazı yayımlamış, devamında \"Azmimiz asla sarsılmayacaktır. Hakkımız verilmedikçe durmayacağız; harp ve darp, zulüm ve kahır, hepsini iman dolu göğsümüzle karşılayacağız!\" ifadelerine yer vermiştir.\n\nBu metne göre,\nI. Bölge halkı Millî Mücadele yanlısı bir tutum sergilemiştir.\nII. Yerel basında zafere olan inanç ve kararlılık vurgulanmıştır.\nIII. Temsil Heyeti, TBMM'nin çalışmalarını yakından takip etmek istemiştir.\n\nyargılarından hangilerine ulaşılabilir?", o: ["Yalnız I", "Yalnız II", "I ve II", "I, II ve III"], a: 2, e: "Halkın coşkulu karşılaması I'i, gazetedeki kararlı ifadeler II'yi gösterir. Aralık 1919'da TBMM henüz açılmamıştı (23 Nisan 1920); III'e ulaşılamaz." },
+  { s: "ink", t: "Ya İstiklal Ya Ölüm", q: "Kemal Tahir'in \"Esir Şehrin İnsanları\" adlı eserinden: \"... Düşman gemilerinin edepsiz bir kibirle Boğaz'dan geçişleri gözümün önüne geldi. ... Önce on torpido, ortada kruvazörler, arkada zırhlılar hiç bitmeyecekmiş gibi temiz Marmara'mıza giriyorlardı. Buradan geçen gemiler, İstanbul'a varınca hemen karaya asker döküp şehrin önemli noktalarını tutmuşlar. Haydarpaşa'dan Eskişehir'e kadar tren yoluna İngilizler el koymuş. İzmir hattını Fransızlar, Konya'ya kadar da İtalyanlar almış... Top kamalarımızı almak için düşman subayları geliyor...\"\n\nBu metne göre aşağıdakilerden hangisi söylenemez?", o: ["Türk halkı, haksız işgallere karşı yerel örgütlenme yoluna gitmiştir.", "İstanbul Boğazı, İtilaf Devletleri tarafından işgal edilmiştir.", "Osmanlı Devleti, askerî açıdan savunmasız bırakılmak istenmiştir.", "Bazı stratejik bölgelerin denetimi, İtilaf Devletleri'nin eline geçmiştir."], a: 0, e: "Metinde işgaller anlatılıyor ama halkın örgütlenmesinden (cemiyetlerden) hiç söz edilmiyor." },
+  { s: "ink", t: "Ya İstiklal Ya Ölüm", q: "Mustafa Kemal, Millî Mücadele Dönemi'ndeki cepheleri şöyle değerlendirmiştir: \"Cepheler iki şekilde düşünülebilir: İç cephe ve görünür cephe. Asıl olan iç cephedir. Bu cephe; bütün memleketin, bütün milletin vücuda getirdiği cephedir. Görünür cephe, doğrudan doğruya ordunun düşman karşısındaki silahlı cephesidir. Mühim olan, memleketi temelinden yıkan, iç cephenin çöküşüdür. ... Gerçekten kaleyi içten almak, dışından zorlamaktan çok kolaydır.\"\n\nBuna göre aşağıdakilerden hangisi \"iç cephenin çöküşü\"ne neden olabilecek olaylardan biridir?", o: ["TBMM'ye karşı ayaklanmaların çıkması", "Yunan ordusunun İzmir'i işgal etmesi", "İşgalcilere karşı halkın direnmesi", "İtilaf Devletleri'nin Boğazlara asker çıkarması"], a: 0, e: "İç cephe milletin birliğidir; TBMM'ye karşı ayaklanmalar bu birliği içeriden bozar. B ve D dış (görünür) cepheyle ilgilidir." },
+  { s: "ink", t: "Atatürkçülük ve Çağdaşlaşan Türkiye", q: "3 Haziran 1933'te kurulan Sümerbank, Türkiye'nin sanayileşmesine öncülük etmiş ve Birinci Beş Yıllık Sanayi Planı'ndaki yatırımları yaşama geçirme görevi üstlenmiştir. Sümerbankın fabrika alanlarında sosyal altyapılar kurulmuş; beslenme, giyim, kreş ve okul olanaklarını içeren hizmetler sunulmuştur. Böylece fabrikalar yalnızca ekonomik işletmeler olmakla kalmamış, bütün yurttaşların temel ihtiyaçlarının giderilmesine ve refah düzeyinin artırılmasına da olanak sağlamıştır.\n\nBuna göre Sümerbankın kuruluşu ve çalışmaları, hangi Atatürk ilkeleriyle ilişkilendirilebilir?", o: ["Laiklik - Devletçilik", "Devletçilik - Halkçılık", "Halkçılık - Cumhuriyetçilik", "Cumhuriyetçilik - Laiklik"], a: 1, e: "Sanayi yatırımını devletin yapması devletçilik, yurttaşların refahını artırması halkçılıktır." },
+  { s: "ink", t: "Atatürkçülük ve Çağdaşlaşan Türkiye", q: "Atatürk, aile ile ilgili şu sözleri söylemiştir: \"Medeniyetin esası, ilerlemenin ve kuvvetin temeli aile hayatındadır. Bu hayatta yaşanan herhangi bir aksaklık; muhakkak toplumsal, ekonomik ve siyasi güçsüzlüğe yol açar. Aileyi oluşturan kadın ve erkek unsurların doğal haklarına sahip olmaları, aile görevlerini yönetebilecek yeterlilikte bulunmaları şarttır.\"\n\nBu sözlerden,\nI. Geleneksel yapıda ailenin üstlendiği işlevleri, günümüzde başka kurumlar üstlenmelidir.\nII. Ailenin yapısında meydana gelen sorunlar diğer kurumlarda da bozulmaya yol açabilir.\nIII. Sosyal yapının devamlılığında ve düzenin sağlanmasında ailenin rolü önemlidir.\n\nyargılarının hangilerine ulaşılabilir?", o: ["Yalnız I", "Yalnız II", "I ve III", "II ve III"], a: 3, e: "Aile hayatındaki aksaklığın toplumsal güçsüzlüğe yol açması II'yi, ailenin medeniyetin temeli olması III'ü destekler. I'e dair bir ifade yok." },
+  { s: "ink", t: "Demokratikleşme Çabaları", q: "12 Ağustos 1930'da Fethi Okyar'ın başkanlığında Serbest Cumhuriyet Fırkası kurulmuştur. Cumhuriyet Halk Fırkasından istifa eden bazı mebuslar Serbest Cumhuriyet Fırkasına katılmış ve onun yetkili kurullarında görev almışlardır. Partinin programında laik cumhuriyete bağlı kalacağı ve ekonomide liberal yaklaşımları benimsediği ifade edilmiştir.\n\nBuna göre Serbest Cumhuriyet Fırkası ile ilgili,\nI. TBMM'de temsil edilmiştir.\nII. Cumhuriyet tarihinin ilk muhalefet partisi olmuştur.\nIII. Devletçi ekonomik modeli savunmuştur.\nIV. Rejimin temel ilke ve esaslarını benimsemiştir.\n\nyargılarından hangilerine ulaşılabilir?", o: ["I ve II", "I ve IV", "II ve III", "III ve IV"], a: 1, e: "Mebuslar katıldığı için Mecliste temsil edildi (I); laik cumhuriyete bağlı kaldı (IV). İlk muhalefet partisi Terakkiperver Cumhuriyet Fırkasıdır; ekonomide liberaldi." },
+  { s: "ink", t: "Atatürk Dönemi Dış Politika", q: "\"Türkiye Cumhuriyeti, Lozan Barış Antlaşması'nın imzalanmasından sonra Atatürk'ün öncülüğünde barışçı bir dış politika izlemiştir.\" diyen bir tarihçi, aşağıdaki gelişmelerden hangisini bu ifadesine kanıt olarak gösteremez?", o: ["Milletler Cemiyetine üye olunması", "Balkan Antantı'nın oluşturulması", "Mondros Mütarekesi'ne karşı çıkılması", "Montrö Boğazlar Sözleşmesi'nin imzalanması"], a: 2, e: "Mondros 1918'de, yani Lozan'dan (1923) önce imzalanmıştır; Lozan sonrası dış politikaya kanıt olamaz." },
+
+  // ---- DİN KÜLTÜRÜ ----
+  { s: "din", t: "Hz. Muhammed'in Örnekliği", q: "İmam Gazali, Hz. Muhammed'i (sav) örnek almak ile onun davranışlarını taklit etmeyi birbirinden ayırmış ve şöyle açıklamıştır: \"Bir peygambere duyulan saygı, onun getirdiği ilkeleri benimseyip uygulamaktır yoksa o bağdaş kurarak oturduğu için bağdaş kurmak, o sedirde oturduğu için sedirde oturmak değildir.\"\n\nBu metinde \"sünnet\" ile ilgili aşağıdakilerden hangisi vurgulanmaktadır?", o: ["Kur'an-ı Kerim'in anlaşılmasında önemli bir role sahiptir.", "Müslümanları birleştiren bir unsurdur.", "İslam dininin temel kaynakları arasında yer alır.", "Hz. Peygamber'in ahlakının özümsenmesidir."], a: 3, e: "Gazali, şekli taklit etmeyi değil, ilkeleri benimseyip uygulamayı, yani ahlakını özümsemeyi öne çıkarıyor." },
+  { s: "din", t: "Kur'an-ı Kerim ve Özellikleri", q: "I. İnsanların birbirine karşı görev ve sorumluluklarını hatırlatmaktadır.\nII. Allah'ın birliğini ve varlıklar üzerindeki mutlak hâkimiyetini konu edinmektedir.\nIII. Yûsuf suresinde yer almaktadır.\nIV. Vakit namazlarından sonra genellikle okunmaktadır.\n\nNumaralanmış bilgilerden hangileri Ayetelkürsi ile ilgilidir?", o: ["I ve II", "I ve III", "II ve IV", "III ve IV"], a: 2, e: "Ayetelkürsi, Allah'ın birliğini ve sonsuz hâkimiyetini anlatır ve namazlardan sonra okunur. Bakara suresinin 255. ayetidir, Yûsuf suresinde değildir." },
+  { s: "din", t: "Din ve Hayat", q: "İslam, evliliği kadın ve erkeğin sevgi ve dayanışma içinde hayatlarını birleştirdiği özel bir kurum olarak görür. Kur'an'da eşlerin birbirleri için huzur kaynağı olduğu ifade edilerek evliliğin iki insanı koruyan, tamamlayan ve güçlendiren bir birliktelik olduğu anlatılır. Eşler birbirlerinin eksikliklerini tamamlar, sorumlulukları paylaşır ve yaşamın zorluklarını beraber çözerler. Bu nedenle evlilik, güçlü bir aile kurarak yaşamı daha anlamlı ve düzenli hâle getirme adımı olarak kabul edilir.\n\nBu metinden \"evlilik\" ile ilgili aşağıdakilerin hangisine ulaşılamaz?", o: ["Kültürel değerleri gelecek nesillere aktaran bir kurumdur.", "Ortak sorumluluk bilinciyle hareket etmektir.", "Saygı ve güvene dayalı bir birlikteliktir.", "Hayatı güzelleştirme çabasıdır."], a: 0, e: "Metinde kültürel değerlerin nesillere aktarılmasından söz edilmiyor. Sorumluluk paylaşımı, huzur ve yaşamı anlamlı kılmak metinde var." },
+  { s: "din", t: "Zekât ve Sadaka", q: "Kişinin zekât verebileceği yakınları aşağıdakilerin hangisinde doğru verilmiştir?", o: ["Amcası - Halası - Kardeşi - Teyzesi", "Çocuğu - Dedesi - Halası - Kardeşi", "Annesi - Çocuğu - Dayısı - Teyzesi", "Babası - Amcası - Dayısı - Ninesi"], a: 0, e: "Anne-baba, dede-nine ve çocuk-torunlara zekât verilmez. A'daki yakınların hiçbiri bu grupta değildir." },
+  { s: "din", t: "Hz. Muhammed'in Örnekliği", q: "Hz. Muhammed (sav) Mekke'yi fethettiğinde endişeyle kendisini bekleyen Kureyşlilere \"Şimdi size ne yapacağımı düşünüyorsunuz?\" diye sordu. Onlar \"Bize iyi davranacağını umuyoruz.\" dediler. Bunun üzerine Hz. Peygamber \"Ben de size Yusuf Peygamber'in kardeşlerine dediğini diyorum: 'Bugün artık yaptıklarınızdan dolayı sizi kınayacak değilim. Allah sizi bağışlasın. Şüphesiz O, merhametlilerin en merhametlisidir.' Haydi gidin!\" diyerek onları serbest bıraktı.\n\nBu olaydan Hz. Muhammed (sav) ile ilgili,\nI. Söz ve davranışları birbiriyle tutarlıdır.\nII. Kanaatkâr bir yaşamı benimsemiştir.\nIII. Affedici bir kişiliğe sahiptir.\n\nyargılarından hangilerine ulaşılır?", o: ["Yalnız I", "Yalnız II", "I ve III", "II ve III"], a: 2, e: "Affettiğini söyleyip onları gerçekten serbest bırakması hem tutarlılığı hem affediciliği gösterir. Kanaatkârlıkla ilgili bilgi yok." },
+  { s: "din", t: "Din ve Hayat", q: "Abdest, arınmanın bir adımıdır. Çünkü insan bilir temizlenmek için suyun yeterli olmadığını. Ellerini yıkar, akıttığını düşünerek günahlarını. Ağzını temizler âdeta kötü sözden, dedikodudan ve yalandan uzaklaştığını ifade edercesine. Yüzünü yıkar, başını mesh eder tüm benliğiyle kötülüklerden ve yanlış düşüncelerden temizlendiğini göstermek için. Ayaklarını yıkar bir daha yanlış yollara sapmayacağına söz verircesine.\n\nBu metinde \"abdest\" ile ilgili asıl anlatılmak istenen aşağıdakilerden hangisidir?", o: ["Belirli bir düzene göre alınması gerekir.", "Namaz ibadetini yerine getirebilmek için şarttır.", "Beden temizliğine ve sağlıklı bir hayata yönlendirir.", "Hatalardan uzaklaştırıp erdemli davranışlarda bulunma bilinci kazandırır."], a: 3, e: "Her adım bir kötülükten uzaklaşmaya bağlanıyor; metin abdestin manevi arınma ve erdem bilinci kazandırdığını anlatıyor." },
+  { s: "din", t: "Hz. Muhammed'in Örnekliği", q: "Hz. Muhammed'in (sav) aşağıdaki davranışlarından hangisi \"takrirî sünnet\"e örnektir?", o: ["\"Bizi yedirip içiren, ihtiyaçlarımızı gideren, bize barınacak yuva veren Allah'a hamdolsun.\" diyerek dua etmesi", "Ağız ve diş temizliğine önem vermesi, insanlara bunu tavsiye etmesi", "Kendisinin tercih etmediği bazı yiyecekleri yiyen sahabeleri gördüğünde müdahale etmeyip onların davranışını onaylaması", "Bir topluluğun yanından geçerken eliyle onları selamlaması"], a: 2, e: "Takrirî sünnet, Peygamberimizin gördüğü bir davranışa karşı çıkmayarak onaylamasıdır." },
+  { s: "din", t: "Zekât ve Sadaka", q: "Hz. Peygamber, temel ihtiyaçlar dışında kalan ve belirli bir miktara ulaşan altın, gümüş, küçükbaş ve büyükbaş hayvanlar, toprak ürünleri gibi mallardan zekât verilmesini istedi. Uzun zaman Müslümanlar bu mallar üzerinden zekâtlarını verdiler. Daha sonra ortaya çıkan nakit para ve değerli taşlar gibi gelişmeler karşısında İslam âlimleri bu mallardan da zekât verilmesi gerektiği görüşünü benimsediler. Bunların nisabının belirlenmesinde altının nisabına denk gelen değerin esas alınmasını uygun gördüler.\n\nBu metinden aşağıdakilerin hangisine ulaşılamaz?", o: ["Zekât verilebilmesi için malın edinilmesi üzerinden bir yıl geçmesi gerekir.", "Âlimler, zekâtın işlevselliğine katkıda bulunmuşlardır.", "Hangi mallardan zekât verileceği sünnet ile belirlenmiştir.", "Zekât verilecek mallarda belirli şartlar aranır."], a: 0, e: "Bir yıl şartı doğru bir bilgidir ama bu metinde geçmiyor; metinden bu sonuca ulaşılamaz." },
+  { s: "din", t: "Hz. Muhammed'in Örnekliği", q: "Hz. Peygamber, Müslümanların yanı sıra Medine'de yaşayan Yahudiler ve müşriklerle toplumu yeniden düzenleyen bir sistem oluşturmaya karar verdi. Bu amaçla grupların birbirleriyle ilişkilerini, adli ve idari yapılarını, fertlerin din ve vicdan hürriyetlerini, hak ve sorumluluklarını belirleyen \"Medine Sözleşmesi\"ni hazırlattı.\n\nBu metne göre, Hz. Muhammed'in (sav) öncelikle aşağıdakilerden hangisini amaçladığı söylenebilir?", o: ["Ekonomik dengeyi sağlamayı", "Sosyal birliği ve adaleti tesis etmeyi", "Medine'yi dinin merkezi olarak öne çıkarmayı", "Şehri dış tehditlere karşı korumayı"], a: 1, e: "Farklı grupların hak ve sorumluluklarını belirlemek, toplumda birlik ve adaleti sağlamaya yöneliktir." },
+
+  // ---- İNGİLİZCE ----
+  { s: "ing", t: "Friendship", q: "Miss June asks her students to write a paragraph describing their relationship with a person in their life.\n\nIn which of the following paragraphs, only good things are mentioned?", o: ["I spend time with Jane, but I can't trust her because she shares my secrets with other people.", "Whenever I invite Amy to go out, she always has an excuse for not joining me. We never spend time together.", "Charlie never keeps his promises. Also, it is disappointing that he never backs me up.", "Jack and I have the same hobbies. We trust and respect each other. He is always there for me."], a: 3, e: "Only the paragraph about Jack has nothing negative: same hobbies, trust, respect, always there." },
+  { s: "ing", t: "Teen Life", q: "Four people are talking about their weekend activities.\nBetty: I'm going shopping with my family on Sunday. I really enjoy shopping.\nMelinda: I can't join the school trip next weekend because my cousins will visit us.\nSusan: On Saturday, there is a pop concert. My friends asked me to join them. I can't say I enjoy pop music, but I'm going with them.\nUrsula: My friends will go cycling this weekend. But I will stay at home because I don't want to join an activity that I don't like.\n\nWho will join an activity that she does not like?", o: ["Betty", "Melinda", "Susan", "Ursula"], a: 2, e: "Susan doesn't enjoy pop music, but she is going to the concert." },
+  { s: "ing", t: "On the Phone", q: "Below, there are some sentences that have the same function in a phone conversation.\n• Hold on, please!\n• Hang on a minute!\n• Don't hang up please, I'll put you through.\n\nWhat is the function of these sentences in a phone conversation?", o: ["Leaving a message for someone", "Closing a conversation on the phone", "Asking the caller to repeat something", "Telling someone to wait for a bit"], a: 3, e: "\"Hold on\" and \"hang on\" both mean \"wait a moment\"." },
+  { s: "ing", t: "Tourism", q: "Below, there are some comments on a tour.\nCarol: The bus was very old, but all the other things, the food, accommodation, etc., were fine.\nJones: It was wonderful. It was the greatest tour in my life. I enjoyed the historic sites we visited. The food was delicious, too.\nKatie: It was terrible. The bus wasn't comfortable and it was very dirty. Go and find another tour company.\n\nAccording to the comments above, which of the following is correct?", o: ["Katie enjoyed every minute of the tour.", "The tour was the best one Jones has ever had.", "Carol's favourite thing in the tour was the food.", "Two of the comments show that the transportation was great."], a: 1, e: "Jones says \"It was the greatest tour in my life.\"" },
+  { s: "ing", t: "Adventures", q: "A group of friends are talking about what they like doing.\nClaire: My favourite activity is paragliding because I really like challenging activities.\nHarry: I would rather have a picnic with my friends near the river. It's relaxing for us.\nSue: I prefer staying at home and spending time with my family.\nTed: I enjoy rock climbing and skydiving very much.\n\nWhich two friends are interested in extreme sports?", o: ["Claire - Harry", "Claire - Ted", "Sue - Harry", "Sue - Ted"], a: 1, e: "Paragliding (Claire), rock climbing and skydiving (Ted) are extreme sports." },
+  { s: "ing", t: "Science", q: "Below, there are some parts of four different conversations.\nI. Linda: What are you reading? / Jason: An article about the history of science.\nII. Bob: Well, do you know who invented the compass, then? / Janet: To be honest, I have no idea.\nIII. Clara: I haven't seen you for days. I hope you are fine. / Mike: I have been very busy doing my science experiment.\nIV. Martin: Alright then. What is our next step? / Mary: Now, we have to put some salty water in these test tubes.\n\nWhich two people are doing an experiment together at the moment?", o: ["Linda - Jason", "Bob - Janet", "Clara - Mike", "Martin - Mary"], a: 3, e: "\"What is our next step?\" and \"put salty water in these test tubes\" show that Martin and Mary are doing it together now." },
+  { s: "ing", t: "Tourism", q: "Four people share their opinions about Istanbul.\nHillary: I don't think I can live in Istanbul, because living there is very tiring.\nLucy: I visited Istanbul last summer, but it was a disappointing experience for me.\nMandy: Istanbul is the place where I feel happy. I wouldn't want to live in another city.\nTodd: I have never been to Istanbul, so I have nothing to say about it.\n\nWho says something good about Istanbul?", o: ["Hillary", "Lucy", "Mandy", "Todd"], a: 2, e: "Mandy says she feels happy in Istanbul." },
+  { s: "ing", t: "The Internet", q: "Four friends make videos and share them on their blogs (number of followers in brackets):\n• Mark (52): Local concerts and latest movies\n• Anna (21): Having fun with my parents and my sister; helping mum clean the house and cook\n• Rick (12): Online games; how to do safe online shopping\n• John (26): Rafting, canoeing, bungee-jumping, caving\n\nAccording to the information above, which of the following is FALSE?", o: ["Anna's videos are about chores and her family.", "The blog about extreme sports is less popular than two of the blogs.", "Rick's videos give useful information about buying things on the Internet.", "The videos of the most popular blogger are about films and performances of music."], a: 1, e: "John's extreme sports blog (26) is less popular than only one blog, Mark's (52)." },
+];
+QMEB.forEach(q => { q.k = MEB; });
+Q.push(...QMEB);
 Q.forEach((q, i) => { q.id = q.s + "-" + i; });
 const QMAP = Object.fromEntries(Q.map(q => [q.id, q]));
 const HARF = ["A", "B", "C", "D"];
@@ -356,7 +446,7 @@ const DENEME_DK = 45;
 /* ===================== KAYIT ===================== */
 const KEY = "lgs-masasi-v1";
 function bos() {
-  return { sinav: "2027-06-13", hedef: 40, ans: {}, gun: {}, yanlis: [], konu: {}, denemeler: [], pomo: {} };
+  return { sinav: "2027-06-13", hedef: 40, ans: {}, gun: {}, yanlis: [], konu: {}, denemeler: [], pomo: {}, oyun: { rekor: 0, olu: 0 } };
 }
 function yukle() {
   try { const r = localStorage.getItem(KEY); if (r) return Object.assign(bos(), JSON.parse(r)); } catch (e) {}
@@ -374,6 +464,7 @@ const karistir = a => { a = a.slice(); for (let i = a.length - 1; i > 0; i--) { 
 const fmt = n => (Math.round(n * 100) / 100).toLocaleString("tr-TR");
 const net = (d, y) => d - y / 3;
 const chip = s => `<span class="chip" style="--c:var(--c-${s})">${esc(DERS[s].ad)}</span>`;
+const kaynak = q => q.k ? `<span class="tag src">MEB · ${esc(q.k)}</span>` : "";
 const sure = sn => String(Math.floor(sn / 60)).padStart(2, "0") + ":" + String(sn % 60).padStart(2, "0");
 
 /* LGS puanı yaklaşık: ağırlıklı net (Türkçe/Mat/Fen ×4, diğerleri ×1), en fazla 270 → 100–500 aralığına */
@@ -416,7 +507,7 @@ function kalanGun() {
 
 /* ===================== YÖNLENDİRME ===================== */
 const SEKME = [
-  ["panel", "Panel"], ["coz", "Soru Çöz"], ["deneme", "Deneme"], ["yanlis", "Yanlışlarım"], ["konular", "Konu Takibi"], ["net", "Net Hesapla"],
+  ["panel", "Panel"], ["oyun", "Kılıç Yolu"], ["coz", "Soru Çöz"], ["deneme", "Deneme"], ["yanlis", "Yanlışlarım"], ["konular", "Konu Takibi"], ["net", "Net Hesapla"],
 ];
 let aktif = "panel";
 function ust() {
@@ -433,10 +524,11 @@ function git(id) {
 }
 function ciz() {
   ust();
-  const v = { panel: vPanel, coz: vCoz, deneme: vDeneme, yanlis: vYanlis, konular: vKonular, net: vNet }[aktif];
+  const v = { panel: vPanel, oyun: vOyun, coz: vCoz, deneme: vDeneme, yanlis: vYanlis, konular: vKonular, net: vNet }[aktif];
   $("#main").innerHTML = v();
   if (aktif === "panel") pomoGuncelle();
   if (aktif === "net") netGuncelle();
+  if (aktif === "oyun") oyunBagla(); else oyunDurdur();
 }
 
 /* ===================== PANEL ===================== */
@@ -568,11 +660,11 @@ function pomoGuncelle() {
 }
 
 /* ===================== SORU ÇÖZ ===================== */
-const C = { ders: "hepsi", konu: "hepsi", adet: 10, yeni: false };
+const C = { ders: "hepsi", konu: "hepsi", adet: 10, yeni: false, meb: false };
 let Z = null; // aktif pratik oturumu
 
 function havuz() {
-  return Q.filter(q => (C.ders === "hepsi" || q.s === C.ders) && (C.konu === "hepsi" || q.t === C.konu) && (!C.yeni || !S.ans[q.id]));
+  return Q.filter(q => (C.ders === "hepsi" || q.s === C.ders) && (C.konu === "hepsi" || q.t === C.konu) && (!C.yeni || !S.ans[q.id]) && (!C.meb || q.k));
 }
 function pratikBasla(liste, baslik) {
   Z = { liste, i: 0, cev: [], baslik };
@@ -604,6 +696,7 @@ function vCoz() {
         <select id="c-adet">${[5, 10, 20, 0].map(n => `<option value="${n}" ${C.adet === n ? "selected" : ""}>${n || "Tümü"}</option>`).join("")}</select>
       </div>
       <label class="row" style="gap:8px;padding-bottom:8px"><input type="checkbox" id="c-yeni" ${C.yeni ? "checked" : ""}> Yalnızca çözmediklerim</label>
+      <label class="row" style="gap:8px;padding-bottom:8px"><input type="checkbox" id="c-meb" ${C.meb ? "checked" : ""}> Yalnızca MEB LGS soruları</label>
     </div>
     <div class="row" style="justify-content:space-between">
       <span class="muted">${h.length} soru uygun</span>
@@ -624,7 +717,7 @@ function vSoru() {
   return `
   <section class="card qcard">
     <div class="progress"><i style="width:${Z.i / Z.liste.length * 100}%"></i></div>
-    <div class="qhead">${chip(q.s)}<span class="note">${esc(q.t)}</span><span class="count">${Z.i + 1} / ${Z.liste.length}</span></div>
+    <div class="qhead">${chip(q.s)}<span class="note">${esc(q.t)}</span>${kaynak(q)}<span class="count">${Z.i + 1} / ${Z.liste.length}</span></div>
     <p class="qtext">${esc(q.q)}</p>
     <div class="opts">${q.o.map((o, j) => `<button class="opt ${sinif(j)}" data-act="p-sec" data-j="${j}" ${acik ? "disabled" : ""}><span class="bub">${HARF[j]}</span><span>${esc(o)}</span></button>`).join("")}</div>
     ${acik ? `<div class="explain ${c === q.a ? "" : "no"}"><b>${c === q.a ? "Doğru!" : c < 0 ? "Boş bıraktın." : "Yanlış."}</b> Doğru cevap ${HARF[q.a]}. ${esc(q.e)}</div>` : ""}
@@ -705,7 +798,7 @@ function vDeneme() {
   return `
   <section class="exam-layout">
     <div class="card qcard" style="margin:0">
-      <div class="qhead">${chip(q.s)}<span class="note">${esc(q.t)}</span><span class="count">${D.i + 1} / ${D.liste.length}</span></div>
+      <div class="qhead">${chip(q.s)}<span class="note">${esc(q.t)}</span>${kaynak(q)}<span class="count">${D.i + 1} / ${D.liste.length}</span></div>
       <p class="qtext">${esc(q.q)}</p>
       <div class="opts">${q.o.map((o, j) => `<button class="opt ${c === j ? "sel" : ""}" data-act="d-sec" data-j="${j}"><span class="bub">${HARF[j]}</span><span>${esc(o)}</span></button>`).join("")}</div>
       <div class="qfoot">
@@ -769,7 +862,7 @@ function vYanlis() {
   </section>
   <section class="list">${liste.map(q => `
     <details class="item">
-      <summary class="row" style="cursor:pointer;gap:10px">${chip(q.s)}<span class="note">${esc(q.t)}</span></summary>
+      <summary class="row" style="cursor:pointer;gap:10px">${chip(q.s)}<span class="note">${esc(q.t)}</span>${kaynak(q)}</summary>
       <p>${esc(q.q)}</p>
       <div class="ans">Doğru cevap: <b>${HARF[q.a]}) ${esc(q.o[q.a])}</b></div>
       <div class="note">${esc(q.e)}</div>
@@ -837,6 +930,413 @@ function netGuncelle() {
   $("#n-uyari").style.color = uyari ? "var(--bad)" : "";
 }
 
+/* ===================== KILIÇ YOLU (OYUN) ===================== */
+/* Kahraman kendiliğinden yürür. Canavar yaklaşınca soru gelir: doğru cevap kılıç darbesi, yanlış cevap can kaybı. */
+const G = {
+  durum: "menu", ders: "hepsi", meb: false,
+  can: 3, puan: 0, kombo: 0, enKombo: 0, olu: 0, d: 0, y: 0, altin: 0, bolum: 1,
+  kuyruk: [], soru: null, sure: 0, sureMax: 0, geri: null, oto: 0,
+  canavar: null, mesafe: 0, sonraki: 360, sonrakiPara: 200, hiz: 150, kamera: 0,
+  hero: { y: 0, vy: 0, kilic: 0, vurdu: false, hasar: 0, adim: 0 },
+  paralar: [], parca: [], yazilar: [], sallan: 0,
+  cv: null, ctx: null, w: 0, h: 0, raf: 0, son: 0, sesAcik: true, actx: null,
+};
+const G_RENK = { tr: "#ec7a4f", mat: "#5b86f2", fen: "#27b8aa", ink: "#c08a52", din: "#93b84e", ing: "#a072e6" };
+const G_AD = { tr: "Yazım Goblini", mat: "Kök Golemi", fen: "Asit Balçığı", ink: "Mondros Hayaleti", din: "Unutkanlık Gölgesi", ing: "Grammar Yarasası" };
+const G_GOK = [["#2a1d4f", "#e68a62"], ["#0f3550", "#75c3a6"], ["#3a1a2e", "#f0a858"], ["#121d38", "#7290db"]];
+const gZemin = () => G.h - 46;
+const gHeroX = () => Math.max(64, G.w * 0.2);
+
+function gHavuz() { return Q.filter(q => (G.ders === "hepsi" || q.s === G.ders) && (!G.meb || q.k)); }
+function gSoruAl() {
+  if (!G.kuyruk.length) G.kuyruk = karistir(gHavuz());
+  return G.kuyruk.pop();
+}
+function ses(f1, f2, sure, tip = "square", vol = 0.12, gecikme = 0) {
+  if (!G.sesAcik || !G.actx) return;
+  try {
+    const t = G.actx.currentTime + gecikme, o = G.actx.createOscillator(), g = G.actx.createGain();
+    o.type = tip; o.frequency.setValueAtTime(f1, t); o.frequency.exponentialRampToValueAtTime(Math.max(30, f2), t + sure);
+    g.gain.setValueAtTime(vol, t); g.gain.exponentialRampToValueAtTime(0.001, t + sure);
+    o.connect(g); g.connect(G.actx.destination); o.start(t); o.stop(t + sure + 0.02);
+  } catch (e) {}
+}
+
+function oyunBasla() {
+  try { if (!G.actx) G.actx = new (window.AudioContext || window.webkitAudioContext)(); } catch (e) {}
+  Object.assign(G, { durum: "walk", can: 3, puan: 0, kombo: 0, enKombo: 0, olu: 0, d: 0, y: 0, altin: 0, bolum: 1,
+    kuyruk: karistir(gHavuz()), soru: null, geri: null, canavar: null, mesafe: 0, sonraki: 360, sonrakiPara: 160, hiz: 150,
+    paralar: [], parca: [], yazilar: [], sallan: 0 });
+  G.hero = { y: gZemin(), vy: 0, kilic: 0, vurdu: false, hasar: 0, adim: 0 };
+  gHud(); gPanel();
+}
+function zipla() {
+  if (G.durum !== "walk" || G.hero.y < gZemin() - 1) return;
+  G.hero.vy = -560; ses(300, 600, 0.12, "triangle", 0.08);
+}
+function duelBasla() {
+  const c = G.canavar;
+  if (!c.q) c.q = gSoruAl();
+  G.soru = c.q; G.durum = "duel"; G.geri = null;
+  const uz = G.soru.q.length + G.soru.o.join("").length;
+  G.sureMax = G.sure = Math.round(Math.min(120, Math.max(25, 18 + uz / 12)));
+  gPanel();
+  const p = $("#g-panel"); if (p && p.getBoundingClientRect().top > window.innerHeight - 120) p.scrollIntoView({ behavior: "smooth", block: "start" });
+}
+function gCevap(j) {
+  if (G.durum !== "duel") return;
+  const q = G.soru, c = G.canavar, dogru = j === q.a;
+  kaydetCevap(q, j);
+  let kazanc = 0;
+  if (dogru) {
+    G.d++; G.kombo++; G.enKombo = Math.max(G.enKombo, G.kombo);
+    kazanc = Math.round(100 * (1 + 0.25 * (G.kombo - 1)) * (c.boss ? 2 : 1));
+    G.puan += kazanc;
+    G.hero.kilic = 0.001; G.hero.vurdu = false;
+    ses(900, 180, 0.16, "sawtooth", 0.09);
+    G.oto = c.boss && c.hp > 1 ? 1.3 : 1.1;
+  } else {
+    G.y++; G.kombo = 0; G.can--;
+    c.saldiri = 0.001; G.hero.hasar = 0.7; G.sallan = 0.35;
+    gYazi(gHeroX(), G.hero.y - 70, "−1 ♥", "#ff6b6b");
+    ses(180, 50, 0.3, "square", 0.14);
+    G.oto = 0;
+  }
+  G.geri = { dogru, j, kazanc };
+  G.durum = "sonuc";
+  gHud(); gPanel();
+}
+function gDevam() {
+  if (G.durum !== "sonuc") return;
+  const c = G.canavar;
+  if (G.can <= 0) return gBitir();
+  if (c && c.hp > 0 && c.boss) { c.q = null; return duelBasla(); }
+  if (c && c.hp > 0) c.kac = true;          // yanlış cevapta canavar kaçar
+  G.durum = "walk"; G.soru = null; G.geri = null;
+  G.sonraki = G.mesafe + 480 + Math.random() * 360;
+  gPanel();
+}
+function gVur() {
+  const c = G.canavar; if (!c) return;
+  c.hp--; c.vuruldu = 0.25;
+  gPatla(c.x, gZemin() - 30 * c.olcek, G_RENK[c.s], 14);
+  if (c.hp <= 0) {
+    c.olum = 0.001; G.olu++; S.oyun.olu = (S.oyun.olu || 0) + 1;
+    gPatla(c.x, gZemin() - 30 * c.olcek, G_RENK[c.s], c.boss ? 50 : 26);
+    gYazi(c.x, gZemin() - 90 * c.olcek, "+" + G.geri.kazanc, "#ffd166");
+    if (G.kombo >= 3) gYazi(c.x, gZemin() - 120 * c.olcek, "Kombo x" + G.kombo + "!", "#fff");
+    if (c.boss) {
+      G.bolum++; G.hiz += 18; G.can = Math.min(5, G.can + 1);
+      gYazi(gHeroX(), G.hero.y - 100, "Bölüm " + G.bolum + "  +1 ♥", "#9ef0b4");
+      [523, 659, 784, 1047].forEach((f, i) => ses(f, f, 0.18, "triangle", 0.1, i * 0.11));
+    } else ses(220, 90, 0.25, "square", 0.08);
+    kaydet(); gHud();
+  } else gYazi(c.x, gZemin() - 110, "+" + G.geri.kazanc, "#ffd166");
+}
+function gBitir() {
+  G.durum = "over";
+  if (G.puan > (S.oyun.rekor || 0)) { S.oyun.rekor = G.puan; G.yeniRekor = true; } else G.yeniRekor = false;
+  kaydet(); gHud(); gPanel();
+}
+function gPatla(x, y, renk, n) {
+  for (let i = 0; i < n; i++) {
+    const a = Math.random() * Math.PI * 2, v = 80 + Math.random() * 260;
+    G.parca.push({ x, y, vx: Math.cos(a) * v, vy: Math.sin(a) * v - 120, t: 0, max: 0.5 + Math.random() * 0.5, r: 2 + Math.random() * 4, renk: Math.random() < 0.3 ? "#fff" : renk });
+  }
+}
+function gYazi(x, y, metin, renk) { G.yazilar.push({ x, y, metin, renk, t: 0 }); }
+
+/* ---- döngü ---- */
+function gDongu(t) {
+  const dt = Math.min(0.05, (t - (G.son || t)) / 1000); G.son = t;
+  gGuncelle(dt); gCiz();
+  G.raf = requestAnimationFrame(gDongu);
+}
+function gGuncelle(dt) {
+  const h = G.hero, zem = gZemin(), hx = gHeroX();
+  const yuru = G.durum === "walk" || G.durum === "menu";
+  const hiz = G.durum === "menu" ? 60 : G.hiz;
+  if (yuru) { G.kamera += hiz * dt; h.adim += dt * hiz / 14; }
+  // zıplama
+  h.vy += 1500 * dt; h.y = Math.min(zem, h.y + h.vy * dt); if (h.y >= zem) h.vy = 0;
+  if (h.kilic > 0) {
+    h.kilic += dt / 0.32;
+    if (!h.vurdu && h.kilic > 0.45) { h.vurdu = true; gVur(); }
+    if (h.kilic >= 1) h.kilic = 0;
+  }
+  if (h.hasar > 0) h.hasar -= dt;
+  if (G.sallan > 0) G.sallan -= dt;
+
+  if (G.durum === "walk") {
+    G.mesafe += hiz * dt;
+    if (!G.canavar && G.mesafe >= G.sonraki) {
+      const boss = (G.olu + 1) % 8 === 0;
+      const q = gSoruAl();
+      G.canavar = { x: G.w + 50, s: q.s, q, boss, hp: boss ? 3 : 1, maxHp: boss ? 3 : 1, olcek: boss ? 1.7 : 1, faz: Math.random() * 6 };
+    }
+    if (G.mesafe >= G.sonrakiPara) {
+      G.sonrakiPara = G.mesafe + 140 + Math.random() * 220;
+      const yuksek = Math.random() < 0.55;
+      const n = 1 + Math.floor(Math.random() * 3);
+      for (let i = 0; i < n; i++) G.paralar.push({ x: G.w + 30 + i * 30, y: zem - (yuksek ? 118 : 30), f: Math.random() * 6 });
+    }
+    G.paralar.forEach(p => { p.x -= hiz * dt; });
+  }
+  // paralar
+  G.paralar = G.paralar.filter(p => {
+    p.f += dt * 6;
+    if (Math.abs(p.x - hx) < 22 && p.y > h.y - 64 && p.y < h.y + 6) {
+      G.altin++; G.puan += 10; ses(1200, 1800, 0.07, "triangle", 0.07); gPatla(p.x, p.y, "#ffd166", 5); gHud(); return false;
+    }
+    return p.x > -20;
+  });
+  // canavar
+  const c = G.canavar;
+  if (c) {
+    c.faz += dt * 5;
+    if (c.vuruldu > 0) c.vuruldu -= dt;
+    if (c.saldiri > 0) { c.saldiri += dt / 0.45; if (c.saldiri >= 1) c.saldiri = 0; }
+    if (c.olum > 0) { c.olum += dt / 0.5; if (c.olum >= 1) G.canavar = null; }
+    else if (c.kac) { c.x += 320 * dt; if (c.x > G.w + 80) G.canavar = null; }
+    else if (G.durum === "walk") {
+      c.x -= (hiz + 45) * dt;
+      if (c.x - hx < 70 + 40 * c.olcek) duelBasla();
+    }
+  }
+  // efektler
+  G.parca = G.parca.filter(p => { p.t += dt; p.x += p.vx * dt; p.y += p.vy * dt; p.vy += 700 * dt; return p.t < p.max; });
+  G.yazilar = G.yazilar.filter(y => { y.t += dt; y.y -= 40 * dt; return y.t < 1.2; });
+  // süre
+  if (G.durum === "duel") {
+    G.sure -= dt;
+    const b = $("#g-tbar"); if (b) { b.style.width = Math.max(0, G.sure / G.sureMax * 100) + "%"; b.style.background = G.sure < 8 ? "var(--bad)" : ""; }
+    const sn = $("#g-sn"); if (sn) sn.textContent = Math.max(0, Math.ceil(G.sure)) + " sn";
+    if (G.sure <= 0) gCevap(-1);
+  }
+  if (G.durum === "sonuc" && G.oto > 0) { G.oto -= dt; if (G.oto <= 0) gDevam(); }
+}
+
+/* ---- çizim ---- */
+function gCiz() {
+  const x = G.ctx; if (!x) return;
+  const W = G.w, H = G.h, zem = gZemin(), k = G.kamera;
+  x.save();
+  if (G.sallan > 0) x.translate((Math.random() - 0.5) * 10, (Math.random() - 0.5) * 6);
+  // gökyüzü
+  const gk = G_GOK[(G.bolum - 1) % G_GOK.length];
+  const gr = x.createLinearGradient(0, 0, 0, zem); gr.addColorStop(0, gk[0]); gr.addColorStop(1, gk[1]);
+  x.fillStyle = gr; x.fillRect(-10, -10, W + 20, zem + 10);
+  x.fillStyle = "rgba(255,240,200,.85)"; x.beginPath(); x.arc(W * 0.78, zem * 0.3, 22, 0, 7); x.fill();
+  // dağlar ve tepeler
+  gKatman(x, k * 0.12, zem - 40, 70, "rgba(20,10,40,.35)", 0.006, 0.013);
+  gKatman(x, k * 0.35, zem - 8, 42, "rgba(20,10,40,.5)", 0.011, 0.023);
+  // zemin
+  x.fillStyle = "#3a2c2a"; x.fillRect(-10, zem, W + 20, H - zem + 10);
+  x.fillStyle = "#5c9a3f"; x.fillRect(-10, zem, W + 20, 8);
+  x.fillStyle = "rgba(0,0,0,.18)";
+  for (let i = -(k % 36); i < W; i += 36) x.fillRect(i, zem + 14, 18, 5);
+  // çitler
+  x.fillStyle = "rgba(30,18,20,.45)";
+  for (let i = -(k * 0.8 % 120); i < W + 20; i += 120) { x.fillRect(i, zem - 26, 5, 26); x.fillRect(i - 20, zem - 20, 45, 4); }
+  // paralar
+  G.paralar.forEach(p => {
+    const s = Math.abs(Math.cos(p.f)) * 8 + 2;
+    x.fillStyle = "#ffd166"; x.beginPath(); x.ellipse(p.x, p.y, s, 9, 0, 0, 7); x.fill();
+    x.fillStyle = "#fff6"; x.fillRect(p.x - 1, p.y - 5, 2, 5);
+  });
+  if (G.canavar) gCanavar(x, G.canavar);
+  gKahraman(x, gHeroX(), G.hero.y);
+  // parçacıklar ve yazılar
+  G.parca.forEach(p => { x.globalAlpha = 1 - p.t / p.max; x.fillStyle = p.renk; x.fillRect(p.x - p.r / 2, p.y - p.r / 2, p.r, p.r); });
+  x.globalAlpha = 1;
+  x.textAlign = "center"; x.font = '800 18px "Bricolage Grotesque", system-ui, sans-serif';
+  G.yazilar.forEach(y => { x.globalAlpha = Math.max(0, 1 - y.t / 1.2); x.fillStyle = "#0008"; x.fillText(y.metin, y.x + 1, y.y + 2); x.fillStyle = y.renk; x.fillText(y.metin, y.x, y.y); });
+  x.globalAlpha = 1;
+  if (G.durum === "menu" || G.durum === "over") {
+    x.fillStyle = "rgba(10,6,25,.45)"; x.fillRect(0, 0, W, H);
+    x.fillStyle = "#fff"; x.font = '800 ' + Math.round(Math.min(44, W / 11)) + 'px "Bricolage Grotesque", system-ui, sans-serif';
+    x.fillText(G.durum === "menu" ? "KILIÇ YOLU" : "OYUN BİTTİ", W / 2, H * 0.4);
+    x.font = '500 15px "Lexend", system-ui, sans-serif'; x.fillStyle = "#ffe2ea";
+    x.fillText(G.durum === "menu" ? "Soruları doğru cevapla, canavarları kılıçla!" : `${G.puan} puan · ${G.olu} canavar`, W / 2, H * 0.4 + 30);
+  }
+  if (G.durum === "duel") {
+    x.fillStyle = "rgba(10,6,25,.25)"; x.fillRect(0, 0, W, H);
+    x.fillStyle = "#fff"; x.font = '800 20px "Bricolage Grotesque", system-ui, sans-serif';
+    x.fillText("Soruyu cevapla, kılıcını savur!", W / 2, 34);
+  }
+  x.restore();
+}
+function gKatman(x, ofs, taban, yuk, renk, f1, f2) {
+  x.fillStyle = renk; x.beginPath(); x.moveTo(-10, taban + 10);
+  for (let i = -10; i <= G.w + 10; i += 8) {
+    const u = i + ofs;
+    x.lineTo(i, taban - yuk * (0.55 + 0.3 * Math.sin(u * f1) + 0.15 * Math.sin(u * f2 + 1.3)));
+  }
+  x.lineTo(G.w + 10, taban + 10); x.closePath(); x.fill();
+}
+function gKahraman(x, hx, y) {
+  const h = G.hero, yuru = (G.durum === "walk" || G.durum === "menu") && y >= gZemin() - 1;
+  const ad = yuru ? Math.sin(h.adim) : 0;
+  if (h.hasar > 0 && Math.floor(h.hasar * 20) % 2 === 0) return;
+  x.save(); x.translate(hx, y);
+  // gölge
+  x.fillStyle = "rgba(0,0,0,.25)"; x.beginPath(); x.ellipse(0, 2, 18, 4, 0, 0, 7); x.fill();
+  // pelerin
+  x.fillStyle = "#c43a5c"; x.beginPath(); x.moveTo(-6, -46); x.lineTo(-22 - ad * 3, -14); x.lineTo(-4, -18); x.closePath(); x.fill();
+  // bacaklar
+  x.fillStyle = "#3b4358"; x.fillRect(-8 + ad * 4, -18, 7, 18); x.fillRect(2 - ad * 4, -18, 7, 18);
+  x.fillStyle = "#2a2230"; x.fillRect(-9 + ad * 4, -3, 9, 3); x.fillRect(1 - ad * 4, -3, 9, 3);
+  // gövde (zırh)
+  x.fillStyle = "#c9d2de"; x.fillRect(-10, -42, 20, 26);
+  x.fillStyle = "#9aa6b6"; x.fillRect(-10, -24, 20, 4);
+  x.fillStyle = "#c43a5c"; x.fillRect(-3, -38, 6, 12);
+  // kask
+  x.fillStyle = "#aeb9c7"; x.fillRect(-9, -60, 18, 18);
+  x.fillStyle = "#1c2230"; x.fillRect(0, -54, 9, 3);
+  x.fillStyle = "#c43a5c"; x.fillRect(-4, -66, 4, 7); x.fillRect(-8, -68, 8, 3);
+  // kılıç
+  const kp = h.kilic;
+  const aci = kp > 0 ? -2.3 + kp * 3.6 : -0.85 + Math.sin(h.adim * 0.5) * 0.05;
+  x.save(); x.translate(9, -30); x.rotate(aci);
+  if (kp > 0) {
+    x.strokeStyle = "rgba(255,255,255," + (0.6 * (1 - kp)) + ")"; x.lineWidth = 10;
+    x.beginPath(); x.arc(0, 0, 32, -kp * 3.6, 0); x.stroke();
+  }
+  x.fillStyle = "#e9eef6"; x.fillRect(4, -3, 34, 6);
+  x.fillStyle = "#fff"; x.fillRect(4, -3, 34, 2);
+  x.beginPath(); x.moveTo(38, -3); x.lineTo(44, 0); x.lineTo(38, 3); x.fillStyle = "#e9eef6"; x.fill();
+  x.fillStyle = "#e0b04a"; x.fillRect(1, -8, 4, 16); x.fillRect(-7, -2, 9, 4);
+  x.restore();
+  x.restore();
+}
+function gCanavar(x, c) {
+  const zem = gZemin(), s = c.olcek, renk = G_RENK[c.s];
+  let cx = c.x;
+  if (c.saldiri > 0) cx -= Math.sin(c.saldiri * Math.PI) * 50;
+  const zipla = Math.abs(Math.sin(c.faz)) * 8;
+  x.save();
+  if (c.olum > 0) { x.globalAlpha = 1 - c.olum; }
+  x.translate(cx, zem - zipla * (c.olum > 0 ? 0 : 1));
+  x.scale(s, s * (c.olum > 0 ? 1 - c.olum * 0.8 : 1));
+  x.fillStyle = "rgba(0,0,0,.25)"; x.beginPath(); x.ellipse(0, 2 + zipla / s, 22, 4, 0, 0, 7); x.fill();
+  // gövde
+  x.fillStyle = c.vuruldu > 0 ? "#fff" : renk;
+  x.beginPath(); x.moveTo(-24, 0); x.quadraticCurveTo(-26, -40, 0, -44); x.quadraticCurveTo(26, -40, 24, 0); x.closePath(); x.fill();
+  x.fillStyle = "rgba(0,0,0,.15)"; x.beginPath(); x.ellipse(4, -8, 16, 6, 0, 0, 7); x.fill();
+  // boynuzlar (patron)
+  if (c.boss) {
+    x.fillStyle = "#f1e3c6";
+    x.beginPath(); x.moveTo(-16, -36); x.lineTo(-24, -56); x.lineTo(-8, -40); x.fill();
+    x.beginPath(); x.moveTo(16, -36); x.lineTo(24, -56); x.lineTo(8, -40); x.fill();
+  }
+  // gözler sola (kahramana) bakar
+  x.fillStyle = "#fff"; x.beginPath(); x.arc(-10, -26, 6, 0, 7); x.arc(4, -26, 6, 0, 7); x.fill();
+  x.fillStyle = "#1b1430"; x.beginPath(); x.arc(-12, -25, 3, 0, 7); x.arc(2, -25, 3, 0, 7); x.fill();
+  x.fillStyle = "#1b1430"; x.fillRect(-12, -14, 16, 4);
+  x.fillStyle = "#fff"; x.fillRect(-10, -14, 3, 3); x.fillRect(-3, -14, 3, 3);
+  x.restore();
+  if (c.olum > 0) return;
+  // isim ve can
+  x.textAlign = "center"; x.font = '600 12px "Lexend", system-ui, sans-serif';
+  const ust = zem - 50 * s - 14;
+  const ad = c.boss ? "Sınav Canavarı" : G_AD[c.s];
+  x.fillStyle = "#0009"; x.fillText(ad, cx + 1, ust + 1); x.fillStyle = "#fff"; x.fillText(ad, cx, ust);
+  if (c.boss) {
+    const bw = 70; x.fillStyle = "#0007"; x.fillRect(cx - bw / 2, ust + 6, bw, 7);
+    x.fillStyle = "#ff5c7a"; x.fillRect(cx - bw / 2, ust + 6, bw * c.hp / c.maxHp, 7);
+  }
+}
+
+/* ---- arayüz ---- */
+function vOyun() {
+  return `
+  <section class="card game">
+    <div class="hud" id="g-hud"></div>
+    <div class="stage"><canvas id="g-cv" aria-label="Kılıç Yolu oyun alanı. Zıplamak için dokun."></canvas></div>
+    <div class="gpanel" id="g-panel"></div>
+  </section>`;
+}
+function gHud() {
+  const el = $("#g-hud"); if (!el) return;
+  const kalp = "♥".repeat(Math.max(0, G.can)) + "♡".repeat(Math.max(0, 3 - G.can));
+  el.innerHTML = `
+    <span class="hearts" aria-label="${G.can} can">${kalp}</span>
+    <span>Puan <b class="mono">${G.puan}</b></span>
+    <span>Kombo <b class="mono">x${G.kombo}</b></span>
+    <span>Bölüm <b class="mono">${G.bolum}</b></span>
+    <span class="note">Rekor <span class="mono">${S.oyun.rekor || 0}</span></span>
+    <button class="btn ghost small sp" data-act="g-ses" aria-pressed="${G.sesAcik}">${G.sesAcik ? "Ses açık" : "Ses kapalı"}</button>`;
+}
+function gPanel() {
+  const el = $("#g-panel"); if (!el) return;
+  if (G.durum === "menu") {
+    const n = gHavuz().length;
+    el.innerHTML = `
+      <div class="stack" style="gap:14px">
+        <div><h2>Kılıç Yolu</h2><p class="muted" style="margin:4px 0 0">Şövalyen yolda yürüyor. Karşısına çıkan her canavar bir LGS sorusu taşıyor: doğru cevap verirsen kılıcınla vurursun, yanlış cevapta 1 can kaybedersin. Her 8 canavarda bir <b>Sınav Canavarı</b> gelir; onu yenmek için 3 soru bilmen gerekir.</p></div>
+        <div class="field"><span class="label">Ders</span>
+          <div class="pick">
+            <button data-act="g-ders" data-v="hepsi" aria-pressed="${G.ders === "hepsi"}">Karışık</button>
+            ${DK.map(s => `<button data-act="g-ders" data-v="${s}" aria-pressed="${G.ders === s}">${esc(DERS[s].ad)}</button>`).join("")}
+          </div>
+        </div>
+        <label class="row" style="gap:8px"><input type="checkbox" id="g-meb" ${G.meb ? "checked" : ""}> Yalnızca MEB'in 2026 LGS soruları</label>
+        <div class="row" style="justify-content:space-between">
+          <span class="note">${n} soru · Zıplamak için ekrana dokun ya da Boşluk'a bas, altınları topla. Cevaplar için A/B/C/D tuşları da çalışır.</span>
+          <button class="btn accent" data-act="g-basla" ${n ? "" : "disabled"}>Yola çık</button>
+        </div>
+      </div>`;
+  } else if (G.durum === "walk") {
+    el.innerHTML = `<div class="row" style="justify-content:space-between"><span class="note">Yürüyorsun… Canavar yaklaşınca soru burada açılacak. Zıplamak için ekrana dokun.</span><button class="btn ghost small" data-act="g-menu">Oyunu bitir</button></div>`;
+  } else if (G.durum === "duel" || G.durum === "sonuc") {
+    const q = G.soru, g = G.geri, c = G.canavar;
+    const sinif = j => !g ? "" : j === q.a ? "ok" : j === g.j ? "no" : "";
+    el.innerHTML = `
+      <div class="duel">
+        <div class="duel-head">${chip(q.s)}<span class="note">${esc(q.t)}</span>${kaynak(q)}<span class="sp mono note" id="g-sn">${g ? "" : Math.ceil(G.sure) + " sn"}</span></div>
+        ${g ? "" : `<div class="tbar"><i id="g-tbar"></i></div>`}
+        ${c && c.boss ? `<div class="note" style="margin-bottom:8px">Sınav Canavarı · ${c.hp} / ${c.maxHp} can</div>` : ""}
+        <p class="qtext">${esc(q.q)}</p>
+        <div class="opts">${q.o.map((o, j) => `<button class="opt ${sinif(j)}" data-act="g-cev" data-j="${j}" ${g ? "disabled" : ""}><span class="bub">${HARF[j]}</span><span>${esc(o)}</span></button>`).join("")}</div>
+        ${g ? `<div class="explain ${g.dogru ? "" : "no"}"><b>${g.dogru ? `Doğru! +${g.kazanc} puan.` : g.j < 0 ? "Süre doldu, canavar vurdu!" : "Yanlış, canavar vurdu!"}</b> Doğru cevap ${HARF[q.a]}. ${esc(q.e)}</div>
+          <div class="qfoot"><span class="note">${g.dogru ? "Devam ediliyor…" : G.can <= 0 ? "Canın kalmadı." : "Açıklamayı okuyup devam et."}</span><button class="btn" data-act="g-devam">${G.can <= 0 ? "Sonucu gör" : "Devam et"}</button></div>` : ""}
+      </div>`;
+  } else if (G.durum === "over") {
+    const oran = G.d + G.y ? Math.round(G.d / (G.d + G.y) * 100) : 0;
+    el.innerHTML = `
+      <div class="stack" style="gap:16px">
+        <div><span class="label">${G.yeniRekor ? "Yeni rekor!" : "Macera bitti"}</span><h2>${G.puan} puan · ${G.olu} canavar yenildi</h2></div>
+        <div class="hero-res">
+          <div><span class="label">Doğru</span><span class="big" style="color:var(--good)">${G.d}</span></div>
+          <div><span class="label">Yanlış</span><span class="big" style="color:var(--bad)">${G.y}</span></div>
+          <div><span class="label">En uzun kombo</span><span class="big">${G.enKombo}</span></div>
+          <div><span class="label">Altın</span><span class="big">${G.altin}</span></div>
+          <div><span class="label">Bölüm</span><span class="big">${G.bolum}</span></div>
+        </div>
+        <p class="note" style="margin:0">Doğru oranın %${oran}. Yanlış yaptığın sorular Yanlışlarım listesine eklendi.</p>
+        <div class="row"><button class="btn accent" data-act="g-basla">Tekrar oyna</button><button class="btn ghost" data-act="g-menu">Ders değiştir</button><button class="btn ghost" data-tab="yanlis">Yanlışlarıma git</button></div>
+      </div>`;
+  }
+}
+function oyunBagla() {
+  const cv = $("#g-cv"); if (!cv) return;
+  G.cv = cv; G.ctx = cv.getContext("2d");
+  gBoyut(); gHud(); gPanel();
+  if (!G.raf) { G.son = 0; G.raf = requestAnimationFrame(gDongu); }
+}
+function oyunDurdur() { if (G.raf) cancelAnimationFrame(G.raf); G.raf = 0; }
+function gBoyut() {
+  if (!G.cv) return;
+  const w = G.cv.parentElement.clientWidth, h = Math.round(Math.min(340, Math.max(230, w * 0.42)));
+  const dpr = Math.min(2, window.devicePixelRatio || 1);
+  G.cv.width = w * dpr; G.cv.height = h * dpr; G.cv.style.height = h + "px";
+  G.ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  G.w = w; G.h = h;
+  if (!G.hero.y || G.hero.y > gZemin()) G.hero.y = gZemin();
+}
+window.addEventListener("resize", () => { if (aktif === "oyun") gBoyut(); });
+document.addEventListener("pointerdown", e => { if (e.target.id === "g-cv") zipla(); });
+
 /* ===================== OLAYLAR ===================== */
 document.addEventListener("click", e => {
   const tab = e.target.closest("[data-tab]");
@@ -883,6 +1383,12 @@ document.addEventListener("click", e => {
     if (P.calisiyor) P.int = setInterval(pomoTik, 1000);
     pomoGuncelle();
   }
+  else if (a === "g-ders") { G.ders = b.dataset.v; gPanel(); }
+  else if (a === "g-basla") oyunBasla();
+  else if (a === "g-cev") gCevap(+b.dataset.j);
+  else if (a === "g-devam") gDevam();
+  else if (a === "g-menu") { G.durum = "menu"; G.canavar = null; G.soru = null; gHud(); gPanel(); }
+  else if (a === "g-ses") { G.sesAcik = !G.sesAcik; gHud(); }
   else if (a === "pomo-sifir") { clearInterval(P.int); P.calisiyor = false; P.mod = "calis"; P.kalan = POMO_SURE.calis; pomoGuncelle(); }
 });
 document.addEventListener("change", e => {
@@ -890,6 +1396,8 @@ document.addEventListener("change", e => {
   if (t.id === "c-konu") { C.konu = t.value; ciz(); }
   else if (t.id === "c-adet") { C.adet = +t.value; }
   else if (t.id === "c-yeni") { C.yeni = t.checked; ciz(); }
+  else if (t.id === "c-meb") { C.meb = t.checked; ciz(); }
+  else if (t.id === "g-meb") { G.meb = t.checked; }
   else if (t.id === "hedef") { const v = Math.max(5, Math.min(300, +t.value || 40)); S.hedef = v; kaydet(); ciz(); }
   else if (t.id === "sinav" && t.value) { S.sinav = t.value; kaydet(); ust(); }
   else if (t.dataset.konu) { if (t.checked) S.konu[t.dataset.konu] = true; else delete S.konu[t.dataset.konu]; kaydet(); ciz(); }
@@ -902,6 +1410,12 @@ document.addEventListener("keydown", e => {
   if (e.target.matches("input, select, textarea")) return;
   const k = e.key.toUpperCase();
   const idx = HARF.indexOf(k);
+  if (aktif === "oyun") {
+    if (e.key === " " && G.durum === "walk") { e.preventDefault(); zipla(); }
+    else if (idx >= 0 && G.durum === "duel") gCevap(idx);
+    else if (e.key === "Enter" && G.durum === "sonuc") gDevam();
+    return;
+  }
   if (aktif === "coz" && Z && Z.i < Z.liste.length) {
     if (idx >= 0 && Z.cev[Z.i] === undefined) { Z.cev[Z.i] = idx; kaydetCevap(Z.liste[Z.i], idx); ciz(); }
     else if (e.key === "Enter" && Z.cev[Z.i] !== undefined) { Z.i++; ciz(); }
