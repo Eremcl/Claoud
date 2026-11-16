@@ -1,0 +1,272 @@
+<!doctype html>
+<html><head><meta charset="utf-8"><title>Arkana Bakma</title>
+<style>html,body{margin:0;background:#000;overflow:hidden}canvas{display:block}</style></head>
+<body><canvas id="c" width="1280" height="720"></canvas>
+<script>
+// ARKANA BAKMA — prosedürel korku kısa filmi. renderFrame(n) tek kareyi çizer.
+const W=1280,H=720,FPS=30,DUR=38.5;
+const cv=document.getElementById('c'),ctx=cv.getContext('2d');
+const mk=(w,h)=>{const c=document.createElement('canvas');c.width=w;c.height=h;return c;};
+const S=mk(W,H),g=S.getContext('2d');
+const TR=mk(W,H),tr=TR.getContext('2d'),TC=mk(W,H),tc=TC.getContext('2d'),T2=mk(W,H),t2=T2.getContext('2d');
+const NZ=mk(426,240),nz=NZ.getContext('2d');
+const SL=mk(4,4);{const s=SL.getContext('2d');s.fillStyle='rgba(0,0,0,0.24)';s.fillRect(0,2,4,2);}
+const hash=(a,b)=>{const x=Math.sin(a*127.1+b*311.7)*43758.5453;return x-Math.floor(x);};
+const mulberry=a=>()=>{a|=0;a=a+0x6D2B79F5|0;let t=Math.imul(a^a>>>15,1|a);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296;};
+const clamp=(x,a=0,b=1)=>Math.max(a,Math.min(b,x));
+const smooth=(a,b,x)=>{x=clamp((x-a)/(b-a));return x*x*(3-2*x);};
+
+// ---- zaman çizelgesi ----
+const T_WALK0=3.5,T_STOP=15,T_DARK=24.5,T_SCARE=28.5,T_STATIC=29.8,T_TITLE=31.5,T_END=37.5;
+const BLACKOUTS=[[14.6,15.0],[19.1,19.3],[21.0,21.2],[24.22,24.37]];
+const OFF={48:17.0,44:17.4,40:18.5,36:20.5,32:22.2,28:24.5};
+const f=700,cx=W/2,cy=H/2,WX=1.3,CEIL=-1.15,FLOOR=1;
+
+function camZ(t){const p=clamp((t-T_WALK0)/(T_STOP-T_WALK0));
+  const q=p<0.9?p/0.95:(0.9/0.95+(1-(1-(p-0.9)/0.1)**2)*0.05/0.95);return 26*q;}
+function flash(t){ if(t<T_WALK0||t>=14.6) return 0;
+  let v=smooth(T_WALK0,T_WALK0+0.6,t);
+  if(t>13.2){ v*= hash(Math.floor(t*30),7)>0.35+0.4*(t-13.2)/1.4 ? 1:0.15; }
+  return v*(0.92+0.08*Math.sin(t*23)); }
+function L(zi,t){
+  for(const b of BLACKOUTS) if(t>=b[0]&&t<b[1]) return hash(zi,Math.floor(t*30))>0.85?0.25:0;
+  if(zi>=52) return 0;
+  const fr=Math.floor(t*30); let v=1;
+  if(hash(zi*3.1,fr)>0.955) v=0.35;
+  if((zi===20||zi===36)&&hash(zi*1.7,Math.floor(t*12))>0.7) v=0.2+0.5*hash(zi,fr);
+  const off=OFF[zi];
+  if(off!==undefined){ if(t>=off) return 0.5*Math.exp(-(t-off)*14);
+    if(t>off-0.3) v=hash(zi*5.3,fr)>0.5?1:0.1; }
+  return v; }
+function bright(zw,t,cz){ let b=0.012; const k0=Math.floor((zw-14)/4),k1=Math.ceil((zw+14)/4);
+  for(let k=k0;k<=k1;k++){const zi=4*k+0; if(zi<0) continue; b+=0.72*L(zi,t)/(1+((zw-zi)/1.5)**2);}
+  const rel=zw-cz; b+=flash(t)*0.85/(1+(rel/4.5)**2); return b*Math.exp(-rel/40); }
+const P=(x,y,z)=>[cx+f*x/z,cy+f*y/z];
+function quad(a,b,c,d,col){g.fillStyle=col;g.strokeStyle=col;g.lineWidth=1;g.beginPath();g.moveTo(a[0],a[1]);g.lineTo(b[0],b[1]);g.lineTo(c[0],c[1]);g.lineTo(d[0],d[1]);g.closePath();g.fill();g.stroke();}
+const rgb=(r,gg,b,k)=>`rgb(${clamp(r*k,0,1)*255|0},${clamp(gg*k,0,1)*255|0},${clamp(b*k,0,1)*255|0})`;
+const inDoor=(z,side)=>{const m=((z%4)+4)%4;return side<0?(m>=0.75&&m<1.75):(m>=2.5&&m<3.5);};
+
+function figState(t){ // dünya z konumu
+  if(t<15) return null; let z=40; if(t>=19.2) z=36; if(t>=21.1) z=32; if(t>=24.3) z=28.3; return z; }
+
+function drawFigure(z,cz,t){
+  const rel=z-cz, s=f/rel, b=clamp(bright(z,t,cz)*1.25,0,1.2); if(b<0.02) return;
+  const sway=Math.sin(t*1.3)*0.012, x0=cx+s*sway, y0=cy+s*FLOOR;
+  g.save(); g.translate(x0,y0); g.scale(s,-s);
+  const pale=(k)=>rgb(0.80,0.82,0.76,b*k);
+  // bacaklar
+  g.fillStyle=pale(0.45); g.fillRect(-0.13,0,0.075,0.42); g.fillRect(0.055,0,0.075,0.42);
+  // önlük
+  const gr=g.createLinearGradient(0,1.45,0,0.3); gr.addColorStop(0,pale(1)); gr.addColorStop(1,pale(0.42));
+  g.fillStyle=gr; g.beginPath(); g.moveTo(-0.2,1.43); g.lineTo(0.2,1.43); g.lineTo(0.27,0.36); g.lineTo(-0.27,0.36); g.closePath(); g.fill();
+  // kollar (fazla uzun)
+  g.fillStyle=pale(0.7);
+  g.beginPath(); g.moveTo(-0.2,1.42); g.lineTo(-0.3,1.36); g.lineTo(-0.36,0.5); g.lineTo(-0.30,0.44); g.closePath(); g.fill();
+  g.beginPath(); g.moveTo(0.2,1.42); g.lineTo(0.3,1.36); g.lineTo(0.36,0.5); g.lineTo(0.30,0.44); g.closePath(); g.fill();
+  // baş (yana eğik)
+  g.translate(0.02,1.48); g.rotate(-0.38);
+  g.fillStyle=pale(0.95); g.beginPath(); g.ellipse(0,0.13,0.095,0.135,0,0,7); g.fill();
+  g.fillStyle='#000';
+  g.beginPath(); g.ellipse(-0.04,0.15,0.026,0.034,0,0,7); g.fill();
+  g.beginPath(); g.ellipse(0.04,0.15,0.026,0.034,0,0,7); g.fill();
+  g.beginPath(); g.ellipse(0,0.045,0.03,0.045,0,0,7); g.fill();
+  // saç
+  g.beginPath(); g.ellipse(0,0.2,0.125,0.11,0,Math.PI,0,true); g.fill();
+  g.beginPath(); g.moveTo(-0.125,0.22); g.lineTo(-0.07,0.2); g.lineTo(-0.1,-0.45); g.lineTo(-0.17,-0.5); g.closePath(); g.fill();
+  g.beginPath(); g.moveTo(0.125,0.22); g.lineTo(0.07,0.2); g.lineTo(0.11,-0.4); g.lineTo(0.17,-0.52); g.closePath(); g.fill();
+  g.restore();
+}
+
+function drawCorridor(t){
+  const cz=camZ(t);
+  const zStart=cz+46;
+  for(let zw=Math.ceil(zStart*4)/4; zw>cz+0.2; zw-=0.25){
+    const z1=zw,z0=Math.max(zw-0.25,cz+0.2); if(z1<=z0) continue;
+    const r0=z0-cz,r1=z1-cz,zm=zw-0.125,b=bright(zm,t,cz);
+    if(b<0.004) continue;
+    const tile=(Math.floor(zm)&1)?0.8:1;
+    quad(P(-WX,FLOOR,r0),P(WX,FLOOR,r0),P(WX,FLOOR,r1),P(-WX,FLOOR,r1),rgb(0.36,0.37,0.33,b*tile*0.9));
+    quad(P(-WX,CEIL,r0),P(WX,CEIL,r0),P(WX,CEIL,r1),P(-WX,CEIL,r1),rgb(0.50,0.52,0.47,b*0.8));
+    for(const sd of [-1,1]){ const x=sd*WX, stain=0.82+0.18*hash(Math.floor(zm*2),sd*9);
+      quad(P(x,CEIL,r0),P(x,0.3,r0),P(x,0.3,r1),P(x,CEIL,r1),rgb(0.60,0.66,0.55,b*stain));
+      quad(P(x,0.3,r0),P(x,FLOOR,r0),P(x,FLOOR,r1),P(x,0.3,r1),rgb(0.24,0.36,0.31,b*stain));
+      quad(P(x,0.27,r0),P(x,0.33,r0),P(x,0.33,r1),P(x,0.27,r1),rgb(0.15,0.2,0.17,b));
+      if(inDoor(zm,sd)){ const edge=!inDoor(zm-0.25,sd)||!inDoor(zm+0.25,sd);
+        quad(P(x,-0.72,r0),P(x,FLOOR,r0),P(x,FLOOR,r1),P(x,-0.72,r1),edge?rgb(0.10,0.08,0.06,b):rgb(0.27,0.19,0.13,b));
+        const m=((zm%4)+4)%4, mid=sd<0?(m>1.0&&m<1.5):(m>2.75&&m<3.25);
+        if(mid) quad(P(x,-0.5,r0),P(x,-0.1,r0),P(x,-0.1,r1),P(x,-0.5,r1),rgb(0.05,0.07,0.08,b));
+      } }
+    const zi=Math.round(zm/4)*4;
+    if(Math.abs(zm-zi)<0.5&&zi>=0){ const l=L(zi,t),fog=Math.exp(-(zm-cz)/40);
+      quad(P(-0.42,CEIL+0.01,r0),P(0.42,CEIL+0.01,r0),P(0.42,CEIL+0.01,r1),P(-0.42,CEIL+0.01,r1),rgb(0.95,1,0.92,(0.1*b+l)*fog)); }
+  }
+  const fz=figState(t); if(fz) drawFigure(fz,cz,t);
+  g.globalCompositeOperation='lighter';
+  for(let zi=Math.ceil((cz+0.6)/4)*4; zi<cz+46; zi+=4){ const l=L(zi,t); if(l<0.02) continue;
+    const rel=zi-cz,p=P(0,CEIL,rel),r=f/rel*1.5,a=0.28*l*Math.exp(-rel/40);
+    const gr=g.createRadialGradient(p[0],p[1],0,p[0],p[1],r);
+    gr.addColorStop(0,`rgba(215,255,225,${a})`); gr.addColorStop(1,'rgba(215,255,225,0)');
+    g.fillStyle=gr; g.fillRect(p[0]-r,p[1]-r,2*r,2*r); }
+  g.globalCompositeOperation='source-over';
+}
+
+function ell(x,y,rx,ry,rot=0){g.beginPath();g.ellipse(x,y,rx,ry,rot,0,7);g.fill();}
+function drawFace(x,y,s,open,seed,alpha){
+  const r=mulberry(seed);
+  g.save(); g.translate(x,y); g.scale(s,s); g.globalAlpha=alpha;
+  g.fillStyle='#020202'; ell(0,-0.25,1.6,2.1);
+  g.fillStyle='#2c2c28'; g.fillRect(-0.42,1.1,0.84,2.5);
+  const ry=1.4+0.36*open, fy=0.1+0.17*open;
+  let gr=g.createRadialGradient(0,-0.35,0.1,0,0.1,1.75);
+  gr.addColorStop(0,'#ece8d6'); gr.addColorStop(0.5,'#b3b2a0'); gr.addColorStop(0.8,'#4d4d44'); gr.addColorStop(1,'#0a0a09');
+  g.fillStyle=gr; ell(0,fy,1,ry);
+  // göz çukurları
+  g.filter=`blur(${0.075*s}px)`; g.fillStyle='#000';
+  const ey=-0.38, er=0.36+0.07*open;
+  ell(-0.44,ey,0.31,er,0.18); ell(0.44,ey,0.31,er,-0.18);
+  for(const sx of [-0.44,0.44]){ gr=g.createLinearGradient(0,ey,0,ey+1.5);
+    gr.addColorStop(0,'rgba(0,0,0,0.95)'); gr.addColorStop(1,'rgba(0,0,0,0)');
+    g.fillStyle=gr; g.fillRect(sx-0.13,ey,0.26,1.5); }
+  // ağız
+  const my=0.78+0.27*open, mrx=0.34+0.1*open, mry=0.12+0.64*open;
+  g.fillStyle='#000'; ell(0,my,mrx,mry);
+  g.filter=`blur(${0.02*s}px)`;
+  gr=g.createRadialGradient(0,my+mry*0.3,0,0,my,mry); gr.addColorStop(0,'rgba(70,0,0,0.9)'); gr.addColorStop(1,'rgba(0,0,0,0)');
+  g.fillStyle=gr; ell(0,my,mrx*0.85,mry*0.9);
+  // dişler
+  for(const top of [1,-1]) for(let i=-4;i<=4;i++){ const tx=i*mrx*0.2, k=Math.sqrt(Math.max(0,1-(tx/mrx)**2));
+    const ty=my-top*mry*k*0.96, h=(0.07+r()*0.09)*(0.5+0.5*k)*(top>0?1.2:0.8);
+    g.fillStyle=`rgb(${190+r()*30|0},${180+r()*25|0},${140+r()*25|0})`;
+    g.beginPath(); g.moveTo(tx-0.03,ty); g.lineTo(tx+0.03,ty); g.lineTo(tx+0.008*(r()-0.5),ty+top*h); g.closePath(); g.fill(); }
+  g.filter='none';
+  // gözbebekleri
+  g.fillStyle='#fff'; ell(-0.44+0.03*(r()-0.5),ey+0.02,0.028,0.028); ell(0.44+0.03*(r()-0.5),ey+0.02,0.028,0.028);
+  g.fillStyle='rgba(0,0,0,0.75)'; ell(-0.07,0.32,0.035,0.06,0.3); ell(0.07,0.32,0.035,0.06,-0.3);
+  // çatlaklar
+  g.strokeStyle='rgba(25,8,8,0.55)'; g.lineWidth=0.012;
+  for(let i=0;i<9;i++){ let px=(r()-0.5)*1.4,py=(r()-0.6)*1.6; g.beginPath(); g.moveTo(px,py);
+    for(let j=0;j<7;j++){px+=(r()-0.5)*0.22;py+=r()*0.2;g.lineTo(px,py);} g.stroke(); }
+  // öne düşen saçlar
+  g.strokeStyle='#020202'; g.lineCap='round';
+  for(let i=0;i<16;i++){ const sx=(r()-0.5)*2.2, ex=sx+(r()-0.5)*0.5; g.lineWidth=0.02+r()*0.07;
+    g.beginPath(); g.moveTo(sx,-1.9); g.quadraticCurveTo(sx*1.25,-0.4,ex,0.2+r()*1.8); g.stroke(); }
+  g.restore();
+}
+
+function noiseFill(){ const id=nz.createImageData(426,240),d=id.data;
+  for(let i=0;i<d.length;i+=4){const v=Math.random()*255|0;d[i]=d[i+1]=d[i+2]=v;d[i+3]=255;} nz.putImageData(id,0,0); }
+const MONO='"DejaVu Sans Mono","JetBrains Mono",monospace', SERIF='"Liberation Serif","DejaVu Serif",serif';
+function hudText(s,x,y,size,align='left',col='rgba(235,235,235,0.92)'){ g.font=`bold ${size}px ${MONO}`; g.textAlign=align;
+  g.fillStyle='rgba(0,0,0,0.6)'; g.fillText(s,x+2,y+2); g.fillStyle=col; g.fillText(s,x,y); }
+function hud(t){
+  const ss=String(Math.floor(t)%60).padStart(2,'0');
+  if(t<T_STATIC){
+    if(t<2.2){ hudText('▶ OYNAT',70,84,30); }
+    else if(Math.floor(t*1.6)%2===0){ g.fillStyle='#e01818'; g.beginPath(); g.arc(84,73,11,0,7); g.fill(); hudText('KAYIT',106,84,30); }
+    else hudText('KAYIT',106,84,30);
+    hudText('SP',W-70,84,30,'right');
+    hudText(`14.11.2026  03:17:${ss}`,W-70,H-56,28,'right');
+    if(t>14.6&&Math.floor(t*2)%2===0) hudText('PİL ZAYIF',70,H-56,28,'left','rgba(255,90,70,0.95)');
+  }
+}
+
+function sceneAt(t){
+  g.setTransform(1,0,0,1,0,0); g.globalAlpha=1; g.filter='none'; g.globalCompositeOperation='source-over';
+  g.fillStyle='#000'; g.fillRect(0,0,W,H);
+  let glitch=0, ca=1.6;
+  if(t<T_WALK0){
+    g.textAlign='center';
+    const l1='14 KASIM 2026 — 03:17', l2='Bu kayıt, kapatılmış bir hastanenin', l3='bodrum katında bulundu.';
+    const n=Math.floor((t-0.5)*16);
+    g.fillStyle='rgba(230,230,225,0.92)'; g.font=`bold 34px ${MONO}`;
+    if(n>0) g.fillText(l1.slice(0,n),cx,cy-50);
+    g.font=`26px ${MONO}`; g.fillStyle='rgba(200,200,195,0.85)';
+    const n2=n-l1.length-6; if(n2>0) g.fillText(l2.slice(0,n2),cx,cy+10);
+    const n3=n2-l2.length; if(n3>0) g.fillText(l3.slice(0,n3),cx,cy+48);
+    if(t>3.2) glitch=1;
+  } else if(t<T_DARK){
+    const w=1-smooth(14.2,15,t), ph=(t-3.7)/0.6, tense=smooth(15,24.5,t);
+    const tr1=(1.5+4*tense)*(Math.sin(t*7.3)+Math.sin(t*11.9+1)), tr2=(1.5+4*tense)*(Math.sin(t*8.7+2)+Math.sin(t*13.1));
+    g.save(); g.translate(cx,cy); g.rotate(0.013*w*Math.sin(Math.PI*ph)+0.002*Math.sin(t*3)); g.scale(1.09,1.09);
+    g.translate(-cx+7*w*Math.sin(Math.PI*ph)+tr1, -cy+10*w*Math.abs(Math.sin(Math.PI*ph))-5+tr2);
+    drawCorridor(t); g.restore();
+    // fener huzmesi / vinyet
+    const fl=flash(t), gr=g.createRadialGradient(cx,cy+10,60,cx,cy+10,760);
+    gr.addColorStop(0,'rgba(0,0,0,0)'); gr.addColorStop(0.45,`rgba(0,0,0,${0.25+0.3*fl})`); gr.addColorStop(1,`rgba(0,0,0,${0.8+0.15*fl})`);
+    g.fillStyle=gr; g.fillRect(0,0,W,H);
+    const a=smooth(T_WALK0,T_WALK0+0.5,t); if(a<1){g.fillStyle=`rgba(0,0,0,${1-a})`;g.fillRect(0,0,W,H);}
+    if(t<T_WALK0+0.25) glitch=0.8;
+    for(const b of BLACKOUTS) if(t>=b[0]-0.03&&t<b[1]+0.05) glitch=Math.max(glitch,0.45);
+    if(t>=15.6&&t<17.6){ g.font=`italic 30px ${SERIF}`; g.textAlign='center'; g.fillStyle='rgba(235,235,220,0.9)'; g.fillText('…orada biri var.',cx,H-120); }
+  } else if(t<T_SCARE){
+    if(t>=26&&t<27.7){ const a=smooth(26,26.4,t)*(1-smooth(27.3,27.7,t));
+      g.font=`italic 34px ${SERIF}`; g.textAlign='center'; g.fillStyle=`rgba(200,200,190,${0.75*a})`;
+      g.fillText('arkana bakma.',cx+2*Math.sin(t*40),H-120); }
+  } else if(t<T_STATIC){
+    const u=t-T_SCARE, fr=Math.floor(t*30);
+    const zoom=0.45+0.6*(1-Math.exp(-u*16))+0.12*u, open=clamp(0.25+u*2.2);
+    const jx=(hash(fr,1)-0.5)*46, jy=(hash(fr,2)-0.5)*34;
+    g.save(); g.translate(cx,cy); g.rotate((hash(fr,3)-0.5)*0.12); g.translate(-cx,-cy);
+    drawFace(cx+jx,cy-70+jy,235*zoom,open,1337+(fr%2),1); g.restore();
+    const gr=g.createRadialGradient(cx,cy,100,cx,cy,720); gr.addColorStop(0,'rgba(0,0,0,0)'); gr.addColorStop(1,'rgba(0,0,0,0.9)');
+    g.fillStyle=gr; g.fillRect(0,0,W,H);
+    if(fr%7===3){ g.globalCompositeOperation='difference'; g.fillStyle='#fff'; g.fillRect(0,0,W,H); g.globalCompositeOperation='source-over'; }
+    g.globalCompositeOperation='multiply'; g.fillStyle=`rgb(255,${215-110*hash(fr,4)|0},${200-110*hash(fr,4)|0})`; g.fillRect(0,0,W,H); g.globalCompositeOperation='source-over';
+    if(u<0.07){ g.fillStyle='rgba(255,255,255,0.85)'; g.fillRect(0,0,W,H); }
+    glitch=0.25+0.5*(hash(fr,6)>0.6); ca=3+6*hash(fr,5);
+  } else if(t<T_TITLE){
+    noiseFill(); g.imageSmoothingEnabled=false; g.drawImage(NZ,0,0,W,H); g.imageSmoothingEnabled=true;
+    g.fillStyle='rgba(0,0,0,0.35)'; g.fillRect(0,0,W,H);
+    const by=((t*260)%(H+200))-200; g.fillStyle='rgba(255,255,255,0.12)'; g.fillRect(0,by,W,120);
+    if(t>30.1){ g.fillStyle='rgba(10,10,160,0.85)'; g.fillRect(cx-170,cy-36,340,64); hudText('SİNYAL YOK',cx,cy+8,34,'center'); }
+    glitch=0.7; ca=4;
+  } else if(t<T_END){
+    const u=t-T_TITLE, a=smooth(0.5,2.2,u), fr=Math.floor(t*30);
+    if(t>=36.55&&t<36.72){ drawFace(cx,cy-30,250,0.9,1337,0.55); glitch=1; ca=8; }
+    const fl=hash(fr,9)>0.93?0.55:1, gx=hash(fr,11)>0.95?(hash(fr,12)-0.5)*24:0;
+    g.textAlign='center'; g.font=`bold 104px ${SERIF}`; g.fillStyle=`rgba(214,208,192,${a*fl})`;
+    const title='ARKANA BAKMA'; let wsum=0; const sp=14; for(const ch of title) wsum+=g.measureText(ch).width+sp;
+    let x=cx-wsum/2+gx; g.textAlign='left'; for(const ch of title){ g.fillText(ch,x,cy+20); x+=g.measureText(ch).width+sp; }
+    g.fillStyle=`rgba(150,20,20,${a*0.9})`; g.fillRect(cx-150,cy+58,300,2);
+    const a2=smooth(2.6,3.6,u); g.font=`22px ${MONO}`; g.textAlign='center'; g.fillStyle=`rgba(160,160,150,${a2*0.8})`;
+    g.fillText('K A Y I T   S O N A   E R D İ',cx,cy+110);
+    if(hash(fr,13)>0.96) glitch=Math.max(glitch,0.5);
+  }
+  g.setTransform(1,0,0,1,0,0); g.globalAlpha=1; g.filter='none';
+  hud(t);
+  return {glitch,ca};
+}
+
+function post(t,glitch,ca){
+  const fr=Math.floor(t*30);
+  tr.globalCompositeOperation='source-over'; tr.fillStyle='#000'; tr.fillRect(0,0,W,H); tr.drawImage(S,ca,0);
+  tr.globalCompositeOperation='multiply'; tr.fillStyle='#f00'; tr.fillRect(0,0,W,H);
+  tc.globalCompositeOperation='source-over'; tc.fillStyle='#000'; tc.fillRect(0,0,W,H); tc.drawImage(S,-ca,0);
+  tc.globalCompositeOperation='multiply'; tc.fillStyle='#0ff'; tc.fillRect(0,0,W,H);
+  ctx.globalCompositeOperation='source-over'; ctx.globalAlpha=1; ctx.fillStyle='#000'; ctx.fillRect(0,0,W,H);
+  ctx.globalCompositeOperation='lighter'; ctx.drawImage(TR,0,0); ctx.drawImage(TC,0,0);
+  ctx.globalCompositeOperation='source-over';
+  // izleme bozulması
+  t2.drawImage(cv,0,0);
+  const roll=((t*37)%(H+80))-40; ctx.drawImage(T2,0,roll,W,14,5,roll,W,14);
+  const nb=Math.round(glitch*10);
+  for(let i=0;i<nb;i++){ const y=hash(fr,20+i)*H, h=6+hash(fr,40+i)*60*glitch, dx=(hash(fr,60+i)-0.5)*160*glitch;
+    ctx.drawImage(T2,0,y,W,h,dx,y,W,h); }
+  // kafa geçiş gürültüsü (alt bant)
+  noiseFill();
+  ctx.globalAlpha=0.5; ctx.drawImage(NZ,0,0,426,6,(hash(fr,80)-0.5)*40,H-12,W,12); ctx.globalAlpha=1;
+  // gren
+  ctx.imageSmoothingEnabled=false;
+  ctx.globalCompositeOperation='overlay'; ctx.globalAlpha=0.16+0.12*glitch; ctx.drawImage(NZ,0,0,W,H);
+  ctx.globalCompositeOperation='lighter'; ctx.globalAlpha=0.035+0.05*glitch; ctx.drawImage(NZ,0,0,W,H);
+  ctx.imageSmoothingEnabled=true; ctx.globalCompositeOperation='source-over'; ctx.globalAlpha=1;
+  ctx.fillStyle=ctx.createPattern(SL,'repeat'); ctx.fillRect(0,0,W,H);
+  const vg=ctx.createRadialGradient(cx,cy,300,cx,cy,800); vg.addColorStop(0,'rgba(0,0,0,0)'); vg.addColorStop(1,'rgba(0,0,0,0.6)');
+  ctx.fillStyle=vg; ctx.fillRect(0,0,W,H);
+  if(t>=T_END){ ctx.fillStyle='#000'; ctx.fillRect(0,0,W,H); }
+}
+window.renderFrame=n=>{ const t=n/FPS; const r=sceneAt(t); post(t,r.glitch,r.ca); return true; };
+window.TOTAL=Math.round(DUR*FPS);
+// tarayıcıda açılırsa önizleme olarak oynat
+if(!navigator.webdriver){ const t0=performance.now(); (function loop(){ const n=Math.floor((performance.now()-t0)/1000*FPS)%window.TOTAL; renderFrame(n); requestAnimationFrame(loop); })(); }
+</script></body></html>
