@@ -81,7 +81,7 @@ const ders = (() => {
     return `Sen ${secili.ad}'sın; ${secili.brans} alanında uzman, LGS'ye hazırlanan 8. sınıf öğrencisine birebir özel ders veren bir öğretmensin. ${secili.kisilik}
 Şu an öğrenciyle CANLI sesli görüşmedesin: öğrenci konuşuyor, sen konuşuyorsun. Yazdıkların doğrudan sesli okunacak.${ad ? ` Öğrencinin adı ${ad}.` : ""}
 Kurallar:
-- Gerçek bir telefon görüşmesi gibi konuş: kısa, doğal cümleler; bir seferde en fazla 4-5 cümle. Uzun çözümü parça parça anlat ve her adımdan sonra "Buraya kadar tamam mı?" gibi kısa bir soruyla öğrencinin cevabını bekle.
+- Gerçek bir insan gibi, günlük konuşma Türkçesiyle konuş: "bak şimdi", "şöyle düşün", "hah, işte burası önemli", "aynen öyle" gibi doğal ifadeler kullan; ders kitabı gibi resmî konuşma. Kısa, doğal cümleler; bir seferde en fazla 4-5 cümle. Uzun çözümü parça parça anlat ve her adımdan sonra "Buraya kadar tamam mı?" gibi kısa bir soruyla öğrencinin cevabını bekle.
 - Madde işareti, numara, başlık, tablo, parantez içi açıklama, kalın yazı, emoji kullanma. Sadece konuşma dili.
 - Matematik ifadelerini sesli okunacak şekilde yaz: "x kare", "üç bölü dört", "kök iki", "eksi beş", "yüzde yirmi".
 - Öğrencinin sözleri sesten yazıya çevrildiği için küçük yazım hataları olabilir; ne demek istediğini anlamaya çalış, anlamazsan kısaca tekrar sor.
@@ -94,16 +94,43 @@ Kurallar:
 
   /* ---------- Ses çıkışı ---------- */
   // Canlı dinleme açıkken Claude sesi çalışmaz (mikrofonla çakışır), o zaman cihazın Türkçe sesi kullanılır.
+  // Cihazdaki Türkçe sesler: en doğal olanlar (Natural/Online/Neural, Google) önce
   let cihazSesleri = [];
-  function sesleriYukle() { if (SS) cihazSesleri = SS.getVoices().filter((v) => /^tr/i.test(v.lang)); }
-  if (SS) { sesleriYukle(); SS.addEventListener?.("voiceschanged", sesleriYukle); }
-  const PERDE = { elif: 1.08, kerem: 0.86, zeynep: 1.16, can: 0.95 };
+  const KADIN = /emel|yelda|filiz|seda|zeynep|elif|aylin|selin|google|female|kad[ıi]n/i;
+  const ERKEK = /ahmet|tolga|cem|mehmet|emre|male|erkek/i;
+  const dogallik = (v) => (/natural|neural|online|premium|enhanced/i.test(v.name) ? 3 : 0) + (/google/i.test(v.name) ? 2 : 0) + (v.localService === false ? 1 : 0);
+  function sesleriYukle() {
+    if (!SS) return;
+    cihazSesleri = SS.getVoices().filter((v) => /^tr/i.test(v.lang)).sort((a, b) => dogallik(b) - dogallik(a));
+    sesListesi();
+  }
+  const HOCA_KADIN = { elif: true, zeynep: true, kerem: false, can: false };
+  function hocaSesi() {
+    const secim = oku("ses") || "oto";
+    const elle = cihazSesleri.find((v) => v.voiceURI === secim);
+    if (elle) return elle;
+    const kadin = HOCA_KADIN[secili.k];
+    const uygun = cihazSesleri.filter((v) => (kadin ? KADIN.test(v.name) && !ERKEK.test(v.name) : ERKEK.test(v.name)));
+    return (uygun[0] && dogallik(uygun[0]) >= dogallik(cihazSesleri[0] || uygun[0]) - 1 ? uygun[0] : cihazSesleri[0]) || null;
+  }
+  function sesListesi() {
+    const sel = $("#dSes"); if (!sel) return;
+    const secim = oku("ses") || "oto";
+    sel.innerHTML = `<option value="oto">Otomatik (en doğal ses)</option>` +
+      (TTS ? `<option value="claude">Claude sesi (çok doğal, her cevaptan sonra dokunursun)</option>` : "") +
+      cihazSesleri.map((v) => `<option value="${esc(v.voiceURI)}">${esc(v.name.replace(/Microsoft |Online |\(Natural\)|- Turkish.*$|Turkish.*$/g, "").trim() || v.name)}${dogallik(v) >= 3 ? " (doğal)" : ""}</option>`).join("");
+    sel.value = [...sel.options].some((o) => o.value === secim) ? secim : "oto";
+  }
   let claudeSesKapali = false, cihazKuyruk = 0;
   const motor = () => {
+    const secim = oku("ses") || "oto";
+    const claudeOlur = TTS && !claudeSesKapali;
+    if (secim === "claude" && claudeOlur) return "claude";
     const dinlemeAcik = canli && DIK && DIK.active();
-    if (TTS && !claudeSesKapali && !dinlemeAcik) return "claude";
-    if (SS) return "cihaz";
-    return TTS && !claudeSesKapali ? "claude" : null;
+    if (secim === "oto" && claudeOlur && !dinlemeAcik && !(cihazSesleri[0] && dogallik(cihazSesleri[0]) >= 3)) return "claude";
+    if (SS && cihazSesleri.length) return "cihaz";
+    if (claudeOlur) return "claude";
+    return SS ? "cihaz" : null;
   };
   const konusuyorMu = () => (SS && (SS.speaking || SS.pending || cihazKuyruk > 0)) || (TTS && TTS.active());
   function konusmaBasladi() { sahne.classList.add("konusuyor"); sahne.classList.remove("dinliyor", "duyuyor"); durum("Anlatıyor"); $("#dDur").disabled = false; }
@@ -116,6 +143,8 @@ Kurallar:
     const m = motor();
     if (!m) { sahne.classList.add("konusuyor"); return; }
     if (m === "claude") {
+      // Claude sesi mikrofonla aynı anda çalışmaz: önce dinlemeyi kapat
+      if (DIK && DIK.active()) { DIK.stop().catch(() => {}).finally(() => seslendir(parca)); return; }
       TTS.add([{ text: parca.slice(0, 1900), voice: secili.ses, language: "tr" }], { rate: hiz() }).catch((e) => {
         if (e?.code === "not_granted") { claudeSesKapali = true; not("Claude sesi kapalı; cihazın sesi kullanılıyor."); if (SS) seslendir(parca); }
         else if (e?.code === "busy" && SS) seslendir(parca);
@@ -125,9 +154,8 @@ Kurallar:
     }
     const u = new SpeechSynthesisUtterance(parca);
     u.lang = "tr-TR";
-    const i = OGRETMENLER.indexOf(secili);
-    if (cihazSesleri.length) u.voice = cihazSesleri[i % cihazSesleri.length];
-    u.rate = hiz(); u.pitch = PERDE[secili.k] || 1;
+    const v = hocaSesi(); if (v) u.voice = v;
+    u.rate = hiz(); u.pitch = 1;
     cihazKuyruk++;
     u.onstart = konusmaBasladi;
     u.onend = u.onerror = () => { cihazKuyruk = Math.max(0, cihazKuyruk - 1); setTimeout(konusmaBitti, 50); };
@@ -265,6 +293,13 @@ Kurallar:
   const hizYaz = () => { $("#dHizDeger").textContent = hiz().toLocaleString("tr-TR", { minimumFractionDigits: 2 }) + "×"; };
   $("#dHiz").oninput = () => { hizYaz(); kaydet("hiz", $("#dHiz").value); TTS?.setRate?.(hiz())?.catch?.(() => {}); };
   $("#dAdim").oninput = () => { kaydet("ad", $("#dAdim").value); $("#senHarf") && ($("#senHarf").textContent = $("#dAdim").value.trim() || "Sen"); };
+  $("#dSes").onchange = () => { kaydet("ses", $("#dSes").value); };
+  $("#dSesDene").onclick = () => {
+    sesiDurdur(); okunan = 0;
+    const t = `Merhaba, ben ${secili.ad}. Sesim böyle. Hadi birlikte soru çözelim.`;
+    sesVer(t, true);
+    if (!motor()) toast("Bu cihazda sesli okuma yok.");
+  };
   $("#dAltyazi").onchange = () => { kaydet("altyazi", $("#dAltyazi").checked ? "1" : "0"); $("#altyazi").hidden = !$("#dAltyazi").checked || !$("#altyazi").textContent; };
 
   async function baslat() {
@@ -274,6 +309,7 @@ Kurallar:
     sec(secili.k);
     const use = (n) => (window.claude?.use ? window.claude.use(n).catch(() => null) : Promise.resolve(null));
     [TTS, DIK] = await Promise.all([use("tts"), use("dictation")]);
+    if (SS) { sesleriYukle(); SS.addEventListener?.("voiceschanged", sesleriYukle); setTimeout(sesleriYukle, 800); } else sesListesi();
     const sesVar = !!(TTS || SS), mikVar = !!(DIK || window.SpeechRecognition || window.webkitSpeechRecognition);
     $("#dAltyazi").checked = oku("altyazi") ? oku("altyazi") === "1" : !sesVar;
     if (!sesVar && !mikVar) not("Bu cihazda ses ve mikrofon kullanılamıyor. Bilgisayarda Chrome ile açarsan canlı konuşabilirsin.");
