@@ -6,23 +6,49 @@
 <title>LGS Koçu</title>
 <meta name="theme-color" content="#4f46e5">
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="style.css">
 </head>
 <body>
+<!-- Çizgi ikonlar -->
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <symbol id="i-logo" viewBox="0 0 24 24"><path d="M22 10 12 5 2 10l10 5 10-5z"/><path d="M6 12v5c3 2.5 9 2.5 12 0v-5"/><path d="M22 10v5"/></symbol>
+  <symbol id="i-chart" viewBox="0 0 24 24"><path d="M3 3v18h18"/><path d="M18 17V9"/><path d="M13 17V5"/><path d="M8 17v-3"/></symbol>
+  <symbol id="i-file" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/><path d="M12 18v-6"/><path d="M9 15h6"/></symbol>
+  <symbol id="i-target" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></symbol>
+  <symbol id="i-camera" viewBox="0 0 24 24"><path d="M14.5 4h-5L7 7H4a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-3l-2.5-3z"/><circle cx="12" cy="13" r="3"/></symbol>
+  <symbol id="i-layers" viewBox="0 0 24 24"><path d="m12 2 10 5-10 5L2 7z"/><path d="m2 17 10 5 10-5"/><path d="m2 12 10 5 10-5"/></symbol>
+  <symbol id="i-message" viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></symbol>
+  <symbol id="i-pen" viewBox="0 0 24 24"><path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4Z"/></symbol>
+  <symbol id="i-hl" viewBox="0 0 24 24"><path d="m9 11-6 6v3h9l3-3"/><path d="m22 12-4.6 4.6a2 2 0 0 1-2.8 0l-5.2-5.2a2 2 0 0 1 0-2.8L14 4"/></symbol>
+  <symbol id="i-eraser" viewBox="0 0 24 24"><path d="m7 21-4.3-4.3c-1-1-1-2.5 0-3.4l9.6-9.6c1-1 2.5-1 3.4 0l5.6 5.6c1 1 1 2.5 0 3.4L13 21"/><path d="M22 21H7"/><path d="m5 11 9 9"/></symbol>
+  <symbol id="i-undo" viewBox="0 0 24 24"><path d="M3 7v6h6"/><path d="M21 17a9 9 0 0 0-15-6.7L3 13"/></symbol>
+  <symbol id="i-redo" viewBox="0 0 24 24"><path d="M21 7v6h-6"/><path d="M3 17a9 9 0 0 1 15-6.7l3 2.7"/></symbol>
+  <symbol id="i-trash" viewBox="0 0 24 24"><path d="M3 6h18"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6"/><path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></symbol>
+  <symbol id="i-image" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="9" cy="9" r="2"/><path d="m21 15-3.1-3.1a2 2 0 0 0-2.8 0L6 21"/></symbol>
+  <symbol id="i-x" viewBox="0 0 24 24"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></symbol>
+  <symbol id="i-check" viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"/></symbol>
+  <symbol id="i-send" viewBox="0 0 24 24"><path d="m22 2-7 20-4-9-9-4Z"/><path d="M22 2 11 13"/></symbol>
+  <symbol id="i-spark" viewBox="0 0 24 24"><path d="M12 3l1.9 5.1L19 10l-5.1 1.9L12 17l-1.9-5.1L5 10l5.1-1.9z"/><path d="M19 17v4"/><path d="M17 19h4"/></symbol>
+  <symbol id="i-arrow" viewBox="0 0 24 24"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></symbol>
+  <symbol id="i-refresh" viewBox="0 0 24 24"><path d="M21 12a9 9 0 1 1-3-6.7L21 8"/><path d="M21 3v5h-5"/></symbol>
+  <symbol id="i-plus" viewBox="0 0 24 24"><path d="M12 5v14"/><path d="M5 12h14"/></symbol>
+</svg>
+
 <header class="top">
-  <div class="brand"><span class="logo">L</span><div><b>LGS Koçu</b><small>2027 puan hesabı · analiz · soru çözümü</small></div></div>
+  <div class="brand"><span class="logo"><svg class="ic"><use href="#i-logo"/></svg></span><div><b>LGS Koçu</b><small>2027 puan hesabı · analiz · soru çözümü</small></div></div>
   <div class="who" id="who"></div>
 </header>
 
 <div class="banner" id="banner" hidden></div>
 
 <nav class="tabs" id="tabs">
-  <button data-tab="analiz" class="on">📊 Analiz</button>
-  <button data-tab="deneme">📝 Deneme Ekle</button>
-  <button data-tab="foto">📸 Fotoğraftan Soru</button>
-  <button data-tab="sor">💬 Soru Sor</button>
-  <button data-tab="tahta">✏️ Tahta</button>
+  <button data-tab="analiz" class="on"><svg class="ic"><use href="#i-chart"/></svg>Analiz</button>
+  <button data-tab="deneme"><svg class="ic"><use href="#i-file"/></svg>Deneme Ekle</button>
+  <button data-tab="koc"><svg class="ic"><use href="#i-target"/></svg>Koç Kontrolü</button>
+  <button data-tab="foto"><svg class="ic"><use href="#i-layers"/></svg>Fotoğraftan Soru</button>
+  <button data-tab="sor"><svg class="ic"><use href="#i-message"/></svg>Soru Sor</button>
+  <button data-tab="tahta"><svg class="ic"><use href="#i-pen"/></svg>Tahta</button>
 </nav>
 
 <main>
@@ -41,7 +67,7 @@
         <label>Tarih<input id="dTarih" type="date"></label>
       </div>
       <div class="fotoOku">
-        <label class="btn ghost">📷 Sonuç kâğıdından doldur
+        <label class="btn ghost"><svg class="ic"><use href="#i-camera"/></svg>Sonuç kâğıdından doldur
           <input type="file" id="dFoto" accept="image/*" capture="environment" hidden>
         </label>
         <span class="muted" id="dFotoDurum">Sonuç kâğıdının fotoğrafını çekersen doğru/yanlış sayıları otomatik doldurulur.</span>
@@ -58,18 +84,39 @@
       </label>
       <div class="puanKutu">
         <div><small>Tahmini 2027 LGS puanı</small><b id="dPuan">—</b></div>
-        <button class="btn" id="dKaydet">Denemeyi kaydet</button>
+        <button class="btn" id="dKaydet">Kaydet ve koç kontrolüne geç<svg class="ic"><use href="#i-arrow"/></svg></button>
       </div>
     </div>
+  </section>
+
+  <!-- KOÇ KONTROLÜ -->
+  <section id="t-koc" class="tab">
+    <div class="card" id="kocGiris">
+      <h2>Koç Kontrolü: Yanlışlarını gerçekten anladın mı?</h2>
+      <p class="muted">Denemede yanlış yaptığın ya da boş bıraktığın soruların fotoğraflarını ekle. Koç her soruyu önce sana tekrar çözdürür, sonra çözümü anlatır ve aynı kazanımdan yeni bir soruyla anlayıp anlamadığını kontrol eder. Sonunda hangi konuları anladığını, hangilerini tekrar etmen gerektiğini denemene kaydeder.</p>
+      <div class="grid2">
+        <label>Hangi deneme?<select id="kDeneme"></select></label>
+        <label>Kontrol sorusu sayısı (her soru için)<select id="kSayi"><option value="1">1</option><option value="2" selected>2</option></select></label>
+      </div>
+      <div class="row">
+        <label class="btn ghost"><svg class="ic"><use href="#i-camera"/></svg>Soru fotoğrafı ekle
+          <input type="file" id="kFoto" accept="image/*" multiple hidden>
+        </label>
+        <span class="muted" id="kSayac">En fazla 10 fotoğraf. Bir fotoğrafta birden fazla soru olabilir.</span>
+      </div>
+      <div class="thumbs" id="kThumbs"></div>
+      <button class="btn" id="kBasla" disabled><svg class="ic"><use href="#i-target"/></svg>Kontrole başla</button>
+    </div>
+    <div id="kAlan"></div>
   </section>
 
   <!-- FOTOĞRAFTAN SORU -->
   <section id="t-foto" class="tab">
     <div class="card">
       <h2>Fotoğraftan sana soru sorayım</h2>
-      <p class="muted">Yanlış yaptığın soruların, defterinin ya da konu anlatımının fotoğrafını çek. Fotoğraftaki konulara benzer, LGS tarzı yeni sorular hazırlarım.</p>
+      <p class="muted">Defterinin, konu anlatımının ya da bir test sayfasının fotoğrafını çek. Fotoğraftaki konulara benzer, LGS tarzı yeni sorular hazırlarım.</p>
       <div class="row">
-        <label class="btn ghost">📷 Fotoğraf çek / seç
+        <label class="btn ghost"><svg class="ic"><use href="#i-camera"/></svg>Fotoğraf çek / seç
           <input type="file" id="fFoto" accept="image/*" multiple hidden>
         </label>
         <label class="inline">Soru sayısı
@@ -80,26 +127,26 @@
         </label>
       </div>
       <div class="thumbs" id="fThumbs"></div>
-      <button class="btn" id="fBasla" disabled>Soruları hazırla</button>
+      <button class="btn" id="fBasla" disabled><svg class="ic"><use href="#i-spark"/></svg>Soruları hazırla</button>
     </div>
     <div id="fQuiz"></div>
   </section>
 
-  <!-- SORU SOR (Kunduz gibi) -->
+  <!-- SORU SOR -->
   <section id="t-sor" class="tab">
     <div class="card chat">
       <div class="chatHead">
         <h2>Soru Sor</h2>
-        <button class="btn ghost sm" id="cYeni">Yeni sohbet</button>
+        <button class="btn ghost sm" id="cYeni"><svg class="ic"><use href="#i-plus"/></svg>Yeni sohbet</button>
       </div>
       <div class="msgs" id="cMsgs">
-        <div class="msg bot"><div class="bubble">Merhaba! Takıldığın sorunun fotoğrafını çek ya da yaz. Adım adım çözer, anlamadığın yeri tekrar anlatırım. 🙂</div></div>
+        <div class="msg bot"><div class="bubble">Merhaba! Takıldığın sorunun fotoğrafını çek ya da yaz. Adım adım çözer, anlamadığın yeri tekrar anlatırım.</div></div>
       </div>
       <div class="thumbs" id="cThumbs"></div>
       <form class="composer" id="cForm">
-        <label class="iconBtn" title="Fotoğraf ekle">📷<input type="file" id="cFoto" accept="image/*" multiple hidden></label>
+        <label class="iconBtn" title="Fotoğraf ekle"><svg class="ic"><use href="#i-camera"/></svg><input type="file" id="cFoto" accept="image/*" multiple hidden></label>
         <textarea id="cText" rows="1" placeholder="Sorunu yaz ya da fotoğraf ekle…"></textarea>
-        <button class="btn" id="cGonder">Gönder</button>
+        <button class="btn" id="cGonder" title="Gönder"><svg class="ic"><use href="#i-send"/></svg></button>
       </form>
       <div class="hizli" id="cHizli">
         <button data-q="Bunu daha basit anlat.">Daha basit anlat</button>
@@ -114,21 +161,21 @@
   <section id="t-tahta" class="tab">
     <div class="card board">
       <div class="tools" id="wbTools">
-        <button data-tool="pen" class="on" title="Kalem">✏️</button>
-        <button data-tool="hl" title="Fosforlu">🖍️</button>
-        <button data-tool="eraser" title="Silgi">🧽</button>
+        <button data-tool="pen" class="on" title="Kalem"><svg class="ic"><use href="#i-pen"/></svg></button>
+        <button data-tool="hl" title="Fosforlu kalem"><svg class="ic"><use href="#i-hl"/></svg></button>
+        <button data-tool="eraser" title="Silgi"><svg class="ic"><use href="#i-eraser"/></svg></button>
         <span class="sep"></span>
         <span class="colors" id="wbColors"></span>
         <span class="sep"></span>
         <select id="wbSize" title="Kalınlık"><option value="2">İnce</option><option value="4" selected>Orta</option><option value="8">Kalın</option></select>
         <select id="wbBg" title="Zemin"><option value="kare">Kareli</option><option value="cizgi">Çizgili</option><option value="duz">Düz</option></select>
         <span class="sep"></span>
-        <button id="wbUndo" title="Geri al">↶</button>
-        <button id="wbRedo" title="Yinele">↷</button>
-        <button id="wbClear" title="Temizle">🗑️</button>
-        <label class="btnTool" title="Fotoğrafı tahtaya koy">🖼️<input type="file" id="wbImg" accept="image/*" hidden></label>
+        <button id="wbUndo" title="Geri al"><svg class="ic"><use href="#i-undo"/></svg></button>
+        <button id="wbRedo" title="Yinele"><svg class="ic"><use href="#i-redo"/></svg></button>
+        <button id="wbClear" title="Temizle"><svg class="ic"><use href="#i-trash"/></svg></button>
+        <label class="btnTool" title="Fotoğrafı tahtaya koy"><svg class="ic"><use href="#i-image"/></svg><input type="file" id="wbImg" accept="image/*" hidden></label>
         <span class="grow"></span>
-        <button class="btn sm" id="wbSor">Tahtayı Soru Sor'a gönder</button>
+        <button class="btn sm" id="wbSor"><svg class="ic"><use href="#i-send"/></svg>Tahtayı Soru Sor'a gönder</button>
       </div>
       <div class="canvasWrap" id="wbWrap"><canvas id="wb"></canvas></div>
     </div>

@@ -1,0 +1,29 @@
+name: LGS Koçu'nu Firebase'e yükle
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths: ["lgs-koc/**"]
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - name: Hizmet hesabı anahtarını yaz
+        env:
+          SA: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+        run: |
+          if [ -z "$SA" ]; then echo "FIREBASE_SERVICE_ACCOUNT secret'ı eklenmemiş."; exit 1; fi
+          printf '%s' "$SA" > "$RUNNER_TEMP/sa.json"
+      - name: Yükle (hosting + güvenlik kuralları)
+        working-directory: lgs-koc
+        env:
+          GOOGLE_APPLICATION_CREDENTIALS: ${{ runner.temp }}/sa.json
+        run: |
+          PROJE=$(jq -r '.project_id' "$RUNNER_TEMP/sa.json")
+          npx -y firebase-tools@15.34.2 deploy --only hosting,firestore:rules --project "$PROJE" --non-interactive

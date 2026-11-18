@@ -4,6 +4,7 @@ import { firebaseConfig, AI_MODELS } from "./firebase-config.js";
 const FB = "https://www.gstatic.com/firebasejs/13.1.0";
 const $ = (s, r = document) => r.querySelector(s);
 const $$ = (s, r = document) => [...r.querySelectorAll(s)];
+const ic = (n) => `<svg class="ic"><use href="#i-${n}"/></svg>`;
 const esc = (s) => String(s ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
 
 /* ------------------------------------------------------------------ */
@@ -105,6 +106,10 @@ const store = {
     }
     const v = lsOku(); const x = { id: "l" + Date.now(), ...d }; v.denemeler.push(x); lsYaz(v); return x;
   },
+  async guncelle(id, patch) {
+    if (user) { const { doc, updateDoc } = fb.fs; await updateDoc(doc(fb.db, "users", user.uid, "denemeler", id), patch); return; }
+    const v = lsOku(); const x = v.denemeler.find((d) => d.id === id); if (x) Object.assign(x, patch); lsYaz(v);
+  },
   async sil(id) {
     if (user) { const { doc, deleteDoc } = fb.fs; await deleteDoc(doc(fb.db, "users", user.uid, "denemeler", id)); return; }
     const v = lsOku(); v.denemeler = v.denemeler.filter((x) => x.id !== id); lsYaz(v);
@@ -139,7 +144,7 @@ const SISTEM = `Sen Türkiye'de LGS'ye hazırlanan 8. sınıf öğrencilerine ya
 Her zaman Türkçe yaz. 8. sınıf (Maarif modeli) müfredatına ve LGS soru tarzına uy.
 Soru çözerken: önce sorunun ne istediğini bir cümleyle söyle, sonra numaralı kısa adımlarla çöz, en sonda "Cevap: X" yaz.
 Matematik ifadelerini LaTeX kullanmadan düz yaz (x², √2, 3/4, ×, ÷ gibi).
-Görseldeki soru okunmuyorsa bunu söyle ve öğrenciden daha net bir fotoğraf iste. Emin olmadığın bir şeyi uydurma.`;
+Görseldeki soru okunmuyorsa bunu söyle ve öğrenciden daha net bir fotoğraf iste. Emin olmadığın bir şeyi uydurma. Emoji kullanma.`;
 
 let calisanModel = null;
 function aiHazirMi() {
@@ -282,7 +287,7 @@ $("#dKaydet").onclick = async () => {
     toast(`Kaydedildi: ${f2(d.puan)} puan`);
     $("#dAd").value = ""; $("#dKonular").value = "";
     $$("#dTablo input").forEach((i) => (i.value = ""));
-    denemeGuncelle(); analizCiz(); sekme("analiz");
+    denemeGuncelle(); analizCiz(); kocAc(x.id);
   } catch (e) { toast("Kaydedilemedi: " + (e.code || e.message)); }
   $("#dKaydet").disabled = false;
 };
@@ -315,9 +320,10 @@ Okuyamadığın dersi {"d":null,"y":null} yaz.`;
 /* Analiz                                                              */
 /* ------------------------------------------------------------------ */
 function analizCiz() {
+  kocSecenekleri();
   const k = $("#analizIcerik");
   if (!DENEMELER.length) {
-    k.innerHTML = `<div class="card empty"><div class="big">📊</div><h2>Henüz deneme yok</h2>
+    k.innerHTML = `<div class="card empty"><div class="big">${ic("chart")}</div><h2>Henüz deneme yok</h2>
       <p class="muted">İlk denemeni ekle; puanını 2027 LGS hesabına göre bulup derslere göre analiz edeyim.</p>
       <button class="btn" id="ilkDeneme">Deneme ekle</button></div>`;
     $("#ilkDeneme").onclick = () => sekme("deneme");
@@ -348,7 +354,7 @@ function analizCiz() {
   let hedefHtml = "";
   if (hedef) {
     const gerek = hedef - son.puan;
-    if (gerek <= 0) hedefHtml = `<p class="up"><b>Hedefini geçtin! 🎉</b> Son denemen hedefinden ${f2(-gerek)} puan yüksek.</p>`;
+    if (gerek <= 0) hedefHtml = `<p class="up"><b>Hedefini geçtin.</b> Son denemen hedefinden ${f2(-gerek)} puan yüksek.</p>`;
     else {
       const ipuclari = oncelik.slice(0, 3).map((o) => {
         const bosNet = Math.min(o.n - o.nt, gerek / o.kat);
@@ -402,9 +408,11 @@ function analizCiz() {
     <div class="chart">${dersGrafik(DENEMELER)}</div>
   </div>
 
+  ${tekrarKarti()}
+
   <div class="card">
     <div class="row" style="justify-content:space-between"><h3 style="margin:0">Yapay zekâ koç yorumu</h3>
-      <button class="btn sm" id="koc">Analiz et ve çalışma planı çıkar</button></div>
+      <button class="btn sm" id="koc">${ic("spark")}Analiz et ve çalışma planı çıkar</button></div>
     <div class="aiCevap bubble" id="kocCevap" hidden></div>
   </div>
 
@@ -416,7 +424,7 @@ function analizCiz() {
         <td>${esc(tarihYaz(d.tarih))}</td><td>${esc(d.ad)}${d.yayin ? `<br><small>${esc(d.yayin)}</small>` : ""}</td>
         ${DERSLER.map((D) => `<td>${f1(net(d.dersler[D.k]?.d, d.dersler[D.k]?.y))}</td>`).join("")}
         <td><b>${f1(d.net)}</b></td><td><b>${f2(d.puan)}</b></td>
-        <td><button class="btn danger" data-sil="${esc(d.id)}" title="Sil">✕</button></td></tr>`).join("")}</tbody>
+        <td style="white-space:nowrap"><button class="btn ghost sm" data-koc="${esc(d.id)}" title="Koç kontrolü">${ic("target")}${d.kontrol ? `${d.kontrol.filter((k) => k.durum === "anladi").length}/${d.kontrol.length}` : ""}</button> <button class="btn danger" data-sil="${esc(d.id)}" title="Sil">${ic("x")}</button></td></tr>`).join("")}</tbody>
     </table></div>
   </div>`;
 
@@ -431,6 +439,7 @@ function analizCiz() {
     catch (e) { toast("Silinemedi"); }
   }));
   $("#koc").onclick = kocYorumu;
+  $$("[data-koc]").forEach((b) => (b.onclick = () => kocAc(b.dataset.koc)));
 }
 function yorum(o) {
   if (o.yanlis >= 3 && o.yanlis > o.bos) return `<br><small>Ortalama ${f1(o.yanlis)} yanlışın var: emin olmadığın soruda işaretlemeden önce şıkları ele. Her 3 yanlış 1 doğruyu götürüyor.</small>`;
@@ -494,11 +503,211 @@ Motive edici ama gerçekçi ol. Verilmeyen bilgiyi uydurma.`;
 }
 
 /* ------------------------------------------------------------------ */
+/* Koç kontrolü: yanlış soruları tekrar çözdür, anlat, anladı mı test et */
+/* ------------------------------------------------------------------ */
+function durumEtiket(dogru) {
+  if (dogru == null) return `<span class="durum bos">Boş</span>`;
+  return dogru ? `<span class="durum ok">${ic("check")}Doğru</span>` : `<span class="durum no">${ic("x")}Yanlış</span>`;
+}
+const DURUM_AD = { anladi: "Anladı", kismen: "Kısmen", tekrar: "Tekrar et" };
+function tekrarKarti() {
+  // Her konunun en son koç kontrolündeki durumu
+  const son = new Map();
+  for (const d of DENEMELER) for (const k of d.kontrol || []) son.set(`${k.ders}|${k.konu}`, { ...k, deneme: d.ad });
+  const liste = [...son.values()];
+  if (!liste.length) return "";
+  const eksik = liste.filter((k) => k.durum !== "anladi");
+  const tamam = liste.filter((k) => k.durum === "anladi");
+  return `<div class="card">
+    <h3>Koç kontrolü sonuçları</h3>
+    <p class="muted">Yanlış yaptığın sorulardan sonra yapılan "anladın mı?" kontrollerine göre.</p>
+    ${eksik.length ? `<p><b>Tekrar etmen gereken konular</b></p><div>${eksik.map((k) => `<span class="etiket no">${ic("refresh")}${esc(k.ders)}: ${esc(k.konu)}${k.durum === "kismen" ? " (kısmen)" : ""}</span>`).join("")}</div>` : `<p class="up"><b>Kontrol ettiğin tüm konuları anlamışsın.</b></p>`}
+    ${tamam.length ? `<p><b>Anladığın konular</b></p><div>${tamam.map((k) => `<span class="etiket ok">${ic("check")}${esc(k.ders)}: ${esc(k.konu)}</span>`).join("")}</div>` : ""}
+    ${eksik.length ? `<div class="btnRow"><button class="btn sm" id="tekrarSor">${ic("message")}Bu konuları bana tekrar anlat</button></div>` : ""}
+  </div>`;
+}
+document.addEventListener("click", (e) => {
+  if (e.target.closest("#tekrarSor")) {
+    const konular = $$("#analizIcerik .etiket.no").map((x) => x.textContent.trim()).join(", ");
+    sohbeteGonder(`Koç kontrolünde şu konuları tam anlamadığım çıktı: ${konular}. Her birini kısaca, örnekle anlat ve sonunda bana bir soru sor.`);
+  }
+});
+function sohbeteGonder(metin) {
+  sekme("sor");
+  $("#cText").value = metin;
+  $("#cForm").requestSubmit();
+}
+
+let kGorseller = [];
+function kocSecenekleri(secili) {
+  const s = $("#kDeneme"); const onceki = secili || s.value;
+  s.innerHTML = DENEMELER.length
+    ? [...DENEMELER].reverse().map((d) => `<option value="${esc(d.id)}">${esc(tarihYaz(d.tarih))} · ${esc(d.ad)} · ${f2(d.puan)} puan</option>`).join("")
+    : `<option value="">Önce bir deneme ekle</option>`;
+  if (onceki && DENEMELER.some((d) => d.id === onceki)) s.value = onceki;
+}
+function kocAc(id) {
+  kocSecenekleri(id);
+  $("#kAlan").innerHTML = "";
+  $("#kocGiris").hidden = false;
+  sekme("koc");
+  toast("Yanlış ve boş bıraktığın soruların fotoğraflarını ekle.");
+}
+function kBtnDurum() {
+  $("#kBasla").disabled = !kGorseller.length || !$("#kDeneme").value;
+  $("#kSayac").textContent = kGorseller.length ? `${kGorseller.length} fotoğraf eklendi (en fazla 10).` : "En fazla 10 fotoğraf. Bir fotoğrafta birden fazla soru olabilir.";
+}
+$("#kFoto").onchange = async (e) => {
+  for (const f of [...e.target.files].slice(0, 10 - kGorseller.length)) { try { kGorseller.push(await gorselHazirla(f)); } catch {} }
+  e.target.value = "";
+  thumbCiz($("#kThumbs"), kGorseller, kBtnDurum);
+};
+$("#kDeneme").onchange = kBtnDurum;
+
+$("#kBasla").onclick = async () => {
+  if (!aiHazirMi()) return;
+  const d = DENEMELER.find((x) => x.id === $("#kDeneme").value);
+  if (!d || !kGorseller.length) return;
+  const kSayi = +$("#kSayi").value;
+  const alan = $("#kAlan");
+  $("#kBasla").disabled = true;
+  alan.innerHTML = `<div class="card"><span class="typing"><i></i><i></i><i></i></span> Koç soruları inceliyor, çözümleri ve kontrol sorularını hazırlıyor…</div>`;
+  const ozet = DERSLER.map((D) => `${D.ad} ${d.dersler[D.k]?.d || 0}D ${d.dersler[D.k]?.y || 0}Y`).join(", ");
+  const istem = `Öğrencinin "${d.ad}" denemesi: ${ozet}. ${d.konular ? `Öğrencinin not ettiği eksik konular: ${d.konular}.` : ""}
+Fotoğraflarda öğrencinin bu denemede YANLIŞ yaptığı ya da BOŞ bıraktığı sorular var. Fotoğraflardaki her soruyu ayrı ayrı ele al (en fazla 10 soru).
+Her soru için:
+- Soruyu oku, dersini, konusunu ve ölçtüğü kazanımı belirle.
+- Sorunun metnini (uzunsa özetleyerek) ve şıklarını yaz. Şıklar okunmuyorsa "secenekler" boş dizi olsun.
+- Soruyu dikkatlice çöz, doğru şıkkı bul ve 8. sınıf öğrencisinin anlayacağı adım adım bir çözüm yaz.
+- Öğrencilerin bu soruda en sık yaptığı hatayı bir cümleyle yaz.
+- Aynı kazanımı ölçen, fotoğraftakinden FARKLI ${kSayi} yeni çoktan seçmeli kontrol sorusu hazırla. Öğrenci konuyu gerçekten anladıysa çözebilmeli, ezberle çözülememeli. Cevaplarını kendin kontrol et.
+Yalnızca şu JSON'u döndür:
+{"sorular":[{"ders":"Matematik","konu":"Üslü İfadeler","kazanim":"kısa kazanım","soru":"soru metni","secenekler":["...","...","...","..."],"dogru":0,"cozum":"adım adım çözüm","sikHata":"sık yapılan hata","kontrol":[{"soru":"...","secenekler":["...","...","...","..."],"dogru":0,"aciklama":"kısa çözüm"}]}]}
+"dogru" değerleri 0-3 arası şık sırasıdır. Şıkların başına harf yazma. Emoji kullanma.`;
+  try {
+    const r = await modelIle((m) => m.generateContent([istem, ...kGorseller.map((g) => g.part)]), { generationConfig: { responseMimeType: "application/json", temperature: 0.4 } });
+    const j = jsonAyikla(r.response.text());
+    if (!j.sorular?.length) throw new Error("Fotoğraflarda soru bulunamadı. Daha net bir fotoğraf dener misin?");
+    kocOturum(d, j.sorular.slice(0, 10));
+  } catch (e) { alan.innerHTML = `<div class="card err">${esc(aiHata(e))}</div>`; }
+  $("#kBasla").disabled = false;
+};
+
+function kocOturum(deneme, sorular) {
+  const alan = $("#kAlan");
+  $("#kocGiris").hidden = true;
+  const sonuc = sorular.map(() => ({ ilk: undefined, kontrol: [] }));
+  let i = 0, asama = "coz", k = 0;
+  const toplamAdim = sorular.reduce((a, q) => a + 2 + (q.kontrol?.length || 0), 0);
+  let yapilan = 0;
+
+  const secenekHtml = (q) => (q.secenekler || []).map((s, n) => `<button class="opt" data-k="${n}"><b>${"ABCD"[n]})</b> ${esc(s)}</button>`).join("");
+  const isaretle = (kutu, secim, dogru) => $$(".opt", kutu).forEach((o) => {
+    const n = +o.dataset.k; o.disabled = true;
+    o.classList.toggle("dogru", n === dogru); o.classList.toggle("yanlis", n === secim && n !== dogru);
+  });
+
+  function ciz() {
+    const q = sorular[i];
+    const bas = `<div class="card">
+      <div class="row" style="justify-content:space-between;margin:0"><b>Soru ${i + 1} / ${sorular.length}</b><span class="muted">${esc(q.ders || "")} · ${esc(q.konu || "")}</span></div>
+      <div class="ilerleme"><i style="width:${(yapilan / toplamAdim) * 100}%"></i></div>`;
+    if (asama === "coz") {
+      const sikVar = (q.secenekler || []).length === 4;
+      alan.innerHTML = `${bas}
+        <div class="adim">1. adım · Önce kendin tekrar çöz</div>
+        <div class="metin" style="white-space:pre-wrap;font-weight:600;margin-bottom:10px">${esc(q.soru)}</div>
+        ${sikVar ? secenekHtml(q) : `<p class="muted">Şıkları okuyamadım; soruyu kâğıdında tekrar çözmeyi dene.</p>`}
+        <div class="btnRow">
+          ${sikVar ? "" : `<button class="btn" id="kCozdum">Çözdüm, çözümü göster</button>`}
+          <button class="btn ghost" id="kBilmiyorum">Bilmiyorum, çözümü göster</button>
+          <button class="btn ghost" id="kTahta">${ic("pen")}Tahtada çöz</button>
+        </div></div>`;
+      $$(".opt", alan).forEach((o) => (o.onclick = () => {
+        const secim = +o.dataset.k; sonuc[i].ilk = secim === q.dogru;
+        isaretle(alan, secim, q.dogru);
+        setTimeout(() => { asama = "cozum"; yapilan++; ciz(); }, 700);
+      }));
+      $("#kBilmiyorum").onclick = () => { sonuc[i].ilk = null; asama = "cozum"; yapilan++; ciz(); };
+      if ($("#kCozdum")) $("#kCozdum").onclick = () => { sonuc[i].ilk = null; asama = "cozum"; yapilan++; ciz(); };
+      $("#kTahta").onclick = () => { wb.metinYaz(q.soru + "\n" + (q.secenekler || []).map((s, n) => `${"ABCD"[n]}) ${s}`).join("   ")); sekme("tahta"); };
+    } else if (asama === "cozum") {
+      const ilk = sonuc[i].ilk;
+      alan.innerHTML = `${bas}
+        <div class="adim">2. adım · Çözüm</div>
+        <p>${ilk === true ? `<span class="durum ok">${ic("check")}Bu sefer doğru çözdün.</span> Yine de çözümü bir oku, sonra kontrol sorusuna geçelim.` : ilk === false ? `<span class="durum no">${ic("x")}Yine yanlış.</span> Sorun değil, birlikte bakalım.` : "Birlikte bakalım."}</p>
+        ${(q.secenekler || []).length ? `<p><b>Doğru cevap: ${"ABCD"[q.dogru]}</b></p>` : ""}
+        <div class="aciklama">${md(q.cozum || "")}</div>
+        ${q.sikHata ? `<p><b>Sık yapılan hata:</b> ${esc(q.sikHata)}</p>` : ""}
+        <div class="btnRow">
+          <button class="btn" id="kTest">${ic("target")}Anladım, beni test et</button>
+          <button class="btn ghost" id="kAnlat">${ic("message")}Anlamadım, Soru Sor'da tekrar anlat</button>
+        </div></div>`;
+      $("#kTest").onclick = () => { asama = q.kontrol?.length ? "kontrol" : "sonraki"; k = 0; yapilan++; ilerle(); };
+      $("#kAnlat").onclick = () => sohbeteGonder(`Denememdeki şu soruyu anlamadım (${q.ders}, ${q.konu}):\n${q.soru}\n${(q.secenekler || []).map((s, n) => `${"ABCD"[n]}) ${s}`).join("\n")}\nDoğru cevap ${"ABCD"[q.dogru] || "?"}. Çözümü daha basit, adım adım anlatır mısın? Anlattıktan sonra anladığımı kontrol etmek için bana bir soru sor.`);
+    } else if (asama === "kontrol") {
+      const c = q.kontrol[k];
+      alan.innerHTML = `${bas}
+        <div class="adim">3. adım · Anladın mı? Kontrol sorusu ${k + 1} / ${q.kontrol.length}</div>
+        <div class="metin" style="white-space:pre-wrap;font-weight:600;margin-bottom:10px">${esc(c.soru)}</div>
+        ${secenekHtml(c)}
+        <div id="kGeri"></div></div>`;
+      $$(".opt", alan).forEach((o) => (o.onclick = () => {
+        const secim = +o.dataset.k, dogru = secim === c.dogru;
+        sonuc[i].kontrol[k] = dogru;
+        isaretle(alan, secim, c.dogru);
+        $("#kGeri").innerHTML = `<div class="aciklama">${durumEtiket(dogru)} ${dogru ? "Anlamışsın." : `Doğru cevap ${"ABCD"[c.dogru]}.`}<br>${md(c.aciklama || "")}</div>
+          <div class="btnRow"><button class="btn" id="kDevam">Devam${ic("arrow")}</button></div>`;
+        $("#kDevam").onclick = () => { k++; yapilan++; if (k >= q.kontrol.length) asama = "sonraki"; ilerle(); };
+      }));
+    }
+  }
+  function ilerle() {
+    if (asama === "sonraki") { i++; asama = "coz"; k = 0; }
+    if (i >= sorular.length) return rapor();
+    ciz();
+    alan.scrollIntoView({ behavior: "smooth", block: "start" });
+  }
+  async function rapor() {
+    const kayit = sorular.map((q, n) => {
+      const kd = sonuc[n].kontrol.filter(Boolean).length, kn = q.kontrol?.length || 0;
+      const durum = kn === 0 ? (sonuc[n].ilk ? "anladi" : "tekrar") : kd === kn ? "anladi" : kd > 0 ? "kismen" : "tekrar";
+      return { ders: q.ders || "", konu: q.konu || "", kazanim: q.kazanim || "", ilk: sonuc[n].ilk ?? null, kontrolD: kd, kontrolN: kn, durum };
+    });
+    const anladi = kayit.filter((x) => x.durum === "anladi").length;
+    alan.innerHTML = `<div class="card">
+      <h2>Koç raporu · ${esc(deneme.ad)}</h2>
+      <p>${sorular.length} sorudan <b>${anladi}</b> tanesinin konusunu anlamışsın.${anladi < sorular.length ? " Kalanları bu hafta tekrar etmeni öneririm." : " Harika iş."}</p>
+      <div class="tablo kocRapor"><table>
+        <thead><tr><th>Ders · Konu</th><th>Tekrar çözüm</th><th>Kontrol</th><th>Durum</th></tr></thead>
+        <tbody>${kayit.map((x) => `<tr><td>${esc(x.ders)} · ${esc(x.konu)}${x.kazanim ? `<br><small>${esc(x.kazanim)}</small>` : ""}</td>
+          <td>${x.ilk === true ? durumEtiket(true) : x.ilk === false ? durumEtiket(false) : `<span class="durum bos">Bilmiyorum</span>`}</td>
+          <td>${x.kontrolN ? `${x.kontrolD}/${x.kontrolN}` : "-"}</td>
+          <td><span class="etiket ${x.durum === "anladi" ? "ok" : "no"}">${DURUM_AD[x.durum]}</span></td></tr>`).join("")}</tbody>
+      </table></div>
+      <div class="btnRow">
+        ${anladi < sorular.length ? `<button class="btn" id="kEksik">${ic("message")}Anlamadıklarımı tekrar anlat</button>` : ""}
+        <button class="btn ghost" id="kYeni">${ic("plus")}Yeni kontrol</button>
+        <button class="btn ghost" id="kAnaliz">${ic("chart")}Analize dön</button>
+      </div></div>`;
+    try {
+      await store.guncelle(deneme.id, { kontrol: kayit, kontrolTarih: Date.now() });
+      deneme.kontrol = kayit; analizCiz();
+      toast("Koç raporu denemene kaydedildi.");
+    } catch (e) { toast("Rapor kaydedilemedi: " + (e.code || e.message)); }
+    if ($("#kEksik")) $("#kEksik").onclick = () => sohbeteGonder(`Denememin koç kontrolünde şu konuları anlamadığım çıktı: ${kayit.filter((x) => x.durum !== "anladi").map((x) => `${x.ders} - ${x.konu}`).join(", ")}. Her birini kısaca, örnekle anlat ve her birinden sonra anladığımı kontrol etmek için bana bir soru sor.`);
+    $("#kYeni").onclick = () => { kGorseller = []; thumbCiz($("#kThumbs"), kGorseller, kBtnDurum); alan.innerHTML = ""; $("#kocGiris").hidden = false; };
+    $("#kAnaliz").onclick = () => sekme("analiz");
+  }
+  ciz();
+}
+
+/* ------------------------------------------------------------------ */
 /* Fotoğraftan soru (quiz)                                             */
 /* ------------------------------------------------------------------ */
 let fGorseller = [];
 function thumbCiz(alan, dizi, yenile) {
-  alan.innerHTML = dizi.map((g, i) => `<div class="t"><img src="${g.dataUrl}" alt=""><button class="x" data-i="${i}">✕</button></div>`).join("");
+  alan.innerHTML = dizi.map((g, i) => `<div class="t"><img src="${g.dataUrl}" alt=""><button class="x" data-i="${i}" title="Kaldır">${ic("x")}</button></div>`).join("");
   $$(".x", alan).forEach((b) => (b.onclick = () => { dizi.splice(+b.dataset.i, 1); thumbCiz(alan, dizi, yenile); yenile?.(); }));
   yenile?.();
 }
@@ -536,7 +745,7 @@ function quizCiz(j) {
       <div class="metin">${esc(q.soru)}</div>
       ${(q.secenekler || []).map((s, k) => `<button class="opt" data-k="${k}"><b>${"ABCD"[k]})</b> ${esc(s)}</button>`).join("")}
       <div class="aciklama" hidden></div>
-      <button class="btn ghost sm tahtaya" style="margin-top:6px">✏️ Tahtada çöz</button>
+      <button class="btn ghost sm tahtaya" style="margin-top:6px">${ic("pen")}Tahtada çöz</button>
     </div>`).join("") +
     `<div class="card row" style="justify-content:space-between"><span class="muted">Tüm soruları işaretleyince bitir.</span><button class="btn" id="fBitir">Bitir ve kontrol et</button></div>
      <div id="fSonuc"></div>`;
@@ -557,11 +766,11 @@ function quizCiz(j) {
       $$(".opt", qe).forEach((o) => { const k = +o.dataset.k; o.classList.toggle("dogru", k === q.dogru); o.classList.toggle("yanlis", k === cevap[i] && k !== q.dogru); });
       if (cevap[i] == null) b++; else if (cevap[i] === q.dogru) d++; else y++;
       const a = $(".aciklama", qe); a.hidden = false;
-      a.innerHTML = `<b>${cevap[i] === q.dogru ? "✅ Doğru" : cevap[i] == null ? "⚪ Boş" : "❌ Yanlış"}</b> · Doğru cevap: ${"ABCD"[q.dogru]}<br>${md(q.aciklama || "")}`;
+      a.innerHTML = `${durumEtiket(cevap[i] == null ? null : cevap[i] === q.dogru)} · Doğru cevap: ${"ABCD"[q.dogru]}<br>${md(q.aciklama || "")}`;
     });
     $("#fBitir").disabled = true;
     $("#fSonuc").innerHTML = `<div class="card sonuc"><small>Sonuç</small><br><b>${d} D · ${y} Y · ${b} B</b><br><span class="muted">Net: ${f1(net(d, y))} / ${j.sorular.length}</span><br><br>
-      <button class="btn" id="fTekrar">Aynı konudan yeni sorular</button></div>`;
+      <button class="btn" id="fTekrar">${ic("refresh")}Aynı konudan yeni sorular</button></div>`;
     $("#fTekrar").onclick = () => $("#fBasla").click();
     $("#fSonuc").scrollIntoView({ behavior: "smooth" });
   };
@@ -588,7 +797,7 @@ $("#cFoto").onchange = async (e) => {
 };
 $("#cText").addEventListener("input", (e) => { e.target.style.height = "auto"; e.target.style.height = e.target.scrollHeight + "px"; });
 $("#cText").addEventListener("keydown", (e) => { if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); $("#cForm").requestSubmit(); } });
-$("#cYeni").onclick = () => { sohbet = null; cGorseller = []; thumbCiz($("#cThumbs"), cGorseller); cMsgs.innerHTML = ""; mesaj("bot", "Yeni sohbet başladı. Sorunu gönder! 🙂"); };
+$("#cYeni").onclick = () => { sohbet = null; cGorseller = []; thumbCiz($("#cThumbs"), cGorseller); cMsgs.innerHTML = ""; mesaj("bot", "Yeni sohbet başladı. Sorunu gönder."); };
 $$("#cHizli button").forEach((b) => (b.onclick = () => { $("#cText").value = b.dataset.q; $("#cForm").requestSubmit(); }));
 let gonderiliyor = false;
 $("#cForm").onsubmit = async (e) => {
@@ -671,7 +880,7 @@ const wb = (() => {
   }
   function cizgi(c, s, beyaz) {
     if (s.metin) {
-      c.fillStyle = beyaz ? "#1d2033" : css("--ink"); c.font = "600 16px Nunito, sans-serif";
+      c.fillStyle = beyaz ? "#1d2033" : css("--ink"); c.font = "500 16px Inter, sans-serif";
       let y = s.y;
       for (const par of s.metin.split("\n")) {
         let satir = "";
