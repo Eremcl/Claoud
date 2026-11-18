@@ -48,3 +48,13 @@
 .dokum summary{cursor:pointer;font-weight:600;color:var(--muted);font-size:14px}
 #dDokum p{margin:8px 0;font-size:14px}
 #dDokum b{color:var(--pri)}
+.kBtn.ara{background:var(--ok);color:#fff;border-color:var(--ok);min-width:140px}
+.kBtn.ara.acik{background:var(--bad);border-color:var(--bad)}
+.dersNot{text-align:center;font-size:13px;margin:6px 0 0}
+.dalga{display:flex;gap:5px;align-items:center;height:28px;margin-top:14px;opacity:0;transition:opacity .2s}
+.dalga i{width:5px;height:8px;border-radius:3px;background:#4ade80}
+.sahne.dinliyor .dalga{opacity:1}
+.sahne.dinliyor .dalga i{animation:dalga 1s infinite ease-in-out}
+.sahne.duyuyor .dalga i{animation-duration:.45s}
+.dalga i:nth-child(2){animation-delay:.12s}.dalga i:nth-child(3){animation-delay:.24s}.dalga i:nth-child(4){animation-delay:.36s}.dalga i:nth-child(5){animation-delay:.48s}
+@keyframes dalga{0%,100%{height:6px}50%{height:26px}}

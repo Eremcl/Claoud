@@ -1,35 +1,36 @@
-  <!-- ÖZEL DERS (görüntülü öğretmen) -->
+  <!-- ÖZEL DERS (canlı görüşme) -->
   <section id="t-ders" class="tab">
     <div class="ogretmenler" id="ogretmenler"></div>
     <div class="cagri" id="cagri">
       <div class="sahne" id="sahne">
         <div class="sahneUst">
           <span class="canli"><i></i><b id="sahneAd">Elif Hoca</b><small id="sahneBrans">Matematik</small></span>
-          <span class="sahneDurum" id="sahneDurum">Hazır</span>
+          <span class="sahneDurum" id="sahneDurum">Görüşme kapalı</span>
         </div>
         <div class="yuzKutu" id="yuzKutu"></div>
-        <div class="altyazi" id="altyazi">Bir soru sor ya da sorunun fotoğrafını göster. Mikrofona basıp konuşabilirsin.</div>
+        <div class="dalga" id="dalga" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i></div>
+        <div class="altyazi" id="altyazi" hidden></div>
         <div class="senKutu" id="senKutu" title="Sen"><span id="senHarf">Sen</span></div>
       </div>
       <div class="kontrol">
-        <button class="kBtn mik" id="dMik" title="Konuş"><svg class="ic"><use href="#i-mic"/></svg><span>Konuş</span></button>
-        <label class="kBtn" id="dFotoBtn" title="Soruyu kameraya göster"><svg class="ic"><use href="#i-camera"/></svg><span>Soruyu göster</span><input type="file" id="dDersFoto" accept="image/*" capture="environment" hidden></label>
-        <button class="kBtn" id="dTahta" title="Tahtayı göster"><svg class="ic"><use href="#i-pen"/></svg><span>Tahtayı göster</span></button>
-        <button class="kBtn dur" id="dDur" title="Sustur" disabled><svg class="ic"><use href="#i-square"/></svg><span>Sustur</span></button>
-        <button class="kBtn" id="dYeniDers" title="Yeni ders"><svg class="ic"><use href="#i-refresh"/></svg><span>Yeni ders</span></button>
+        <button class="kBtn ara" id="dAra"><svg class="ic"><use href="#i-phone"/></svg><span>Görüşmeyi başlat</span></button>
+        <label class="kBtn" title="Soruyu kameraya göster"><svg class="ic"><use href="#i-camera"/></svg><span>Soruyu göster</span><input type="file" id="dDersFoto" accept="image/*" capture="environment" hidden></label>
+        <button class="kBtn" id="dTahta"><svg class="ic"><use href="#i-pen"/></svg><span>Tahtayı göster</span></button>
+        <button class="kBtn dur" id="dDur" disabled><svg class="ic"><use href="#i-square"/></svg><span>Sözünü kes</span></button>
+        <button class="kBtn" id="dYeniDers"><svg class="ic"><use href="#i-refresh"/></svg><span>Yeni ders</span></button>
       </div>
-      <form class="composer" id="dForm">
-        <textarea id="dMetin" rows="1" placeholder="Yazarak da sorabilirsin…"></textarea>
-        <button class="btn" id="dGonder" title="Gönder"><svg class="ic"><use href="#i-send"/></svg></button>
-      </form>
+      <p class="muted dersNot" id="dSesNot"></p>
       <div class="dersAyar">
         <label class="inline">Adın<input id="dAdim" placeholder="İsteğe bağlı" maxlength="24"></label>
-        <label class="inline">Konuşma hızı<input type="range" id="dHiz" min="0.9" max="1.4" step="0.05" value="1.15"><output id="dHizDeger">1,15×</output></label>
-        <span class="muted" id="dSesNot"></span>
+        <label class="inline">Konuşma hızı<input type="range" id="dHiz" min="0.9" max="1.5" step="0.05" value="1.15"><output id="dHizDeger">1,15×</output></label>
+        <label class="inline"><input type="checkbox" id="dAltyazi" style="width:auto;margin:0"> Hocanın altyazısı</label>
       </div>
       <details class="dokum">
-        <summary>Dersin yazılı dökümü</summary>
-        <div id="dDokum"></div>
+        <summary>Mikrofon yoksa yazarak sor</summary>
+        <form class="composer" id="dForm">
+          <textarea id="dMetin" rows="1" placeholder="Sorunu yaz…"></textarea>
+          <button class="btn" id="dGonder" title="Gönder"><svg class="ic"><use href="#i-send"/></svg></button>
+        </form>
       </details>
     </div>
   </section>

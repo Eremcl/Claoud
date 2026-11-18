@@ -242,6 +242,16 @@ canvas#wb{width:100%;height:100%;display:block;cursor:crosshair}
 .dokum summary{cursor:pointer;font-weight:600;color:var(--muted);font-size:14px}
 #dDokum p{margin:8px 0;font-size:14px}
 #dDokum b{color:var(--pri)}
+.kBtn.ara{background:var(--ok);color:#fff;border-color:var(--ok);min-width:140px}
+.kBtn.ara.acik{background:var(--bad);border-color:var(--bad)}
+.dersNot{text-align:center;font-size:13px;margin:6px 0 0}
+.dalga{display:flex;gap:5px;align-items:center;height:28px;margin-top:14px;opacity:0;transition:opacity .2s}
+.dalga i{width:5px;height:8px;border-radius:3px;background:#4ade80}
+.sahne.dinliyor .dalga{opacity:1}
+.sahne.dinliyor .dalga i{animation:dalga 1s infinite ease-in-out}
+.sahne.duyuyor .dalga i{animation-duration:.45s}
+.dalga i:nth-child(2){animation-delay:.12s}.dalga i:nth-child(3){animation-delay:.24s}.dalga i:nth-child(4){animation-delay:.36s}.dalga i:nth-child(5){animation-delay:.48s}
+@keyframes dalga{0%,100%{height:6px}50%{height:26px}}
 
 .kayit{font-size:12px;color:var(--muted);border:1px solid var(--line);border-radius:999px;padding:4px 10px}
 .btn.onay,.tools>button.onay{background:var(--bad);color:#fff;border-color:var(--bad)}
@@ -275,6 +285,7 @@ button:focus-visible,select:focus-visible,.btn:focus-visible{outline:2px solid v
   <symbol id="i-refresh" viewBox="0 0 24 24"><path d="M21 12a9 9 0 1 1-3-6.7L21 8"/><path d="M21 3v5h-5"/></symbol>
   <symbol id="i-mic" viewBox="0 0 24 24"><path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><path d="M12 19v3"/></symbol>
   <symbol id="i-square" viewBox="0 0 24 24"><rect x="6" y="6" width="12" height="12" rx="2"/></symbol>
+  <symbol id="i-phone" viewBox="0 0 24 24"><path d="M22 16.9v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3.1 19.5 19.5 0 0 1-6-6A19.8 19.8 0 0 1 2.1 4.2 2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.7c.1 1 .4 1.9.7 2.8a2 2 0 0 1-.5 2.1L8 9.9a16 16 0 0 0 6 6l1.3-1.3a2 2 0 0 1 2.1-.4c.9.3 1.8.6 2.8.7a2 2 0 0 1 1.7 2z"/></symbol>
   <symbol id="i-video" viewBox="0 0 24 24"><path d="m22 8-6 4 6 4V8Z"/><rect x="2" y="6" width="14" height="12" rx="2"/></symbol>
   <symbol id="i-plus" viewBox="0 0 24 24"><path d="M12 5v14"/><path d="M5 12h14"/></symbol>
 </svg>
@@ -425,38 +436,39 @@ button:focus-visible,select:focus-visible,.btn:focus-visible{outline:2px solid v
       <div class="canvasWrap" id="wbWrap"><canvas id="wb"></canvas></div>
     </div>
   </section>
-  <!-- ÖZEL DERS (görüntülü öğretmen) -->
+  <!-- ÖZEL DERS (canlı görüşme) -->
   <section id="t-ders" class="tab">
     <div class="ogretmenler" id="ogretmenler"></div>
     <div class="cagri" id="cagri">
       <div class="sahne" id="sahne">
         <div class="sahneUst">
           <span class="canli"><i></i><b id="sahneAd">Elif Hoca</b><small id="sahneBrans">Matematik</small></span>
-          <span class="sahneDurum" id="sahneDurum">Hazır</span>
+          <span class="sahneDurum" id="sahneDurum">Görüşme kapalı</span>
         </div>
         <div class="yuzKutu" id="yuzKutu"></div>
-        <div class="altyazi" id="altyazi">Bir soru sor ya da sorunun fotoğrafını göster. Mikrofona basıp konuşabilirsin.</div>
+        <div class="dalga" id="dalga" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i></div>
+        <div class="altyazi" id="altyazi" hidden></div>
         <div class="senKutu" id="senKutu" title="Sen"><span id="senHarf">Sen</span></div>
       </div>
       <div class="kontrol">
-        <button class="kBtn mik" id="dMik" title="Konuş"><svg class="ic"><use href="#i-mic"/></svg><span>Konuş</span></button>
-        <label class="kBtn" id="dFotoBtn" title="Soruyu kameraya göster"><svg class="ic"><use href="#i-camera"/></svg><span>Soruyu göster</span><input type="file" id="dDersFoto" accept="image/*" capture="environment" hidden></label>
-        <button class="kBtn" id="dTahta" title="Tahtayı göster"><svg class="ic"><use href="#i-pen"/></svg><span>Tahtayı göster</span></button>
-        <button class="kBtn dur" id="dDur" title="Sustur" disabled><svg class="ic"><use href="#i-square"/></svg><span>Sustur</span></button>
-        <button class="kBtn" id="dYeniDers" title="Yeni ders"><svg class="ic"><use href="#i-refresh"/></svg><span>Yeni ders</span></button>
+        <button class="kBtn ara" id="dAra"><svg class="ic"><use href="#i-phone"/></svg><span>Görüşmeyi başlat</span></button>
+        <label class="kBtn" title="Soruyu kameraya göster"><svg class="ic"><use href="#i-camera"/></svg><span>Soruyu göster</span><input type="file" id="dDersFoto" accept="image/*" capture="environment" hidden></label>
+        <button class="kBtn" id="dTahta"><svg class="ic"><use href="#i-pen"/></svg><span>Tahtayı göster</span></button>
+        <button class="kBtn dur" id="dDur" disabled><svg class="ic"><use href="#i-square"/></svg><span>Sözünü kes</span></button>
+        <button class="kBtn" id="dYeniDers"><svg class="ic"><use href="#i-refresh"/></svg><span>Yeni ders</span></button>
       </div>
-      <form class="composer" id="dForm">
-        <textarea id="dMetin" rows="1" placeholder="Yazarak da sorabilirsin…"></textarea>
-        <button class="btn" id="dGonder" title="Gönder"><svg class="ic"><use href="#i-send"/></svg></button>
-      </form>
+      <p class="muted dersNot" id="dSesNot"></p>
       <div class="dersAyar">
         <label class="inline">Adın<input id="dAdim" placeholder="İsteğe bağlı" maxlength="24"></label>
-        <label class="inline">Konuşma hızı<input type="range" id="dHiz" min="0.9" max="1.4" step="0.05" value="1.15"><output id="dHizDeger">1,15×</output></label>
-        <span class="muted" id="dSesNot"></span>
+        <label class="inline">Konuşma hızı<input type="range" id="dHiz" min="0.9" max="1.5" step="0.05" value="1.15"><output id="dHizDeger">1,15×</output></label>
+        <label class="inline"><input type="checkbox" id="dAltyazi" style="width:auto;margin:0"> Hocanın altyazısı</label>
       </div>
       <details class="dokum">
-        <summary>Dersin yazılı dökümü</summary>
-        <div id="dDokum"></div>
+        <summary>Mikrofon yoksa yazarak sor</summary>
+        <form class="composer" id="dForm">
+          <textarea id="dMetin" rows="1" placeholder="Sorunu yaz…"></textarea>
+          <button class="btn" id="dGonder" title="Gönder"><svg class="ic"><use href="#i-send"/></svg></button>
+        </form>
       </details>
     </div>
   </section>
@@ -1434,193 +1446,253 @@ const ders = (() => {
   const kaydet = (k, v) => { try { localStorage.setItem("lgs-ders-" + k, v); } catch {} };
   const oku = (k) => { try { return localStorage.getItem("lgs-ders-" + k); } catch { return null; } };
   let secili = OGRETMENLER.find((o) => o.k === oku("ogr")) || OGRETMENLER[0];
-  const konusmalar = {}; // öğretmene göre sohbet turları
-  let TTS = null, DIK = null;
-  let ctl = null, mesgul = false, dinliyor = false, tampon = "", bekleyenGorsel = [];
+  const konusmalar = {};
+  let TTS = null, DIK = null, TANI = null; // Claude sesi, Claude dikte, tarayıcı ses tanıma
+  let ctl = null, mesgul = false, canli = false, tampon = "", sessizT = null, sonKonusma = 0;
   const sahne = $("#sahne");
+  const SS = window.speechSynthesis || null;
+  const hiz = () => +$("#dHiz").value;
 
-  function durum(t) { $("#sahneDurum").textContent = t; }
-  function altyazi(html) { const a = $("#altyazi"); a.innerHTML = html; a.scrollTop = a.scrollHeight; }
-  function dokumEkle(kim, metin) {
-    const p = document.createElement("p");
-    p.innerHTML = `<b>${esc(kim)}:</b> ${esc(metin)}`;
-    $("#dDokum").appendChild(p);
-  }
+  const durum = (t) => { $("#sahneDurum").textContent = t; };
+  const altyaziAcik = () => $("#dAltyazi").checked;
+  function altyazi(t) { const a = $("#altyazi"); a.hidden = !altyaziAcik() || !t; a.textContent = t || ""; a.scrollTop = a.scrollHeight; }
+  function not(t) { $("#dSesNot").textContent = t || ""; }
+
   function ogretmenCiz() {
     $("#ogretmenler").innerHTML = OGRETMENLER.map((o) => `<button class="ogr ${o.k === secili.k ? "on" : ""}" data-ogr="${o.k}">${yuzSvg(o, true)}<span><b>${o.ad}</b><small class="muted">${o.brans}</small></span></button>`).join("");
     $$("[data-ogr]").forEach((b) => (b.onclick = () => sec(b.dataset.ogr)));
   }
   function sec(k) {
-    if (mesgul) susmak();
+    if (mesgul || konusuyorMu()) sozunuKes();
     secili = OGRETMENLER.find((o) => o.k === k) || secili;
     kaydet("ogr", secili.k);
     ogretmenCiz();
     $("#yuzKutu").innerHTML = yuzSvg(secili);
     $("#sahneAd").textContent = secili.ad;
     $("#sahneBrans").textContent = secili.brans;
-    $("#dDokum").innerHTML = "";
-    for (const t of konusmalar[secili.k] || []) dokumEkle(t.role === "user" ? "Sen" : secili.ad, t.content);
-    altyazi(`Merhaba, ben ${esc(secili.ad)}. ${esc(secili.brans)} sorularında yanındayım. Takıldığın soruyu sor ya da kameraya göster.`);
+    altyazi("");
   }
 
   function istem() {
     const ad = ($("#dAdim").value || "").trim();
     return `Sen ${secili.ad}'sın; ${secili.brans} alanında uzman, LGS'ye hazırlanan 8. sınıf öğrencisine birebir özel ders veren bir öğretmensin. ${secili.kisilik}
-Şu an öğrenciyle görüntülü görüşmedesin ve yazdıkların sesli okunacak.${ad ? ` Öğrencinin adı ${ad}.` : ""}
+Şu an öğrenciyle CANLI sesli görüşmedesin: öğrenci konuşuyor, sen konuşuyorsun. Yazdıkların doğrudan sesli okunacak.${ad ? ` Öğrencinin adı ${ad}.` : ""}
 Kurallar:
-- Konuşur gibi yaz: kısa cümleler, en fazla 5-6 cümlelik bir konuşma. Uzun çözümü parça parça anlat; bir adımı anlattıktan sonra "Buraya kadar tamam mı?" gibi kısa bir soruyla bekle.
-- Madde işareti, numaralı liste, başlık, tablo, kalın yazı, emoji kullanma. Sadece düz paragraf.
-- Matematik ifadelerini okunacak şekilde yaz: "x kare", "üç bölü dört", "kök iki", "eksi beş".
-- Öğrenci fotoğraf ya da tahta görüntüsü gönderirse önce soruyu bir cümleyle özetle, sonra çözüme başla. Okuyamıyorsan bunu söyle.
-- Öğrenci anlamadığını söylerse başka bir yoldan, günlük hayattan bir örnekle anlat. Ara ara anladığını kontrol etmek için küçük bir soru sor.
-- Kendi branşın dışında bir soru gelirse de yardım et; gerekiyorsa bunun için diğer öğretmenleri (Elif Hoca matematik, Kerem Hoca fen, Zeynep Hoca Türkçe, Can Hoca inkılap, din ve İngilizce) önerebilirsin.
-- 8. sınıf müfredatına ve LGS tarzına uy. Emin olmadığın şeyi uydurma; cevabın doğru olduğundan emin ol.
-- Öğrenciyi cesaretlendir ama abartma.`;
+- Gerçek bir telefon görüşmesi gibi konuş: kısa, doğal cümleler; bir seferde en fazla 4-5 cümle. Uzun çözümü parça parça anlat ve her adımdan sonra "Buraya kadar tamam mı?" gibi kısa bir soruyla öğrencinin cevabını bekle.
+- Madde işareti, numara, başlık, tablo, parantez içi açıklama, kalın yazı, emoji kullanma. Sadece konuşma dili.
+- Matematik ifadelerini sesli okunacak şekilde yaz: "x kare", "üç bölü dört", "kök iki", "eksi beş", "yüzde yirmi".
+- Öğrencinin sözleri sesten yazıya çevrildiği için küçük yazım hataları olabilir; ne demek istediğini anlamaya çalış, anlamazsan kısaca tekrar sor.
+- Öğrenci fotoğraf ya da tahta görüntüsü gösterirse önce soruyu bir cümleyle özetle, sonra ilk adımla başla. Okuyamıyorsan söyle.
+- Öğrenci anlamadığını söylerse başka bir yoldan, günlük hayattan bir örnekle anlat. Ara ara küçük bir soruyla anladığını kontrol et.
+- Branşın dışındaki sorulara da yardım et.
+- 8. sınıf müfredatına ve LGS tarzına uy. Emin olmadığın şeyi uydurma.
+- Samimi ve cesaretlendirici ol, abartma.`;
   }
 
-  // Konuşma: metin geldikçe cümle cümle sese ver
-  let okunan = 0, sesHatasi = false;
+  /* ---------- Ses çıkışı ---------- */
+  // Canlı dinleme açıkken Claude sesi çalışmaz (mikrofonla çakışır), o zaman cihazın Türkçe sesi kullanılır.
+  let cihazSesleri = [];
+  function sesleriYukle() { if (SS) cihazSesleri = SS.getVoices().filter((v) => /^tr/i.test(v.lang)); }
+  if (SS) { sesleriYukle(); SS.addEventListener?.("voiceschanged", sesleriYukle); }
+  const PERDE = { elif: 1.08, kerem: 0.86, zeynep: 1.16, can: 0.95 };
+  let claudeSesKapali = false, cihazKuyruk = 0;
+  const motor = () => {
+    const dinlemeAcik = canli && DIK && DIK.active();
+    if (TTS && !claudeSesKapali && !dinlemeAcik) return "claude";
+    if (SS) return "cihaz";
+    return TTS && !claudeSesKapali ? "claude" : null;
+  };
+  const konusuyorMu = () => (SS && (SS.speaking || SS.pending || cihazKuyruk > 0)) || (TTS && TTS.active());
+  function konusmaBasladi() { sahne.classList.add("konusuyor"); sahne.classList.remove("dinliyor", "duyuyor"); durum("Anlatıyor"); $("#dDur").disabled = false; }
+  function konusmaBitti() {
+    if (konusuyorMu() || mesgul) return;
+    sahne.classList.remove("konusuyor"); sonKonusma = Date.now(); $("#dDur").disabled = true;
+    dinlemeyeDon();
+  }
+  function seslendir(parca) {
+    const m = motor();
+    if (!m) { sahne.classList.add("konusuyor"); return; }
+    if (m === "claude") {
+      TTS.add([{ text: parca.slice(0, 1900), voice: secili.ses, language: "tr" }], { rate: hiz() }).catch((e) => {
+        if (e?.code === "not_granted") { claudeSesKapali = true; not("Claude sesi kapalı; cihazın sesi kullanılıyor."); if (SS) seslendir(parca); }
+        else if (e?.code === "busy" && SS) seslendir(parca);
+        else if (e?.code === "rate_limited") not("Ses sınırına ulaşıldı; biraz bekleyip tekrar dene.");
+      });
+      return;
+    }
+    const u = new SpeechSynthesisUtterance(parca);
+    u.lang = "tr-TR";
+    const i = OGRETMENLER.indexOf(secili);
+    if (cihazSesleri.length) u.voice = cihazSesleri[i % cihazSesleri.length];
+    u.rate = hiz(); u.pitch = PERDE[secili.k] || 1;
+    cihazKuyruk++;
+    u.onstart = konusmaBasladi;
+    u.onend = u.onerror = () => { cihazKuyruk = Math.max(0, cihazKuyruk - 1); setTimeout(konusmaBitti, 50); };
+    SS.speak(u);
+  }
+  let okunan = 0;
   function sesVer(metin, son) {
-    if (!TTS || sesHatasi) return;
     const kalan = metin.slice(okunan);
     let kes = -1;
     if (son) kes = kalan.length;
-    else {
-      const re = /[.!?…](?=\s)|\n/g; let m;
-      while ((m = re.exec(kalan))) if (m.index + 1 >= 70) { kes = m.index + 1; break; }
-    }
+    else { const re = /[.!?…](?=\s)|\n/g; let m; while ((m = re.exec(kalan))) if (m.index + 1 >= 60) { kes = m.index + 1; break; } }
     if (kes <= 0) return;
-    const parca = kalan.slice(0, kes).replace(/[*_#`>]/g, "").trim();
+    const parca = kalan.slice(0, kes).replace(/[*_#`>()]/g, "").trim();
     okunan += kes;
-    if (!parca) return;
-    TTS.add([{ text: parca.slice(0, 1900), voice: secili.ses, language: "tr" }], { rate: +$("#dHiz").value }).catch((e) => {
-      if (e?.code === "not_granted" || e?.code === "unavailable") { sesHatasi = true; $("#dSesNot").textContent = "Sesli okuma kapalı; cevaplar altyazı olarak görünüyor."; }
-      else if (e?.code === "rate_limited") $("#dSesNot").textContent = "Sesli okuma sınırına ulaşıldı; bir süre altyazıyla devam ediliyor.";
-    });
+    if (parca) seslendir(parca);
   }
+  function sesiDurdur() { try { SS?.cancel(); } catch {} cihazKuyruk = 0; TTS?.stop().catch(() => {}); }
 
+  /* ---------- Yapay zekâ ---------- */
   async function gonder(metin, gorseller = []) {
     if (!aiHazirMi() || mesgul) return;
     if (!metin && !gorseller.length) return;
-    mesgul = true; $("#dDur").disabled = false; $("#dGonder").disabled = true;
-    try { await TTS?.stop(); } catch {}
-    okunan = 0;
+    mesgul = true; $("#dDur").disabled = false;
+    sesiDurdur(); okunan = 0;
     const turlar = konusmalar[secili.k] || (konusmalar[secili.k] = []);
-    const icerik = (gorseller.length ? `(Sana ${gorseller.length === 1 ? "bir fotoğraf" : gorseller.length + " fotoğraf"} gösteriyorum.) ` : "") + (metin || "Bu soruyu bana anlatır mısın?");
-    dokumEkle("Sen", icerik);
+    const icerik = (gorseller.length ? "(Sana bir fotoğraf gösteriyorum.) " : "") + (metin || "Bu soruyu bana anlatır mısın?");
     if (gorseller[0]) $("#senKutu").innerHTML = `<img src="${gorseller[gorseller.length - 1].dataUrl}" alt="Gösterdiğin fotoğraf">`;
-    altyazi(`<span class="ben">${esc(icerik)}</span>`);
-    sahne.classList.add("dusunuyor"); durum("Düşünüyor…");
+    sahne.classList.remove("dinliyor", "duyuyor"); sahne.classList.add("dusunuyor"); durum("Düşünüyor…");
     ctl = new AbortController();
-    const giris = [{ role: "user", content: istem() + "\n\nDers başlıyor." }, ...turlar.slice(-16), { role: "user", content: icerik }];
-    let son = "";
+    const giris = [{ role: "user", content: istem() + "\n\nGörüşme başladı." }, ...turlar.slice(-16), { role: "user", content: icerik }];
     try {
       const r = await SAMPLE(giris, {
-        images: gorselSinir(gorseller), cache: false, signal: ctl.signal,
-        onText: ({ text }) => {
-          son = text;
-          sahne.classList.remove("dusunuyor");
-          if (!TTS || sesHatasi) { sahne.classList.add("konusuyor"); durum("Anlatıyor"); }
-          altyazi(esc(text.replace(/[*_#`]/g, "")).replace(/\n/g, "<br>"));
-          sesVer(text, false);
-        },
+        images: gorselSinir(gorseller), cache: false, signal: ctl.signal, modelTier: gorseller.length ? "default" : "quick",
+        onText: ({ text }) => { sahne.classList.remove("dusunuyor"); altyazi(text.replace(/[*_#`]/g, "")); sesVer(text, false); },
       });
-      son = r.text;
-      sesVer(son, true);
-      turlar.push({ role: "user", content: icerik }, { role: "assistant", content: son });
-      dokumEkle(secili.ad, son);
+      sesVer(r.text, true);
+      turlar.push({ role: "user", content: icerik }, { role: "assistant", content: r.text });
     } catch (e) {
-      if (e?.code !== "cancelled") altyazi(esc(aiHata(e)));
-      if (e?.text) { turlar.push({ role: "user", content: icerik }, { role: "assistant", content: e.text }); dokumEkle(secili.ad, e.text); }
+      if (e?.code !== "cancelled") { const h = aiHata(e); altyazi(h); not(h); }
+      if (e?.text) turlar.push({ role: "user", content: icerik }, { role: "assistant", content: e.text });
     } finally {
-      mesgul = false; ctl = null; $("#dGonder").disabled = false;
+      mesgul = false; ctl = null;
       sahne.classList.remove("dusunuyor");
-      if (!TTS || sesHatasi) { setTimeout(() => sahne.classList.remove("konusuyor"), 600); durum("Dinliyor"); $("#dDur").disabled = true; }
+      if (!motor()) setTimeout(() => sahne.classList.remove("konusuyor"), 1500);
+      setTimeout(konusmaBitti, 300);
     }
   }
-  function susmak() {
-    ctl?.abort();
-    TTS?.stop().catch(() => {});
-    sahne.classList.remove("konusuyor", "dusunuyor");
-    durum("Hazır"); $("#dDur").disabled = true;
+  function sozunuKes() { ctl?.abort(); sesiDurdur(); sahne.classList.remove("konusuyor", "dusunuyor"); mesgul = false; setTimeout(konusmaBitti, 100); }
+
+  /* ---------- Canlı dinleme ---------- */
+  function duydum(metin, kesin) {
+    if (!canli || mesgul || konusuyorMu() || Date.now() - sonKonusma < 500) { if (kesin) tampon = ""; return; } // hocanın kendi sesini duymasın
+    sahne.classList.add("duyuyor");
+    if (kesin) tampon = (tampon + " " + metin).trim();
+    clearTimeout(sessizT);
+    sessizT = setTimeout(() => {
+      sahne.classList.remove("duyuyor");
+      const m = tampon.trim(); tampon = "";
+      if (m.length > 1) gonder(m);
+    }, kesin ? 1300 : 1900);
+  }
+  function dinlemeyeDon() {
+    if (!canli || mesgul) return;
+    if (DIK) {
+      if (DIK.active()) { sahne.classList.add("dinliyor"); durum("Seni dinliyor"); }
+      else { durum("Konuşmak için yeşil düğmeye dokun"); $("#dAra").querySelector("span").textContent = "Konuşmaya devam"; }
+      return;
+    }
+    if (TANI) { try { TANI.start(); } catch {} sahne.classList.add("dinliyor"); durum("Seni dinliyor"); }
+  }
+  function araYaz() {
+    $("#dAra").classList.toggle("acik", canli);
+    $("#dAra").querySelector("span").textContent = canli ? "Görüşmeyi bitir" : "Görüşmeyi başlat";
+  }
+  function bitir() {
+    canli = false; araYaz(); clearTimeout(sessizT); tampon = "";
+    DIK?.stop().catch(() => {}); try { TANI?.abort(); } catch {}
+    sozunuKes(); sahne.classList.remove("dinliyor", "duyuyor"); durum("Görüşme kapalı");
+  }
+  function tarayiciTanima() {
+    const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+    if (!SR) return null;
+    const r = new SR(); r.lang = "tr-TR"; r.continuous = true; r.interimResults = true;
+    r.onresult = (e) => { for (let i = e.resultIndex; i < e.results.length; i++) duydum(e.results[i][0].transcript, e.results[i].isFinal); };
+    r.onerror = (e) => {
+      if (e.error === "not-allowed" || e.error === "service-not-allowed") { TANI = null; bitir(); not("Bu görünümde mikrofon açılamıyor. Bilgisayarda Chrome ile aç ya da Claude uygulamasının sesli modunu kullan."); }
+    };
+    r.onend = () => { if (canli && !mesgul && !konusuyorMu()) { try { r.start(); } catch {} } };
+    return r;
   }
 
-  // Mikrofon
-  $("#dMik").onclick = () => {
-    if (!DIK) { toast("Sesle konuşma bu tarayıcıda yok. Bilgisayarda Chrome ile aç ya da yazarak sor."); $("#dMetin").focus(); return; }
-    if (dinliyor) { DIK.stop().catch(() => {}); return; }
-    if (TTS?.active()) TTS.stop().catch(() => {});
-    tampon = "";
-    const dilli = oku("dil") !== "yok";
-    DIK.start(dilli ? { language: "tr" } : undefined).catch((e) => {
-      if (e?.code === "unavailable" && dilli) { kaydet("dil", "yok"); toast("Türkçe ses tanıma açılamadı; bir daha bas, tarayıcının diliyle deneyelim."); }
-      else if (e?.code === "not_granted") toast("Mikrofon izni verilmedi. Sayfanın izin menüsünden açabilirsin.");
-      else if (e?.code !== "stopped" && e?.code !== "dismissed") toast("Mikrofon açılamadı. Yazarak sorabilirsin.");
-    });
+  $("#dAra").onclick = () => {
+    if (canli && !(DIK && !DIK.active())) { bitir(); return; }
+    if (!aiHazirMi()) return;
+    // Mikrofon dokunuşun içinde, beklemeden açılmalı
+    if (DIK) {
+      canli = true; araYaz(); sesiDurdur();
+      const dilli = oku("dil") !== "yok";
+      DIK.start(dilli ? { language: "tr" } : undefined).catch((e) => {
+        if (e?.code === "unavailable" && dilli) { kaydet("dil", "yok"); not("Türkçe ses tanıma açılamadı; düğmeye bir daha bas."); }
+        else if (e?.code === "not_granted") not("Mikrofon izni verilmedi. Sayfanın izin menüsünden açabilirsin.");
+        else if (e?.code !== "stopped" && e?.code !== "dismissed") not("Mikrofon açılamadı.");
+        if (!DIK.active()) bitir();
+      });
+      if (!mesgul) { const ilk = (konusmalar[secili.k] || []).length === 0; if (ilk) selamla(); }
+      return;
+    }
+    TANI = TANI || tarayiciTanima();
+    if (!TANI) { not("Bu cihazda canlı konuşma için mikrofon kullanılamıyor. Bilgisayarda Chrome ile açarsan çalışır; telefonda Claude uygulamasının sesli modunu kullanabilirsin."); return; }
+    canli = true; araYaz();
+    try { TANI.start(); } catch {}
+    if ((konusmalar[secili.k] || []).length === 0) selamla(); else dinlemeyeDon();
   };
-  $("#dDur").onclick = susmak;
-  $("#dYeniDers").onclick = () => { susmak(); konusmalar[secili.k] = []; $("#dDokum").innerHTML = ""; $("#senKutu").innerHTML = `<span>Sen</span>`; sec(secili.k); };
-  $("#dForm").onsubmit = (e) => {
-    e.preventDefault();
-    const m = $("#dMetin").value.trim(); if (!m) return;
-    $("#dMetin").value = ""; gonder(m, bekleyenGorsel.splice(0));
-  };
+  function selamla() {
+    const ad = ($("#dAdim").value || "").trim();
+    const t = `Merhaba${ad ? " " + ad : ""}, ben ${secili.ad}. Hangi soruda takıldın? Anlatabilirsin ya da sorunun fotoğrafını gösterebilirsin.`;
+    altyazi(t); okunan = 0; sesVer(t, true);
+    (konusmalar[secili.k] = konusmalar[secili.k] || []).push({ role: "user", content: "Merhaba hocam." }, { role: "assistant", content: t });
+    if (!motor()) setTimeout(() => { sahne.classList.remove("konusuyor"); dinlemeyeDon(); }, 2500);
+  }
+
+  $("#dDur").onclick = sozunuKes;
+  $("#dYeniDers").onclick = () => { sozunuKes(); konusmalar[secili.k] = []; $("#senKutu").innerHTML = `<span>Sen</span>`; altyazi(""); if (canli) selamla(); };
+  $("#dForm").onsubmit = (e) => { e.preventDefault(); const m = $("#dMetin").value.trim(); if (!m) return; $("#dMetin").value = ""; gonder(m); };
   $("#dMetin").addEventListener("keydown", (e) => { if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); $("#dForm").requestSubmit(); } });
   $("#dDersFoto").onchange = async (e) => {
     const f = e.target.files[0]; e.target.value = ""; if (!f) return;
-    try { const g = await gorselHazirla(f); gonder($("#dMetin").value.trim() || "Bu soruyu bana anlatır mısın?", [g]); $("#dMetin").value = ""; }
-    catch { toast("Fotoğraf açılamadı."); }
+    try { const g = await gorselHazirla(f); gonder("Bu soruyu bana anlatır mısın?", [g]); } catch { toast("Fotoğraf açılamadı."); }
   };
   $("#dTahta").onclick = () => {
     if (wb.bosMu()) { toast("Tahta boş. Önce Tahta bölümünde çözümünü yaz."); return; }
     const dataUrl = wb.png();
-    gonder($("#dMetin").value.trim() || "Tahtaya yazdığım çözüme bakar mısın? Hatam varsa nerede?", [{ dataUrl, blob: dataUrlBlob(dataUrl) }]);
-    $("#dMetin").value = "";
+    gonder("Tahtaya yazdığım çözüme bakar mısın? Hatam varsa nerede?", [{ dataUrl, blob: dataUrlBlob(dataUrl) }]);
   };
-  const hizYaz = () => { $("#dHizDeger").textContent = (+$("#dHiz").value).toLocaleString("tr-TR", { minimumFractionDigits: 2 }) + "×"; };
-  $("#dHiz").oninput = () => { hizYaz(); kaydet("hiz", $("#dHiz").value); TTS?.setRate?.(+$("#dHiz").value).catch?.(() => {}); };
+  const hizYaz = () => { $("#dHizDeger").textContent = hiz().toLocaleString("tr-TR", { minimumFractionDigits: 2 }) + "×"; };
+  $("#dHiz").oninput = () => { hizYaz(); kaydet("hiz", $("#dHiz").value); TTS?.setRate?.(hiz())?.catch?.(() => {}); };
   $("#dAdim").oninput = () => { kaydet("ad", $("#dAdim").value); $("#senHarf") && ($("#senHarf").textContent = $("#dAdim").value.trim() || "Sen"); };
+  $("#dAltyazi").onchange = () => { kaydet("altyazi", $("#dAltyazi").checked ? "1" : "0"); $("#altyazi").hidden = !$("#dAltyazi").checked || !$("#altyazi").textContent; };
 
   async function baslat() {
     $("#dAdim").value = oku("ad") || "";
+    if ($("#senHarf")) $("#senHarf").textContent = $("#dAdim").value.trim() || "Sen";
     $("#dHiz").value = oku("hiz") || "1.15"; hizYaz();
     sec(secili.k);
     const use = (n) => (window.claude?.use ? window.claude.use(n).catch(() => null) : Promise.resolve(null));
     [TTS, DIK] = await Promise.all([use("tts"), use("dictation")]);
-    const notlar = [];
-    if (!TTS) notlar.push("sesli anlatım");
-    if (!DIK) notlar.push("mikrofonla konuşma");
-    $("#dSesNot").textContent = notlar.length ? `Bu tarayıcıda ${notlar.join(" ve ")} yok; bilgisayarda Chrome ile açarsan çalışır.` : "";
+    const sesVar = !!(TTS || SS), mikVar = !!(DIK || window.SpeechRecognition || window.webkitSpeechRecognition);
+    $("#dAltyazi").checked = oku("altyazi") ? oku("altyazi") === "1" : !sesVar;
+    if (!sesVar && !mikVar) not("Bu cihazda ses ve mikrofon kullanılamıyor. Bilgisayarda Chrome ile açarsan canlı konuşabilirsin.");
+    else if (!mikVar) not("Bu cihazda mikrofon kullanılamıyor; hoca sesli anlatır, sen aşağıdan yazarak sorabilirsin.");
+    else not("Görüşmeyi başlat'a bas ve konuşmaya başla. Sustuğunda hoca cevap verir. Kulaklık kullanırsan daha iyi duyar.");
     if (TTS) {
-      TTS.setRate?.(+$("#dHiz").value).catch?.(() => {});
-      TTS.onState(({ state }) => {
-        const k = state === "speaking" || state === "starting";
-        sahne.classList.toggle("konusuyor", state === "speaking");
-        if (k) { durum("Anlatıyor"); $("#dDur").disabled = false; }
-        else if (state === "idle" && !mesgul) { durum("Dinliyor"); $("#dDur").disabled = true; }
+      TTS.setRate?.(hiz())?.catch?.(() => {});
+      TTS.onState(({ state, reason }) => {
+        if (state === "speaking" || state === "starting") konusmaBasladi();
+        if (state === "idle") { if (reason === "not_granted" || reason === "unavailable") claudeSesKapali = true; setTimeout(konusmaBitti, 50); }
       });
     }
     if (DIK) {
-      DIK.onPartial(({ text }) => { if (dinliyor) altyazi(`<span class="ben">${esc((tampon + " " + text).trim())}</span>`); });
-      DIK.onFinal(({ text }) => { tampon = (tampon + text).trim(); altyazi(`<span class="ben">${esc(tampon)}</span>`); });
-      DIK.onState(({ state, reason }) => {
-        dinliyor = state === "listening" || state === "starting";
-        $("#dMik").classList.toggle("acik", state !== "idle");
-        $("#dMik").querySelector("span").textContent = state === "idle" ? "Konuş" : "Bitir";
-        sahne.classList.toggle("dinliyor", state === "listening");
-        if (state === "listening") durum("Seni dinliyor");
-        if (state === "idle") {
-          const m = tampon.trim(); tampon = "";
-          if (m && reason !== "hidden") gonder(m, bekleyenGorsel.splice(0));
-          else if (!mesgul) durum("Hazır");
-        }
+      DIK.onPartial(({ text }) => { if (text) duydum(text, false); });
+      DIK.onFinal(({ text }) => duydum(text, true));
+      DIK.onState(({ state }) => {
+        if (state === "listening") { sahne.classList.add("dinliyor"); if (!mesgul && !konusuyorMu()) durum("Seni dinliyor"); araYaz(); }
+        if (state === "idle") { sahne.classList.remove("dinliyor", "duyuyor"); if (canli) dinlemeyeDon(); }
       });
     }
   }
-  function ac(metin) {
-    sekme("ders");
-    if (metin) gonder(metin);
-  }
+  function ac(metin) { sekme("ders"); if (metin) gonder(metin); }
   return { baslat, ac };
 })();
 
