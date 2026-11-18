@@ -1,3 +1,5 @@
+> **Yeni: LGS Koçu** (`lgs-koc/`). Firebase ile yayınlanan web uygulaması: 2027 tahmini puanla deneme analizi, fotoğraftan soru üretme, fotoğrafla soru sorma (adım adım çözüm) ve tahta. Kurulum için `lgs-koc/README.md` dosyasına bak.
+
 # LGS Masası
 
 > **Yeni: Matematik Savaşı** (`matematik-savasi.html`). Matematik öğreten, 2.5D, sevimli çizimli bir savaş oyunu. Tek dosyadır, tarayıcıda açman yeterli.

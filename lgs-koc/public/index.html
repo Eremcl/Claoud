@@ -1,0 +1,141 @@
+<!doctype html>
+<html lang="tr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>LGS Koçu</title>
+<meta name="theme-color" content="#4f46e5">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<header class="top">
+  <div class="brand"><span class="logo">L</span><div><b>LGS Koçu</b><small>2027 puan hesabı · analiz · soru çözümü</small></div></div>
+  <div class="who" id="who"></div>
+</header>
+
+<div class="banner" id="banner" hidden></div>
+
+<nav class="tabs" id="tabs">
+  <button data-tab="analiz" class="on">📊 Analiz</button>
+  <button data-tab="deneme">📝 Deneme Ekle</button>
+  <button data-tab="foto">📸 Fotoğraftan Soru</button>
+  <button data-tab="sor">💬 Soru Sor</button>
+  <button data-tab="tahta">✏️ Tahta</button>
+</nav>
+
+<main>
+  <!-- ANALİZ -->
+  <section id="t-analiz" class="tab on">
+    <div id="analizIcerik"></div>
+  </section>
+
+  <!-- DENEME EKLE -->
+  <section id="t-deneme" class="tab">
+    <div class="card">
+      <h2>Yeni deneme</h2>
+      <div class="grid3">
+        <label>Deneme adı<input id="dAd" placeholder="Örn. Türkiye Geneli 3"></label>
+        <label>Yayın<input id="dYayin" placeholder="Örn. X Yayınları"></label>
+        <label>Tarih<input id="dTarih" type="date"></label>
+      </div>
+      <div class="fotoOku">
+        <label class="btn ghost">📷 Sonuç kâğıdından doldur
+          <input type="file" id="dFoto" accept="image/*" capture="environment" hidden>
+        </label>
+        <span class="muted" id="dFotoDurum">Sonuç kâğıdının fotoğrafını çekersen doğru/yanlış sayıları otomatik doldurulur.</span>
+      </div>
+      <div class="tablo">
+        <table id="dTablo">
+          <thead><tr><th>Ders</th><th>Soru</th><th>Doğru</th><th>Yanlış</th><th>Boş</th><th>Net</th></tr></thead>
+          <tbody></tbody>
+          <tfoot><tr><th colspan="5">Toplam net</th><th id="dToplamNet">0</th></tr></tfoot>
+        </table>
+      </div>
+      <label>Yanlış yaptığın / boş bıraktığın konular (isteğe bağlı)
+        <textarea id="dKonular" rows="3" placeholder="Örn. Mat: üslü ifadeler, olasılık · Fen: basınç · Türkçe: sözel mantık"></textarea>
+      </label>
+      <div class="puanKutu">
+        <div><small>Tahmini 2027 LGS puanı</small><b id="dPuan">—</b></div>
+        <button class="btn" id="dKaydet">Denemeyi kaydet</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- FOTOĞRAFTAN SORU -->
+  <section id="t-foto" class="tab">
+    <div class="card">
+      <h2>Fotoğraftan sana soru sorayım</h2>
+      <p class="muted">Yanlış yaptığın soruların, defterinin ya da konu anlatımının fotoğrafını çek. Fotoğraftaki konulara benzer, LGS tarzı yeni sorular hazırlarım.</p>
+      <div class="row">
+        <label class="btn ghost">📷 Fotoğraf çek / seç
+          <input type="file" id="fFoto" accept="image/*" multiple hidden>
+        </label>
+        <label class="inline">Soru sayısı
+          <select id="fSayi"><option>3</option><option selected>5</option><option>10</option></select>
+        </label>
+        <label class="inline">Zorluk
+          <select id="fZor"><option>Kolay</option><option selected>Orta</option><option>Zor (LGS üstü)</option></select>
+        </label>
+      </div>
+      <div class="thumbs" id="fThumbs"></div>
+      <button class="btn" id="fBasla" disabled>Soruları hazırla</button>
+    </div>
+    <div id="fQuiz"></div>
+  </section>
+
+  <!-- SORU SOR (Kunduz gibi) -->
+  <section id="t-sor" class="tab">
+    <div class="card chat">
+      <div class="chatHead">
+        <h2>Soru Sor</h2>
+        <button class="btn ghost sm" id="cYeni">Yeni sohbet</button>
+      </div>
+      <div class="msgs" id="cMsgs">
+        <div class="msg bot"><div class="bubble">Merhaba! Takıldığın sorunun fotoğrafını çek ya da yaz. Adım adım çözer, anlamadığın yeri tekrar anlatırım. 🙂</div></div>
+      </div>
+      <div class="thumbs" id="cThumbs"></div>
+      <form class="composer" id="cForm">
+        <label class="iconBtn" title="Fotoğraf ekle">📷<input type="file" id="cFoto" accept="image/*" multiple hidden></label>
+        <textarea id="cText" rows="1" placeholder="Sorunu yaz ya da fotoğraf ekle…"></textarea>
+        <button class="btn" id="cGonder">Gönder</button>
+      </form>
+      <div class="hizli" id="cHizli">
+        <button data-q="Bunu daha basit anlat.">Daha basit anlat</button>
+        <button data-q="Bu konuyla ilgili benzer bir LGS sorusu sor, cevabını hemen söyleme.">Benzer soru sor</button>
+        <button data-q="Bu sorudaki püf noktası ve sık yapılan hata nedir?">Püf noktası</button>
+        <button data-q="Bu konunun kısa bir özetini çıkar.">Konu özeti</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- TAHTA -->
+  <section id="t-tahta" class="tab">
+    <div class="card board">
+      <div class="tools" id="wbTools">
+        <button data-tool="pen" class="on" title="Kalem">✏️</button>
+        <button data-tool="hl" title="Fosforlu">🖍️</button>
+        <button data-tool="eraser" title="Silgi">🧽</button>
+        <span class="sep"></span>
+        <span class="colors" id="wbColors"></span>
+        <span class="sep"></span>
+        <select id="wbSize" title="Kalınlık"><option value="2">İnce</option><option value="4" selected>Orta</option><option value="8">Kalın</option></select>
+        <select id="wbBg" title="Zemin"><option value="kare">Kareli</option><option value="cizgi">Çizgili</option><option value="duz">Düz</option></select>
+        <span class="sep"></span>
+        <button id="wbUndo" title="Geri al">↶</button>
+        <button id="wbRedo" title="Yinele">↷</button>
+        <button id="wbClear" title="Temizle">🗑️</button>
+        <label class="btnTool" title="Fotoğrafı tahtaya koy">🖼️<input type="file" id="wbImg" accept="image/*" hidden></label>
+        <span class="grow"></span>
+        <button class="btn sm" id="wbSor">Tahtayı Soru Sor'a gönder</button>
+      </div>
+      <div class="canvasWrap" id="wbWrap"><canvas id="wb"></canvas></div>
+    </div>
+  </section>
+</main>
+
+<div class="toast" id="toast"></div>
+<script type="module" src="app.js"></script>
+</body>
+</html>
